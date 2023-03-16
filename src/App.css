@@ -7,45 +7,49 @@
 } */
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 
-*{
-  font-family: 'Poppins', sans-serif ;
+* {
+  font-family: 'Poppins', sans-serif;
 }
-.login{
+
+.login {
   background-color: #f5f7ff
 }
 
-.forgot-password{
+.forgot-password {
   background-color: #f5f7ff
 }
 
-.navlink{
+.navlink {
   padding: 0px;
   margin: 0px;
   box-sizing: border-box;
 }
 
-.listItem .navlink{
+.listItem .navlink {
   text-decoration: none;
   color: black;
   width: 100%;
 }
-.listItem .navlink:hover{
+
+.listItem .navlink:hover {
   text-decoration: none;
   color: black;
   background-color: #c8d1f4;
   width: 100%;
 }
-.listItem .navlink.active
-{
+
+.listItem .navlink.active {
   text-decoration: none;
   color: black;
   background-color: #c8d1f4;
   width: 100%;
   border-right: 5px solid #6883ed;
 }
-.content-bg{
+
+.content-bg {
   background-color: #e7edff;
   height: 100%;
+  min-height: 100vh;
 }
 
 .selectElement {
@@ -53,16 +57,17 @@
   border-radius: 7px;
 }
 
-.search-card *{
+.search-card * {
   display: "flex";
   justify-content: "space-between";
 }
 
-.page-title{
+.page-title {
   /* line-height: 14px; */
   font-style: normal;
   font-size: 40px
 }
+
 .ant-select-selector {
   width: 100% !important;
   height: 37px !important;
@@ -72,9 +77,10 @@
 
 .gm-style-cc,
 .gm-svpc,
-.gm-svpc{
+.gm-svpc {
   display: none;
 }
+
 /* 
 iframe div .gmnoprint{
   display: absolute !important;
@@ -82,17 +88,17 @@ iframe div .gmnoprint{
   right: 100px !important;
 } */
 
-.box{
+.box {
   width: 150px;
   height: 250px;
   background-color: white;
   position: absolute;
-  right:7px;
+  right: 7px;
   top: 230px;
   overflow: hidden;
 }
 
-.profile-icon{
-  position:absolute;
+.profile-icon {
+  position: absolute;
   right: 20px;
 }

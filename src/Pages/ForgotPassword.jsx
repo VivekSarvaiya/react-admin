@@ -1,17 +1,25 @@
 import React, { useState } from "react";
 import { Card, Row, Col, Form, Input, Button, message } from "antd";
 import { MailOutlined } from "@ant-design/icons";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function ForgotPassword(props) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-
+  const nav = useNavigate();
   const onSend = (values) => {
+    console.log(values);
     setLoading(true);
-    setTimeout(() => {
+    axios.post(`http://127.0.0.1:8000/api/admin/forgot_password/`, values).then((res) => {
+      console.log(res);
       setLoading(false);
-      message.success("New password has send to your email!");
-    }, 1500);
+      message.success("A Email has been sent to your email address !", 2);
+    }).catch((err) => {
+      console.log(err);
+      setLoading(false)
+      message.error(err.message);
+    })
   };
   return (
     <section className="forgot-password">
@@ -34,23 +42,20 @@ function ForgotPassword(props) {
                       onFinish={onSend}
                     >
                       <Form.Item
-                        name="email"
+                        name="username"
                         rules={[
                           {
                             required: true,
-                            message: "Please input your email address",
-                          },
-                          {
-                            type: "email",
-                            message: "Please enter a validate email!",
+                            message: "Please input your username or email address",
                           },
                         ]}
                       >
                         <Input
-                          placeholder="Email Address"
+                          placeholder=" Enter username or email address"
                           prefix={<MailOutlined className="text-primary" />}
                         />
                       </Form.Item>
+                      <br />
                       <Form.Item>
                         <Button
                           loading={loading}

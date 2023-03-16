@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import MOCK_DATA from "../Components/MOCK_DATA.json";
@@ -30,6 +30,7 @@ import moment from "moment/moment";
 import { AddCircleOutlineOutlined, Block } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
+import axios from "axios";
 // import axios from "axios";
 const { confirm } = Modal;
 const { Option } = Select;
@@ -43,6 +44,7 @@ function Staff() {
   const [openAdd, setOpenAdd] = useState(false);
   const [open1, setOpen1] = useState(false);
   const [row, setRow] = useState(null);
+  const [data, setData] = useState([]);
   // const [form] = Form.useForm();
 
   const [load, setLoad] = useState(false);
@@ -148,6 +150,15 @@ function Staff() {
     },
   ];
 
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/staff/details").then((res) => {
+      console.log(res);
+      setData(res.data)
+    }).catch((err) => {
+      console.log(err);
+    })
+  }, [])
+
   return (
     <div>
       <div className="h-100">
@@ -197,11 +208,11 @@ function Staff() {
                   </label>
                   <RangePicker
                     className="w-100 my-2 p-2 selectElement"
-                    //   defaultValue={[
-                    // moment("2015/01/01", dateFormat),
-                    // moment("2015/01/01", dateFormat)
-                    //   ]}
-                    //   format={dateFormat}
+                  //   defaultValue={[
+                  // moment("2015/01/01", dateFormat),
+                  // moment("2015/01/01", dateFormat)
+                  //   ]}
+                  //   format={dateFormat}
                   />
                 </div>
 
@@ -278,20 +289,20 @@ function Staff() {
                 type="primary"
                 size="large"
                 className="d-flex align-items-center "
-                // onClick={() => {
-                //   // exportTableData(list);
-                //   const excel = new Excel();
-                //   excel
-                //     .addSheet("test")
-                //     .addColumns([
-                //       { title: "Driver Name", dataIndex: "name" },
-                //       { title: "Driver ID", dataIndex: "uuid" },
-                //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-                //       { title: "Department", dataIndex: "deptName" },
-                //     ])
-                //     .addDataSource(exportTableData(list))
-                //     .saveAs("Drivers.xlsx");
-                // }}
+              // onClick={() => {
+              //   // exportTableData(list);
+              //   const excel = new Excel();
+              //   excel
+              //     .addSheet("test")
+              //     .addColumns([
+              //       { title: "Driver Name", dataIndex: "name" },
+              //       { title: "Driver ID", dataIndex: "uuid" },
+              //       { title: "Staff Pass ID", dataIndex: "cardNo" },
+              //       { title: "Department", dataIndex: "deptName" },
+              //     ])
+              //     .addDataSource(exportTableData(list))
+              //     .saveAs("Drivers.xlsx");
+              // }}
               >
                 <DownloadOutlined />
                 Export
@@ -320,7 +331,7 @@ function Staff() {
             <div className="table-responsive ">
               <Table
                 columns={tableColumns}
-                dataSource={MOCK_DATA}
+                dataSource={data}
                 rowKey="id"
               />
             </div>
@@ -347,7 +358,7 @@ function Staff() {
             <Card>
               <Form
                 name="login-form"
-                //  onFinish={onLogin}
+              //  onFinish={onLogin}
               >
                 <Form.Item name="name" label="Employee Name" required>
                   <Input

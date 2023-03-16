@@ -148,7 +148,6 @@ function Users(props) {
     },
   ];
 
-  const search = () => {};
 
   useEffect(() => {
     setLoad(true);
@@ -179,7 +178,7 @@ function Users(props) {
           style={open ? { margin: "65px 0 0 240px" } : { margin: "65px 0 0 0" }}
         >
           <div className="px-5">
-            {/* <span className="page-title">Users</span> */}
+            <span className="page-title">Users</span>
             {/* <Card className="selectElement">
               <div
                 style={{
@@ -291,20 +290,20 @@ function Users(props) {
                 type="primary"
                 size="large"
                 className="d-flex align-items-center "
-                // onClick={() => {
-                //   // exportTableData(list);
-                //   const excel = new Excel();
-                //   excel
-                //     .addSheet("test")
-                //     .addColumns([
-                //       { title: "Driver Name", dataIndex: "name" },
-                //       { title: "Driver ID", dataIndex: "uuid" },
-                //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-                //       { title: "Department", dataIndex: "deptName" },
-                //     ])
-                //     .addDataSource(exportTableData(list))
-                //     .saveAs("Drivers.xlsx");
-                // }}
+              // onClick={() => {
+              //   // exportTableData(list);
+              //   const excel = new Excel();
+              //   excel
+              //     .addSheet("test")
+              //     .addColumns([
+              //       { title: "Driver Name", dataIndex: "name" },
+              //       { title: "Driver ID", dataIndex: "uuid" },
+              //       { title: "Staff Pass ID", dataIndex: "cardNo" },
+              //       { title: "Department", dataIndex: "deptName" },
+              //     ])
+              //     .addDataSource(exportTableData(list))
+              //     .saveAs("Drivers.xlsx");
+              // }}
               >
                 <DownloadOutlined />
                 Export

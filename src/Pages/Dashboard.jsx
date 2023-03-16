@@ -1,11 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box } from "@mui/system";
 import GoogleMapComp from "../Components/GoogleMapComp";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 function Dashboard(props) {
   const [open, setOpen] = useState(true);
+  const nav = useNavigate()
   localStorage.setItem("URL", window.location.pathname);
+
+  useEffect(() => {
+    if (!localStorage.getItem("TOKEN")) {
+      nav('/login')
+    }
+  }, [])
+
+
   return (
     <div>
       <div className="h-100">
