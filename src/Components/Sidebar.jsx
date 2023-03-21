@@ -16,6 +16,7 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import {
+  AccountCircle,
   Assessment,
   Engineering,
   GridView,
@@ -74,7 +75,7 @@ function Sidebar(props) {
       },
     },
   });
-
+  console.log(window.innerWidth);
   const SideListItems = [
     {
       path: "/",
@@ -192,13 +193,19 @@ function Sidebar(props) {
                 </div>
               </div>
               <Divider />
+              <MenuItem onClick={() => nav("/profile")}>
+                <ListItemIcon>
+                  <AccountCircle fontSize="small" />
+                </ListItemIcon>
+                My Profile
+              </MenuItem>
               <MenuItem onClick={() => nav("/changepassword")}>
                 <ListItemIcon>
                   <Settings fontSize="small" />
                 </ListItemIcon>
                 Change Password
               </MenuItem>
-              <MenuItem onClick={() => {}}>
+              <MenuItem onClick={() => { }}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>

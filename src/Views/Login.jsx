@@ -85,7 +85,7 @@ export const Login = (props) => {
       <section className="login">
         <div className="container " style={{ height: "100vh" }}>
           <div className="row d-flex justify-content-center align-items-center h-100 ">
-            <div className="col-xl-4 my-2">
+            <div className="col-xl-4 col-lg-6 col-sm-8 col-xs-10 m-2">
 
               <div className="card" style={{ borderRadius: "10px" }}>
                 {/* <img
@@ -125,11 +125,12 @@ export const Login = (props) => {
                       />
                     </Form.Item>
                     <p
-                      className="text-decoration-underline"
+                      className="text-decoration-underline d-inline-block"
                       onClick={() => nav("/forgetpassword")}
                     >
                       Forgot Password ?
                     </p>
+                    <br />
                     <br />
                     <Form.Item>
                       <Button

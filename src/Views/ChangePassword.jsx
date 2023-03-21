@@ -54,7 +54,7 @@ function ChangePassword(props) {
     <section className="forgot-password">
       <div className="container" style={{ height: "100vh" }}>
         <div className="row d-flex justify-content-center align-items-center h-100 ">
-          <div className="col-xl-4 my-2">
+          <div className="col-xl-4 col-lg-6 col-sm-8 col-xs-10 m-2">
             <div className="card" style={{ borderRadius: "10px" }}>
               <div className="my-2">
                 <div className="text-center">
