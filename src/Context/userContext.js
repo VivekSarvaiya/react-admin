@@ -14,18 +14,18 @@ const AuthProvider = ({ children }) => {
     // localStorage.setItem("UID", data.userId);
     // localStorage.setItem("TOKEN", data.token);
 
-    axios
-      .get("http://localhost:4000/api/auth/getUserDetails", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
-      })
-      .then((res) => {
-        console.log(res);
-        setAuthState(res.data?.message);
-        localStorage.setItem("Line", res.data?.message?.Line);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // axios
+    //   .get("http://localhost:4000/api/auth/getUserDetails", {
+    //     headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+    //   })
+    //   .then((res) => {
+    //     console.log(res);
+    //     setAuthState(res.data?.message);
+    //     localStorage.setItem("Line", res.data?.message?.Line);
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
   };
 
   // checks if the user is authenticated or not
@@ -53,9 +53,9 @@ const AuthProvider = ({ children }) => {
       }
     };
 
-    if (localStorage.getItem("TOKEN")) {
-      getUserData();
-    }
+    // if (localStorage.getItem("TOKEN")) {
+    //   getUserData();
+    // }
   }, [_authState]);
 
   return (
