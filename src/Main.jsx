@@ -15,10 +15,8 @@ function Main(props) {
   return (
     <div>
       <Routes>
-
         <Route path="/forgetpassword" element={<ForgotPassword />} />
         <Route path="/login" element={<Login />} />
-
         <Route element={<PrivateRoutes />}>
           <Route path="/" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
