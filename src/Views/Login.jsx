@@ -44,49 +44,49 @@ const rules = {
 
 export const Login = (props) => {
   // const { signUp, showLoading, loading } = props;
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const nav = useNavigate();
   const [form] = Form.useForm();
-  const [messageApi, contextHolder] = message.useMessage();
   //   let history = useHistory();
 
   localStorage.setItem("URL", window.location.pathname);
 
   const onSignUp = () => {
-    setLoading(true)
+    setLoading(true);
     form
       .validateFields()
       .then((values) => {
         console.log(values);
         console.log(process.env.REACT_API_BASE_URL);
-        axios.post(`http://127.0.0.1:8000/api/admin/login/`, values).then((res) => {
-          console.log(res);
-          localStorage.setItem("TOKEN", res.data.token.access)
-          message.success("Login Successful !", 1, () => {
-            nav('/')
+        axios
+          .post(`http://127.0.0.1:8000/api/admin/login/`, values)
+          .then((res) => {
+            console.log(res);
+            localStorage.setItem("TOKEN", res.data.token.access);
+            message.success("Login Successful !", 1, () => {
+              nav("/");
+            });
+          })
+          .catch((err) => {
+            console.log(err);
+            setLoading(false);
+            message.error("Invalid Credentials !");
           });
-        }).catch((err) => {
-          console.log(err);
-          setLoading(false)
-          message.error("Invalid Credentials !");
-        })
         // showsetLoading();
         // signUp(values);
       })
       .catch((info) => {
         console.log("Validate Failed:", info);
-        setLoading(false)
+        setLoading(false);
       });
   };
 
   return (
     <>
-      {contextHolder}
       <section className="login">
         <div className="container " style={{ height: "100vh" }}>
           <div className="row d-flex justify-content-center align-items-center h-100 ">
             <div className="col-xl-4 col-lg-6 col-sm-8 col-xs-10 m-2">
-
               <div className="card" style={{ borderRadius: "10px" }}>
                 {/* <img
                   src="../assets/images/logo.png"
@@ -103,7 +103,6 @@ export const Login = (props) => {
                     autoComplete="fasle"
                   >
                     <Form.Item
-
                       name="username"
                       label="Email or Username"
                       rules={rules.username}
