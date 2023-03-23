@@ -49,80 +49,7 @@ function GoogleMapComp(props) {
     }
     setFlag(!flag);
   };
-  // console.log(types);
-
-  // const coordinates = [
-  //   { lat: 21.1458, lng: 72.781 },
-  //   { lat: 21.1399, lng: 72.8111 },
-  //   { lat: 21.1291, lng: 72.8111 },
-  //   { lat: 21.1292, lng: 72.781 },
-  // ];
-  // const map_theme = [
-  //   {
-  //     featureType: "all",
-  //     elementType: "labels.text",
-  //     stylers: [
-  //       {
-  //         color: "#878787",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     featureType: "all",
-  //     elementType: "labels.text.stroke",
-  //     stylers: [
-  //       {
-  //         visibility: "off",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     featureType: "landscape",
-  //     elementType: "all",
-  //     stylers: [
-  //       {
-  //         color: "#f9f5ed",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     featureType: "road.highway",
-  //     elementType: "all",
-  //     stylers: [
-  //       {
-  //         color: "#f5f5f5",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     featureType: "road.highway",
-  //     elementType: "geometry.stroke",
-  //     stylers: [
-  //       {
-  //         color: "#c9c9c9",
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     featureType: "water",
-  //     elementType: "all",
-  //     stylers: [
-  //       {
-  //         color: "#aee0f4",
-  //       },
-  //     ],
-  //   },
-  // ];
   const map_theme = [
-    {
-      featureType: "administrative.neighborhood",
-      elementType: "labels",
-      stylers: [
-        {
-          visibility: "off",
-        },
-      ],
-    },
     {
       featureType: "landscape.natural",
       elementType: "geometry.fill",
@@ -132,6 +59,18 @@ function GoogleMapComp(props) {
         },
         {
           color: "#e0efef",
+        },
+        {
+          saturation: "51",
+        },
+        {
+          lightness: "0",
+        },
+        {
+          gamma: "1",
+        },
+        {
+          weight: "1.20",
         },
       ],
     },
@@ -158,28 +97,7 @@ function GoogleMapComp(props) {
           lightness: 100,
         },
         {
-          visibility: "on",
-        },
-      ],
-    },
-    {
-      featureType: "road",
-      elementType: "geometry.fill",
-      stylers: [
-        {
-          color: "#616184",
-        },
-        {
-          visibility: "on",
-        },
-      ],
-    },
-    {
-      featureType: "road",
-      elementType: "geometry.stroke",
-      stylers: [
-        {
-          visibility: "on",
+          visibility: "simplified",
         },
       ],
     },
@@ -188,16 +106,7 @@ function GoogleMapComp(props) {
       elementType: "labels",
       stylers: [
         {
-          visibility: "off",
-        },
-      ],
-    },
-    {
-      featureType: "road.highway",
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#4f44bf",
+          visibility: "on",
         },
       ],
     },
@@ -206,64 +115,22 @@ function GoogleMapComp(props) {
       elementType: "geometry.fill",
       stylers: [
         {
-          color: "#083754",
+          color: "#ff9f9f",
         },
         {
-          lightness: "-26",
+          saturation: "37",
         },
         {
-          gamma: "7.86",
+          lightness: "43",
         },
       ],
     },
     {
-      featureType: "road.highway",
-      elementType: "geometry.stroke",
-      stylers: [
-        {
-          color: "#5d7227",
-        },
-      ],
-    },
-    {
-      featureType: "road.arterial",
-      elementType: "geometry",
-      stylers: [
-        {
-          visibility: "on",
-        },
-        {
-          saturation: "-43",
-        },
-        {
-          lightness: "55",
-        },
-        {
-          gamma: "1.14",
-        },
-      ],
-    },
-    {
-      featureType: "road.local",
-      elementType: "geometry",
-      stylers: [
-        {
-          visibility: "on",
-        },
-      ],
-    },
-    {
-      featureType: "road.local",
+      featureType: "road.highway.controlled_access",
       elementType: "geometry.fill",
       stylers: [
         {
-          saturation: "-86",
-        },
-        {
-          lightness: "58",
-        },
-        {
-          gamma: "1.14",
+          saturation: "86",
         },
       ],
     },
@@ -280,47 +147,17 @@ function GoogleMapComp(props) {
       ],
     },
     {
-      featureType: "transit.line",
-      elementType: "geometry.fill",
-      stylers: [
-        {
-          color: "#f84747",
-        },
-      ],
-    },
-    {
-      featureType: "transit.line",
-      elementType: "labels.text.fill",
-      stylers: [
-        {
-          color: "#f64d4d",
-        },
-      ],
-    },
-    {
       featureType: "water",
       elementType: "all",
       stylers: [
         {
-          color: "#7dcdcd",
+          color: "#7495e6",
         },
-      ],
-    },
-    {
-      featureType: "water",
-      elementType: "geometry.fill",
-      stylers: [
         {
-          color: "#95ace7",
+          saturation: "19",
         },
-      ],
-    },
-    {
-      featureType: "water",
-      elementType: "labels.text.stroke",
-      stylers: [
         {
-          color: "#0079ff",
+          lightness: "24",
         },
       ],
     },

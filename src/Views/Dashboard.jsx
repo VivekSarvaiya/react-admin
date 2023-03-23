@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Box } from "@mui/system";
 import GoogleMapComp from "../Components/GoogleMapComp";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../Context/userContext";
+
 function Dashboard(props) {
   const [open, setOpen] = useState(true);
-  const nav = useNavigate()
+  const nav = useNavigate();
+  const { authState } = useContext(AuthContext);
   localStorage.setItem("URL", window.location.pathname);
 
   useEffect(() => {
-    if (!localStorage.getItem("TOKEN")) {
-      nav('/login')
-    }
-  }, [])
-
+    console.log(authState);
+  }, []);
 
   return (
     <div>

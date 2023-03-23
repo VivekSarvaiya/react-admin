@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Row, Col, Form, Input, Button, message } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { LockOutlined } from "@mui/icons-material";
+import { AuthContext } from "../Context/userContext";
 
 function ChangePassword(props) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const { authState } = useContext(AuthContext);
 
   const rules = {
     oldpassword: [

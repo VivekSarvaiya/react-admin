@@ -17,24 +17,24 @@ function ForgotPassword(props) {
     console.log(values);
     setLoading(true);
     axios
-      .post(`http://127.0.0.1:8000/api/admin/forgot_password/`, values)
+      .post(`http://localhost:8000/api/usersForgotPassword/`, values)
       .then((res) => {
         console.log(res);
         setLoading(false);
+        setSendOTP(true);
         message.success("A Email has been sent to your email address !", 2);
       })
       .catch((err) => {
         console.log(err);
         setLoading(false);
-        message.error(err.message);
-        setSendOTP(true);
+        message.error(err.response.data.message);
       });
   };
 
   const verifyOtp = () => {
     setLoading(true);
     axios
-      .post(`http://127.0.0.1:8000/api/admin/forgot_password/`, {
+      .post(`http://127.0.0.1:8000/api/admin/usersForgotPassword/`, {
         otp: "12345",
       })
       .then((res) => {

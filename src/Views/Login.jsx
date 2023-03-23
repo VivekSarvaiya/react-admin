@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 // import { connect } from 'react-redux'
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Alert, message } from "antd";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import jwt_decode from "jwt-decode";
+import { AuthContext } from "../Context/userContext";
+
 // import { signUp, showAuthMessage, showLoading, hideAuthMessage } from 'redux/actions/Auth';
 // import { useHistory } from "react-router-dom";
 // import { motion } from "framer-motion"
@@ -47,22 +50,23 @@ export const Login = (props) => {
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
   const [form] = Form.useForm();
+  const { authState, setAuthState } = useContext(AuthContext);
   //   let history = useHistory();
-
-  localStorage.setItem("URL", window.location.pathname);
 
   const onSignUp = () => {
     setLoading(true);
     form
       .validateFields()
       .then((values) => {
-        console.log(values);
-        console.log(process.env.REACT_API_BASE_URL);
         axios
-          .post(`http://127.0.0.1:8000/api/admin/login/`, values)
+          .post(`http://localhost:8000/api/usersLogin/`, values)
           .then((res) => {
             console.log(res);
             localStorage.setItem("TOKEN", res.data.token.access);
+            localStorage.setItem("REFRESH", res.data.token.refresh);
+            var decoded = jwt_decode(res.data.token.access);
+            localStorage.setItem("USERID", decoded.user_id);
+            setAuthState(decoded.user_id);
             message.success("Login Successful !", 1, () => {
               nav("/");
             });
@@ -70,10 +74,8 @@ export const Login = (props) => {
           .catch((err) => {
             console.log(err);
             setLoading(false);
-            message.error("Invalid Credentials !");
+            message.error(err.response.data.error);
           });
-        // showsetLoading();
-        // signUp(values);
       })
       .catch((info) => {
         console.log("Validate Failed:", info);

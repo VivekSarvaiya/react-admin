@@ -9,61 +9,49 @@ const AuthProvider = ({ children }) => {
 
   const _authState = useRef(authState).current;
 
-  const setUserAuthInfo = (data) => {
-    // console.log(data.data.token, "setauth");
-    // localStorage.setItem("UID", data.userId);
-    // localStorage.setItem("TOKEN", data.token);
-
-    // axios
-    //   .get("http://localhost:4000/api/auth/getUserDetails", {
-    //     headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
-    //   })
-    //   .then((res) => {
-    //     console.log(res);
-    //     setAuthState(res.data?.message);
-    //     localStorage.setItem("Line", res.data?.message?.Line);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
-  };
-
-  // checks if the user is authenticated or not
-  const isUserAuthenticated = () => {
-    if (!localStorage.getItem("TOKEN")) {
-      return false;
-    }
+  const setUserAuthInfo = (id) => {
+    axios
+      .get(`http://localhost:8000/api/UserAllDetails/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+      })
+      .then((res) => {
+        console.log(res, "context");
+        setAuthState(res.data?.message);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   useEffect(() => {
     const getUserData = async () => {
-      try {
-        const res = await axios.get(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/getUserDetails`,
+      axios
+        .get(
+          `http://localhost:8000/api/UserAllDetails/${localStorage.getItem(
+            "USERID"
+          )}`,
           {
             headers: {
-              Authorization: "Bearer " + localStorage.getItem("TOKEN"),
+              Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
             },
           }
-        );
-        // console.log(res.data.message);
-        setAuthState(res.data?.message);
-      } catch (error) {
-        console.error(error);
-      }
+        )
+        .then((res) => {
+          console.log(res, "context");
+          setAuthState(res.data?.message);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     };
-
-    // if (localStorage.getItem("TOKEN")) {
-    //   getUserData();
-    // }
+    getUserData();
   }, [_authState]);
-
+  console.log(authState, "authstate");
   return (
     <Provider
       value={{
         authState,
         setAuthState: (userAuthInfo) => setUserAuthInfo(userAuthInfo),
-        isUserAuthenticated,
       }}
     >
       {children}

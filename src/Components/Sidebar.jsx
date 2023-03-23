@@ -59,6 +59,7 @@ function Sidebar(props) {
   const nav = useNavigate();
   const [open, setOpen] = React.useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [width, setWidth] = useState();
   const openmenu = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -75,7 +76,6 @@ function Sidebar(props) {
       },
     },
   });
-  console.log(window.innerWidth);
   const SideListItems = [
     {
       path: "/",
@@ -103,7 +103,17 @@ function Sidebar(props) {
       icon: <Assessment />,
     },
   ];
+  useEffect(() => {
+    setWidth(window.innerWidth);
+    window.addEventListener("resize", () => setWidth(window.innerWidth));
+    return () => {
+      window.removeEventListener("resize", () => setWidth(window.innerWidth));
+    };
+  }, []);
 
+  useEffect(() => {
+    if (width < 1000) setOpen(false);
+  }, [width]);
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -205,7 +215,7 @@ function Sidebar(props) {
                 </ListItemIcon>
                 Change Password
               </MenuItem>
-              <MenuItem onClick={() => { }}>
+              <MenuItem onClick={() => {}}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>
