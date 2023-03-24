@@ -11,6 +11,7 @@ function ForgotPassword(props) {
   const [sendOTP, setSendOTP] = useState(false);
   const [otp, setOtp] = useState();
   const [otperror, setOtperror] = useState();
+  const [username, setUsername] = useState("");
   const nav = useNavigate();
 
   const onSend = (values) => {
@@ -33,22 +34,23 @@ function ForgotPassword(props) {
 
   const verifyOtp = () => {
     setLoading(true);
+    console.log({ username, otp });
     axios
-      .post(`http://127.0.0.1:8000/api/admin/usersForgotPassword/`, {
-        otp: "12345",
+      .post(`http://localhost:8000/api/usersForgotPasswordOTPVerify/`, {
+        username,
+        otp,
       })
       .then((res) => {
         console.log(res);
         setLoading(false);
         setOtperror(false);
-        message.success("AEmail has been sent to your email address !", 2);
+        message.success("OTP verified and Password updated successfully !", 2);
       })
       .catch((err) => {
         console.log(err);
         setOtperror(true);
         setLoading(false);
-
-        message.error(err.message);
+        message.error(err.response.data.error);
       });
   };
 
@@ -59,20 +61,6 @@ function ForgotPassword(props) {
     borderRadius: "3px",
     border: "none",
     fontSize: "20px",
-  };
-
-  const succesStyle = {
-    width: "40px",
-    height: "56px",
-    background: "#FFFFFF",
-    borderRadius: "3px",
-    border: "1px solid green",
-    fontSize: "20px",
-  };
-
-  const focusedStyle = {
-    border: "1px solid #2EBFAA !important",
-    boxShadow: " 0px 4px 12px rgba(46, 191, 170, 0.3)",
   };
 
   return (
@@ -107,6 +95,8 @@ function ForgotPassword(props) {
                           ]}
                         >
                           <Input
+                            onChange={(e) => setUsername(e.target.value)}
+                            value={username}
                             placeholder=" Enter username or email address"
                             prefix={<MailOutlined className="text-primary" />}
                           />
@@ -142,14 +132,13 @@ function ForgotPassword(props) {
                         onChange={(e) => setOtp(e)}
                         numInputs={6}
                         placeholder="000000"
-                        inputStyle={!otperror ? inputstyle : succesStyle}
+                        inputStyle={inputstyle}
                         isInputNum="true"
                         containerStyle={{
                           margin: "0 1rem",
                           gap: "5px",
                           justifyContent: "center",
                         }}
-                        focusStyle={focusedStyle}
                         hasErrored={otperror}
                         errorStyle={{ border: "1px solid red" }}
                         // focusStyle={{ border: "1px solid red !important" }}
