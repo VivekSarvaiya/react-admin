@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 // import { connect } from 'react-redux'
 import { LockOutlined, MailOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Alert, message } from "antd";
+import { Button, Form, Input, Alert, message, Typography } from "antd";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -90,12 +90,15 @@ export const Login = (props) => {
           <div className="row d-flex justify-content-center align-items-center h-100 ">
             <div className="col-xl-4 col-lg-6 col-sm-8 col-xs-10 m-2">
               <div className="card" style={{ borderRadius: "10px" }}>
-                {/* <img
-                  src="../assets/images/logo.png"
-                  alt="logo"
-                  className="main-logo"
-                /> */}
-                <h3 className="m-5 text-center">Welcome back, Admin</h3>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  style={{ margin: "1em auto" }}
+                >
+                  <img src="../assets/images/logo.png" alt="logo" width={100} style={{ filter: "invert(1)" }} />
+                </Typography>
+                <h3 className="my-3 mx-5 text-center">Welcome back, Admin</h3>
                 <div className="card-body px-5 py-4">
                   <Form
                     form={form}
