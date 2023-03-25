@@ -23,8 +23,7 @@ function ForgotPassword(props) {
       .then((res) => {
         console.log(res);
         setLoading(false);
-        setPageState("VerifyOtp");
-        message.success("A Email has been sent to your email address !", 2);
+        message.success("OTP has been sent to your email address !", 1, () => setPageState("VerifyOtp"));
       })
       .catch((err) => {
         console.log(err);
@@ -39,26 +38,26 @@ function ForgotPassword(props) {
     axios
       .post(`http://localhost:8000/api/usersForgotPasswordOTPVerify/`, {
         username,
-        otp,
+        otp: Number(otp),
       })
       .then((res) => {
         console.log(res);
         setLoading(false);
         setOtperror(false);
-        message.success("OTP verified and Password updated successfully !", 2);
-        // setPageState("SetPassword")
+        message.success("OTP verified successfully !", 1, () => setPageState("SetPassword"));
+
       })
       .catch((err) => {
-        setPageState("SetPassword")
         console.log(err);
         setLoading(false);
         setOtperror(true);
+        setOtp()
         message.error(err.response.data.error);
       });
   };
 
   const rules = {
-    newpassword: [
+    password: [
       {
         required: true,
         message: "Please enter your password",
@@ -71,7 +70,7 @@ function ForgotPassword(props) {
       },
       ({ getFieldValue }) => ({
         validator(rule, value) {
-          if (!value || getFieldValue("newpassword") === value) {
+          if (!value || getFieldValue("password") === value) {
             return Promise.resolve();
           }
           return Promise.reject("Passwords do not match!");
@@ -83,10 +82,14 @@ function ForgotPassword(props) {
   const setNewPassword = (values) => {
     console.log(values);
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      message.success("New password has send to your email!");
-    }, 1500);
+    axios.post(`http://localhost:8000/api/usersForgotPasswordChange/`, { username, password: values.password }).then((res) => {
+      setLoading(false)
+      message.success("Password changed successfully !", 1, () => nav('/login'))
+    }).catch((err) => {
+      console.log(err);
+      setLoading(false)
+      message.error(err.response.data.error);
+    })
   };
 
   const inputstyle = {
@@ -225,13 +228,12 @@ function ForgotPassword(props) {
                         onFinish={setNewPassword}
                       >
                         <Form.Item
-                          name="newpassword"
-                          label="New Password"
-                          rules={rules.newpassword}
-                          hasFeedback
+                          name="password"
+                          label="Password"
+                          rules={rules.password}
+
                         >
                           <Input.Password
-                            placeholder="New Password"
                             prefix={<LockOutlined className="text-primary" />}
                           />
                         </Form.Item>
@@ -240,10 +242,9 @@ function ForgotPassword(props) {
                           name="confirm"
                           label="Confirm Password"
                           rules={rules.confirm}
-                          hasFeedback
+
                         >
                           <Input.Password
-                            placeholder="Confirm Password"
                             prefix={<LockOutlined className="text-primary" />}
                           />
                         </Form.Item>

@@ -92,7 +92,7 @@ export const Login = (props) => {
               <div className="card" style={{ borderRadius: "10px" }}>
                 <Typography
                   variant="h6"
-                  noWrap
+                  noWrap={true}
                   component="div"
                   style={{ margin: "1em auto" }}
                 >
@@ -111,7 +111,7 @@ export const Login = (props) => {
                       name="username"
                       label="Email or Username"
                       rules={rules.username}
-                      hasFeedback
+
                     >
                       <Input
                         prefix={<MailOutlined className="text-primary" />}
@@ -122,7 +122,7 @@ export const Login = (props) => {
                       name="password"
                       label="Password"
                       rules={rules.password}
-                      hasFeedback
+
                     >
                       <Input.Password
                         prefix={<LockOutlined className="text-primary" />}

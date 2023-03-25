@@ -3,26 +3,28 @@ import { Row, Col, Form, Input, Button, message } from "antd";
 import { MailOutlined } from "@ant-design/icons";
 import { LockOutlined } from "@mui/icons-material";
 import { AuthContext } from "../Context/userContext";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function ChangePassword(props) {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const { authState } = useContext(AuthContext);
-
+  const nav = useNavigate()
   const rules = {
     oldpassword: [
       {
         required: true,
         message: "Please enter your password",
       },
-      ({ getFieldValue }) => ({
-        validator(rule, value) {
-          if (!value || getFieldValue("password") === value) {
-            return Promise.resolve();
-          }
-          return Promise.reject("Password do not match to old password!");
-        },
-      }),
+      // ({ getFieldValue }) => ({
+      //   validator(rule, value) {
+      //     if (!value || getFieldValue("password") === value) {
+      //       return Promise.resolve();
+      //     }
+      //     return Promise.reject("Password do not match to old password!");
+      //   },
+      // }),
     ],
     newpassword: [
       {
@@ -47,10 +49,17 @@ function ChangePassword(props) {
   };
   const onSend = (values) => {
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      message.success("New password has send to your email!");
-    }, 1500);
+    axios.post(`http://localhost:8000/api/UsersChangePassword/`, { password: values.newpassword },
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+      }).then((res) => {
+        setLoading(false)
+        message.success("Password Changed Successfully !", 2, () => nav("/"))
+      }).catch((err) => {
+        console.log(err);
+        setLoading(false)
+        message.error(err?.response?.data?.error)
+      })
   };
   return (
     <section className="forgot-password">
@@ -78,7 +87,6 @@ function ChangePassword(props) {
                         name="oldpassword"
                         rules={rules.oldpassword}
                         label="Old Password"
-                        hasFeedback
                       >
                         <Input
                           placeholder="Old Password"
@@ -90,7 +98,7 @@ function ChangePassword(props) {
                         name="newpassword"
                         label="New Password"
                         rules={rules.newpassword}
-                        hasFeedback
+
                       >
                         <Input.Password
                           placeholder="New Password"
@@ -102,7 +110,7 @@ function ChangePassword(props) {
                         name="confirm"
                         label="Confirm Password"
                         rules={rules.confirm}
-                        hasFeedback
+
                       >
                         <Input.Password
                           placeholder="Confirm Password"

@@ -27,7 +27,7 @@ const AuthProvider = ({ children }) => {
     const getUserData = async () => {
       axios
         .get(
-          `http://localhost:8000/api/UserAllDetails/${localStorage.getItem(
+          `http://localhost:8000/api/AdminDetail/${localStorage.getItem(
             "USERID"
           )}`,
           {
@@ -38,7 +38,7 @@ const AuthProvider = ({ children }) => {
         )
         .then((res) => {
           console.log(res, "context");
-          setAuthState(res.data?.message);
+          setAuthState(res.data);
         })
         .catch((err) => {
           console.log(err);
@@ -46,7 +46,7 @@ const AuthProvider = ({ children }) => {
     };
     getUserData();
   }, [_authState]);
-  console.log(authState, "authstate");
+
   return (
     <Provider
       value={{

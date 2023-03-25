@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { styled, useTheme } from "@mui/material/styles";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -28,6 +28,7 @@ import {
 } from "@mui/icons-material";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Avatar, Menu, MenuItem, Tooltip } from "@mui/material";
+import { AuthContext } from "../Context/userContext";
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -60,6 +61,7 @@ function Sidebar(props) {
   const [open, setOpen] = React.useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [width, setWidth] = useState();
+  const { authState } = useContext(AuthContext)
   const openmenu = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -103,6 +105,7 @@ function Sidebar(props) {
       icon: <Assessment />,
     },
   ];
+
   useEffect(() => {
     setWidth(window.innerWidth);
     window.addEventListener("resize", () => setWidth(window.innerWidth));
@@ -132,7 +135,7 @@ function Sidebar(props) {
           </IconButton>
           <Typography
             variant="h6"
-            noWrap
+            noWrap={true}
             component="div"
             style={{ cursor: "pointer" }}
             onClick={() => nav("/")}
@@ -198,8 +201,8 @@ function Sidebar(props) {
             >
               <div className="d-flex m-3 align-items-center">
                 <div className="d-flex flex-column fs-5">
-                  <span className="text-dark"> Admin</span>
-                  <span className="fs-6 fw-light"> mmcsurat@gmail.com</span>
+                  <span className="text-dark"> {authState?.username}</span>
+                  <span className="fs-6 fw-light"> {authState?.email}</span>
                 </div>
               </div>
               <Divider />
@@ -215,16 +218,13 @@ function Sidebar(props) {
                 </ListItemIcon>
                 Change Password
               </MenuItem>
-              <MenuItem onClick={() => {}}>
+              <MenuItem onClick={() => { }}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>
                 Logout
               </MenuItem>
             </Menu>
-            {/* <button className=" px-5 btn btn-success" onClick={logout}>
-                Logout
-              </button> */}
           </div>
 
           <Drawer
@@ -246,7 +246,7 @@ function Sidebar(props) {
             <Divider />
             <List className="listItem">
               {SideListItems.map((item, index) => (
-                <ListItem disablePadding key={item.text}>
+                <ListItem disablePadding key={index} >
                   <NavLink to={item.path} className="navlink">
                     <ThemeProvider theme={theme}>
                       <ListItemButton>
