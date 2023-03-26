@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import { AuthContext } from "../Context/userContext";
+import { AuthContext, } from "../Context/userContext";
 
 // import { signUp, showAuthMessage, showLoading, hideAuthMessage } from 'redux/actions/Auth';
 // import { useHistory } from "react-router-dom";
@@ -18,10 +18,6 @@ const rules = {
       required: true,
       message: "Please enter your username or email address",
     },
-    // {
-    //   type: "email",
-    //   message: "Please enter a username or valid email",
-    // },
   ],
   password: [
     {
@@ -29,20 +25,6 @@ const rules = {
       message: "Please enter your password",
     },
   ],
-  // confirm: [
-  //   {
-  //     required: true,
-  //     message: "Please confirm your password!",
-  //   },
-  //   ({ getFieldValue }) => ({
-  //     validator(rule, value) {
-  //       if (!value || getFieldValue("password") === value) {
-  //         return Promise.resolve();
-  //       }
-  //       return Promise.reject("Passwords do not match!");
-  //     },
-  //   }),
-  // ],
 };
 
 export const Login = (props) => {
@@ -50,14 +32,16 @@ export const Login = (props) => {
   const [loading, setLoading] = useState(false);
   const nav = useNavigate();
   const [form] = Form.useForm();
-  const { authState, setAuthState } = useContext(AuthContext);
+  const { authState, setAuthflag, authflag } = useContext(AuthContext);
   //   let history = useHistory();
 
   const onSignUp = () => {
     setLoading(true);
+    console.log(loading);
     form
       .validateFields()
       .then((values) => {
+        console.log(loading);
         axios
           .post(`http://localhost:8000/api/usersLogin/`, values)
           .then((res) => {
@@ -66,7 +50,8 @@ export const Login = (props) => {
             localStorage.setItem("REFRESH", res.data.token.refresh);
             var decoded = jwt_decode(res.data.token.access);
             localStorage.setItem("USERID", decoded.user_id);
-            setAuthState(decoded.user_id);
+            setAuthflag(!authflag)
+            setLoading(false)
             message.success("Login Successful !", 1, () => {
               nav("/");
             });
@@ -74,7 +59,7 @@ export const Login = (props) => {
           .catch((err) => {
             console.log(err);
             setLoading(false);
-            message.error(err.response.data.error);
+            message.error(err.response?.data?.error);
           });
       })
       .catch((info) => {

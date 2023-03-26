@@ -16,7 +16,7 @@ const rules = {
 };
 
 const Profile = () => {
-  const { authState, setAuthState } = useContext(AuthContext)
+  const { authState, setAuthflag, authflag } = useContext(AuthContext)
   const [open, setOpen] = useState(true);
   const [openEditModal, setOpenModal] = useState(false);
   const [file, setFile] = useState(authState?.image);
@@ -54,7 +54,7 @@ const Profile = () => {
       console.log(res);
       message.success("Details Updated Successfully !",)
       setOpenModal(false)
-      setAuthState(authState)
+      setAuthflag(!authflag)
     }).catch((err) => {
       console.log(err);
       message.error(err.response?.data?.message)

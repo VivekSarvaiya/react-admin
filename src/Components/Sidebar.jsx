@@ -115,7 +115,7 @@ function Sidebar(props) {
   }, []);
 
   useEffect(() => {
-    if (width < 1000) setOpen(false);
+    if (width < 1200) setOpen(false);
   }, [width]);
   return (
     <Box sx={{ display: "flex" }}>

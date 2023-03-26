@@ -6,24 +6,26 @@ const { Provider } = AuthContext;
 
 const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState({});
-
+  const [authflag, setAuthflag] = useState(false)
   const _authState = useRef(authState).current;
 
-  const setUserAuthInfo = (id) => {
-    axios
-      .get(`http://localhost:8000/api/UserAllDetails/${id}/`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
-      })
-      .then((res) => {
-        console.log(res, "context");
-        setAuthState(res.data?.message);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
+  // const setUserAuthInfo = (id) => {
+  //   console.log(id);
+  //   axios
+  //     .get(`http://localhost:8000/api/UserAllDetails/${id}/`, {
+  //       headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+  //     })
+  //     .then((res) => {
+  //       console.log(res, "context");
+  //       setAuthState(res.data?.message);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // };
 
   useEffect(() => {
+    console.log(authflag);
     const getUserData = async () => {
       axios
         .get(
@@ -45,13 +47,15 @@ const AuthProvider = ({ children }) => {
         });
     };
     getUserData();
-  }, [_authState]);
+  }, [authflag]);
 
   return (
     <Provider
       value={{
         authState,
-        setAuthState: (userAuthInfo) => setUserAuthInfo(userAuthInfo),
+        // setAuthState: (userAuthInfo) => setUserAuthInfo(userAuthInfo),
+        setAuthflag,
+        authflag
       }}
     >
       {children}
