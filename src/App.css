@@ -102,3 +102,26 @@ iframe div .gmnoprint{
   position: absolute;
   right: 20px;
 }
+
+.image_upload {
+  line-height: 1.5714285714285714;
+  color: rgba(0, 0, 0, 0.88);
+  font-weight: 400;
+  font-size: 14px;
+  height: 32px;
+  padding: 4px 15px;
+  border-radius: 6px;
+  background-color: #ffffff;
+  border: 1px solid #d9d9d9;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.02);
+  margin: 10px 0 15px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.image_upload:hover {
+  color: #6883ed;
+  border: 1px solid #6883ed;
+  box-shadow: 0 2px 0 rgba(13, 201, 243, 0.02);
+
+}

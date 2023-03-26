@@ -11,7 +11,7 @@ const AuthProvider = ({ children }) => {
 
   const setUserAuthInfo = (id) => {
     axios
-      .get(`http://localhost:8000/api/UserAllDetails/${id}`, {
+      .get(`http://localhost:8000/api/UserAllDetails/${id}/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
       })
       .then((res) => {

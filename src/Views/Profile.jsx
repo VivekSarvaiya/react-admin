@@ -1,10 +1,10 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
-import { Button, Card, Form, Input, Modal, Select, Upload } from "antd";
+import { Button, Card, Form, Input, message, Modal } from "antd";
 import Sidebar from "../Components/Sidebar";
 import { AuthContext } from "../Context/userContext";
-const { Option } = Select;
+import axios from "axios";
 
 const rules = {
   require: [
@@ -16,21 +16,72 @@ const rules = {
 };
 
 const Profile = () => {
-  const { authState } = useContext(AuthContext)
+  const { authState, setAuthState } = useContext(AuthContext)
   const [open, setOpen] = useState(true);
   const [openEditModal, setOpenModal] = useState(false);
-  const [file, setFile] = useState();
-  const [data, setData] = useState({});
+  const [file, setFile] = useState(authState?.image);
+  const [data, setData] = useState({
+    fname: authState?.first_name,
+    lname: authState?.last_name,
+    dob: authState?.Date_of_birth,
+    email: authState?.email,
+    phone: authState?.phone_no,
+  });
   // const [efitData, setEditData] = ({})
-  // const handleChange = (e) => {
-  //   const { value, name } = e.target;
-  //   setData({ ...data, [name]: value });
-  //   console.log(data);
-  // };
+  const handleChange = (e) => {
+    const { value, name } = e.target;
+    setData({ ...data, [name]: value });
+    // console.log(data);
+  };
+
   const handleImageChange = async (e) => {
     // await console.log(e.target.file[0]);
     setFile(URL.createObjectURL(e.target.files[0]));
   };
+
+  const handleUpdate = () => {
+    console.log(data);
+    axios.patch(`http://localhost:8000/api/usersDetailsUpdate/${localStorage.getItem("USERID")}/`, {
+      first_name: data.fname || authState.first_name,
+      last_name: data.lname || authState.last_name,
+      Date_of_birth: data.dob || authState.Date_of_birth,
+      image: file || authState.image,
+      email: data.email || authState.email,
+      phone_no: data.phone || authState.phone_no,
+    }, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` }
+    }).then((res) => {
+      console.log(res);
+      message.success("Details Updated Successfully !",)
+      setOpenModal(false)
+      setAuthState(authState)
+    }).catch((err) => {
+      console.log(err);
+      message.error(err.response?.data?.message)
+    })
+  }
+
+  const handleCancelUpdate = () => {
+    // debugger
+    setData({
+      fname: authState?.first_name,
+      lname: authState?.last_name,
+      dob: authState?.Date_of_birth,
+      email: authState?.email,
+      phone: authState?.phone_no,
+    })
+    setOpenModal(false);
+  }
+
+  // useEffect(() => {
+  //   setData({
+  //     fname: authState?.first_name,
+  //     lname: authState?.last_name,
+  //     dob: authState?.Date_of_birth,
+  //     email: authState?.email,
+  //     phone: authState?.phone_no,
+  //   })
+  // }, [])
 
 
   return (
@@ -53,33 +104,12 @@ const Profile = () => {
                         }}
                         src={authState.image}
                       />
-                      {/* <Button
-                        variant="outlined"
-                        component="label"
-                        className="m-4"
-                      >
-                        <UploadOutlined /> Upload
-                        <input
-                          hidden
-                          accept="image/*"
-                          multiple
-                          type="file"
-                          onChange={handleImageChange}
-                        />
-                      </Button> */}
                     </div>
                     <div className="col-md-6 mx-4">
                       <dt className="text-sm font-medium text-gray-500">
                         {authState?.username || "N/A"}
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900">{authState.email || "N/A"}</dd>
-                      {/* <Button
-                        variant="text"
-                        className="px-0"
-                      // onClick={() => }
-                      >
-                        <EditOutlined className="fs-5" />{" "} Edit Details
-                      </Button> */}
                       <Button
                         type="link"
                         icon={<EditOutlined style={{ fontSize: "20px" }} />}
@@ -166,16 +196,15 @@ const Profile = () => {
       <Modal
         title="Edit Personal Information"
         open={openEditModal}
+        maskClosable={false}
         // onSubmit={() => setOpen(false)}
-        onCancel={() => {
-          setOpenModal(false);
-        }}
+        onCancel={handleCancelUpdate}
         footer={[
-          <Button key="back">Save</Button>,
+          <Button key="submit" onClick={handleUpdate}>Save</Button>,
           <Button
-            key="submit"
+            key="cancel"
             type="primary"
-            onClick={() => setOpenModal(false)}
+            onClick={handleCancelUpdate}
           >
             Cancel
           </Button>,
@@ -185,67 +214,65 @@ const Profile = () => {
         <Card>
           <Form
             name="edit details"
-          //  onFinish={onLogin}
+            style={{ textAlign: "-webkit-center" }}
           >
-            <Form.Item name="name" label="First Name" required>
+            <div className="">
+              <Avatar
+                sx={{
+                  width: "8rem",
+                  height: "8rem",
+                  background:
+                    "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+                }}
+                src={file}
+              />
+              <input type="file" id="upload" hidden onChange={handleImageChange} />
+              <label className="image_upload" htmlFor="upload"><UploadOutlined /> Upload</label>
+            </div>
+            <Form.Item name="fname" label="First Name" initialValue={authState?.first_name}>
               <Input
-                // onChange={(e) => handleChangeADD(e)}
-                name="name"
+                rules={rules.require}
+                onChange={handleChange}
+                value={data.fname}
+                name="fname"
                 className="selectElement"
               />
-            </Form.Item>
-            <Form.Item name="cardNos" label="Staff Pass ID" required>
-              <Input
-                // onChange={(e) => handleChangeADD(e)}
-                // value={authStateAdd.cardNos}
-                name="cardNos"
-                className="selectElement"
-              />
-            </Form.Item>
-            <Form.Item name="driverID" label="Driver ID">
-              <Input
-                // onChange={(e) => handleChangeADD(e)}
-                // value={dataAdd.driverID}
-                name="driverID"
-                className="selectElement"
-              />
-            </Form.Item>
-            <Form.Item name="job" label="Job">
-              <Input
-                // onChange={(e) => handleChangeADD(e)}
-                name="job"
-                className="selectElement"
-              />
-            </Form.Item>
-            <Form.Item name="deptId" label="Department Name " required>
-              <Select
-                className="w-100 mar10 selectElement"
-                placeholder="Select department Name"
-                // onChange={handleChange}
-                name="deptId"
-              >
-                {/* {departId !== "" &&
-                      departId.map((data) => {
-                        return <Option value={data.id}>{data.name}</Option>;
-                      })} */}
-              </Select>
-            </Form.Item>
-            <Form.Item name="gender" label="Gender">
-              <Select
-                className="w-100 mar10 selectElement"
-                placeholder="Select gender"
-                // onChange={handleChangeGender}
-                name="gender"
-              >
-                <Option value="0">Male</Option>
-                <Option value="1">Female</Option>
-                <Option value="-1">unKnown</Option>
-              </Select>
             </Form.Item>
 
-            <Form.Item name="phoneNumber" label="Phone Number">
+            <Form.Item name="lname" label="Last Name" initialValue={authState?.last_name}>
               <Input
-                // onChange={(e) => handleChangeADD(e)}
+                rules={rules.require}
+                onChange={handleChange}
+                value={data.lname}
+                name="lname"
+                className="selectElement"
+              />
+            </Form.Item>
+            <Form.Item name="dob" label="Date Of Birth" initialValue={authState?.Date_of_birth}>
+              <Input
+                rules={rules.require}
+                onChange={handleChange}
+                value={data.dob}
+                type="date"
+                name="dob"
+                className="selectElement"
+              />
+            </Form.Item>
+            <Form.Item name="email" label="Registered Email" initialValue={authState?.email}>
+              <Input
+                rules={rules.require}
+                onChange={handleChange}
+                value={data.email}
+                name="email"
+                className="selectElement"
+              />
+            </Form.Item>
+            <Form.Item name="phone" label="Phone Number" initialValue={authState?.phone_no}>
+              <Input
+                rules={rules.require}
+                onChange={handleChange}
+                value={data.phone}
+                type="number"
                 name="phone"
                 className="selectElement"
               />
