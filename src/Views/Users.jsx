@@ -179,7 +179,7 @@ function Users(props) {
         >
           <div className="px-5">
             <span className="page-title">Users</span>
-            {/* <Card className="selectElement">
+            <Card className="selectElement">
               <div
                 style={{
                   display: "flex",
@@ -217,11 +217,11 @@ function Users(props) {
                   </label>
                   <RangePicker
                     className="w-100 my-2 p-2 selectElement"
-                    //   defaultValue={[
-                    // moment("2015/01/01", dateFormat),
-                    // moment("2015/01/01", dateFormat)
-                    //   ]}
-                    //   format={dateFormat}
+                  //   defaultValue={[
+                  // moment("2015/01/01", dateFormat),
+                  // moment("2015/01/01", dateFormat)
+                  //   ]}
+                  //   format={dateFormat}
                   />
                 </div>
 
@@ -277,7 +277,7 @@ function Users(props) {
                   Search
                 </Button>
               </div>
-            </Card> */}
+            </Card>
             <br />
             <div
               style={{
