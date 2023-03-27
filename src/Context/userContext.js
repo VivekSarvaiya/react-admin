@@ -6,7 +6,7 @@ const { Provider } = AuthContext;
 
 const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState({});
-  const [authflag, setAuthflag] = useState(false)
+  const [authflag, setAuthflag] = useState(true);
   const _authState = useRef(authState).current;
 
   // const setUserAuthInfo = (id) => {
@@ -24,8 +24,13 @@ const AuthProvider = ({ children }) => {
   //     });
   // };
 
+  const setAuthStateflag = (flag) => {
+    console.log(flag);
+    setAuthflag(flag);
+  };
+
   useEffect(() => {
-    console.log(authflag);
+    console.log(authflag, "authflag");
     const getUserData = async () => {
       axios
         .get(
@@ -54,8 +59,8 @@ const AuthProvider = ({ children }) => {
       value={{
         authState,
         // setAuthState: (userAuthInfo) => setUserAuthInfo(userAuthInfo),
-        setAuthflag,
-        authflag
+        setAuthflag: (flag) => setAuthStateflag(flag),
+        authflag,
       }}
     >
       {children}

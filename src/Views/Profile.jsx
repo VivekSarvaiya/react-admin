@@ -5,6 +5,7 @@ import { Button, Card, Form, Input, message, Modal } from "antd";
 import Sidebar from "../Components/Sidebar";
 import { AuthContext } from "../Context/userContext";
 import axios from "axios";
+import { Verified } from "@mui/icons-material";
 
 const rules = {
   require: [
@@ -16,7 +17,7 @@ const rules = {
 };
 
 const Profile = () => {
-  const { authState, setAuthflag, authflag } = useContext(AuthContext)
+  const { authState, setAuthflag, authflag } = useContext(AuthContext);
   const [open, setOpen] = useState(true);
   const [openEditModal, setOpenModal] = useState(false);
   const [file, setFile] = useState(authState?.image);
@@ -41,25 +42,35 @@ const Profile = () => {
 
   const handleUpdate = () => {
     console.log(data);
-    axios.patch(`http://localhost:8000/api/usersDetailsUpdate/${localStorage.getItem("USERID")}/`, {
-      first_name: data.fname || authState.first_name,
-      last_name: data.lname || authState.last_name,
-      Date_of_birth: data.dob || authState.Date_of_birth,
-      image: file || authState.image,
-      email: data.email || authState.email,
-      phone_no: data.phone || authState.phone_no,
-    }, {
-      headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` }
-    }).then((res) => {
-      console.log(res);
-      message.success("Details Updated Successfully !",)
-      setOpenModal(false)
-      setAuthflag(!authflag)
-    }).catch((err) => {
-      console.log(err);
-      message.error(err.response?.data?.message)
-    })
-  }
+    const bodyFormData = new FormData();
+    bodyFormData.append("first_name", data.fname || authState.first_name);
+    bodyFormData.append("last_name", data.lname || authState.last_name);
+    bodyFormData.append("Date_of_birth", data.dob || authState.Date_of_birth);
+
+    file && bodyFormData.append("image", file || authState.image);
+    bodyFormData.append("email", data.email || authState.email);
+    bodyFormData.append("phone_no", data.phone || authState.phone_no);
+    axios
+      .patch(
+        `http://localhost:8000/api/usersDetailsUpdate/${localStorage.getItem(
+          "USERID"
+        )}/`,
+        bodyFormData,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        setOpenModal(false);
+        message.success("Details Updated Successfully !");
+        setAuthflag(!authflag);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error(err.response?.data?.message);
+      });
+  };
 
   const handleCancelUpdate = () => {
     // debugger
@@ -69,9 +80,9 @@ const Profile = () => {
       dob: authState?.Date_of_birth,
       email: authState?.email,
       phone: authState?.phone_no,
-    })
+    });
     setOpenModal(false);
-  }
+  };
 
   // useEffect(() => {
   //   setData({
@@ -82,7 +93,6 @@ const Profile = () => {
   //     phone: authState?.phone_no,
   //   })
   // }, [])
-
 
   return (
     <>
@@ -102,14 +112,17 @@ const Profile = () => {
                           background:
                             "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
                         }}
-                        src={authState.image}
+                        src={authState?.image}
                       />
                     </div>
                     <div className="col-md-6 mx-4">
                       <dt className="text-sm font-medium text-gray-500">
-                        {authState?.username || "N/A"}
+                        {authState?.username || "N/A"}{" "}
+                        <Verified color="primary" />
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900">{authState.email || "N/A"}</dd>
+                      <dd className="mt-1 text-sm text-gray-900">
+                        {authState.email || "N/A"}
+                      </dd>
                       <Button
                         type="link"
                         icon={<EditOutlined style={{ fontSize: "20px" }} />}
@@ -173,7 +186,10 @@ const Profile = () => {
                             Adhar Card Number
                           </dt>
                           <dd className="mt-1 text-sm text-gray-900">
-                            {authState?.aadhar_no?.replace(/\d{4}(?=\d)/g, '$&-') || "N/A"}
+                            {authState?.aadhar_no?.replace(
+                              /\d{4}(?=\d)/g,
+                              "$&-"
+                            ) || "N/A"}
                           </dd>
                         </div>
                         <div className="col-md-6 mt-3">
@@ -200,22 +216,17 @@ const Profile = () => {
         // onSubmit={() => setOpen(false)}
         onCancel={handleCancelUpdate}
         footer={[
-          <Button key="submit" onClick={handleUpdate}>Save</Button>,
-          <Button
-            key="cancel"
-            type="primary"
-            onClick={handleCancelUpdate}
-          >
+          <Button key="submit" onClick={handleUpdate}>
+            Save
+          </Button>,
+          <Button key="cancel" type="primary" onClick={handleCancelUpdate}>
             Cancel
           </Button>,
         ]}
-      // width={1000}
+        // width={1000}
       >
         <Card>
-          <Form
-            name="edit details"
-            style={{ textAlign: "-webkit-center" }}
-          >
+          <Form name="edit details" style={{ textAlign: "-webkit-center" }}>
             <div className="">
               <Avatar
                 sx={{
@@ -226,10 +237,21 @@ const Profile = () => {
                 }}
                 src={file}
               />
-              <input type="file" id="upload" hidden onChange={handleImageChange} />
-              <label className="image_upload" htmlFor="upload"><UploadOutlined /> Upload</label>
+              <input
+                type="file"
+                id="upload"
+                hidden
+                onChange={handleImageChange}
+              />
+              <label className="image_upload" htmlFor="upload">
+                <UploadOutlined /> Upload
+              </label>
             </div>
-            <Form.Item name="fname" label="First Name" initialValue={authState?.first_name}>
+            <Form.Item
+              name="fname"
+              label="First Name"
+              initialValue={authState?.first_name}
+            >
               <Input
                 rules={rules.require}
                 onChange={handleChange}
@@ -239,7 +261,11 @@ const Profile = () => {
               />
             </Form.Item>
 
-            <Form.Item name="lname" label="Last Name" initialValue={authState?.last_name}>
+            <Form.Item
+              name="lname"
+              label="Last Name"
+              initialValue={authState?.last_name}
+            >
               <Input
                 rules={rules.require}
                 onChange={handleChange}
@@ -248,7 +274,11 @@ const Profile = () => {
                 className="selectElement"
               />
             </Form.Item>
-            <Form.Item name="dob" label="Date Of Birth" initialValue={authState?.Date_of_birth}>
+            <Form.Item
+              name="dob"
+              label="Date Of Birth"
+              initialValue={authState?.Date_of_birth}
+            >
               <Input
                 rules={rules.require}
                 onChange={handleChange}
@@ -258,7 +288,11 @@ const Profile = () => {
                 className="selectElement"
               />
             </Form.Item>
-            <Form.Item name="email" label="Registered Email" initialValue={authState?.email}>
+            <Form.Item
+              name="email"
+              label="Registered Email"
+              initialValue={authState?.email}
+            >
               <Input
                 rules={rules.require}
                 onChange={handleChange}
@@ -267,7 +301,11 @@ const Profile = () => {
                 className="selectElement"
               />
             </Form.Item>
-            <Form.Item name="phone" label="Phone Number" initialValue={authState?.phone_no}>
+            <Form.Item
+              name="phone"
+              label="Phone Number"
+              initialValue={authState?.phone_no}
+            >
               <Input
                 rules={rules.require}
                 onChange={handleChange}
