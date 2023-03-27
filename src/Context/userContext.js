@@ -29,28 +29,45 @@ const AuthProvider = ({ children }) => {
     setAuthflag(flag);
   };
 
+  const refreshToken = async () => {
+    axios
+      .post(
+        `http://localhost:8000/api/token/refresh/`,
+        {
+          refresh: localStorage.getItem("REFRESH")
+        }
+      )
+      .then((res) => {
+        console.log(res, "Refresh");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const getUserData = async () => {
+    axios
+      .get(
+        `http://localhost:8000/api/AdminDetail/${localStorage.getItem(
+          "USERID"
+        )}`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res, "context");
+        setAuthState(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        refreshToken()
+      });
+  };
   useEffect(() => {
     console.log(authflag, "authflag");
-    const getUserData = async () => {
-      axios
-        .get(
-          `http://localhost:8000/api/AdminDetail/${localStorage.getItem(
-            "USERID"
-          )}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-            },
-          }
-        )
-        .then((res) => {
-          console.log(res, "context");
-          setAuthState(res.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    };
     getUserData();
   }, [authflag]);
 

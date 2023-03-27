@@ -20,7 +20,7 @@ const Profile = () => {
   const { authState, setAuthflag, authflag } = useContext(AuthContext);
   const [open, setOpen] = useState(true);
   const [openEditModal, setOpenModal] = useState(false);
-  const [file, setFile] = useState(authState?.image);
+  const [image, setImage] = useState(authState?.image);
   const [data, setData] = useState({
     fname: authState?.first_name,
     lname: authState?.last_name,
@@ -35,9 +35,27 @@ const Profile = () => {
     // console.log(data);
   };
 
-  const handleImageChange = async (e) => {
+  const convertImageToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
+
+
+  const handleImageChange = async (event) => {
     // await console.log(e.target.file[0]);
-    setFile(URL.createObjectURL(e.target.files[0]));
+    // setFile(URL.createObjectURL(e.target.files[0]));
+    const file = event.target.files[0];
+    const base64 = await convertImageToBase64(file);
+    setImage(base64)
+    // console.log(base64);
   };
 
   const handleUpdate = () => {
@@ -47,7 +65,7 @@ const Profile = () => {
     bodyFormData.append("last_name", data.lname || authState.last_name);
     bodyFormData.append("Date_of_birth", data.dob || authState.Date_of_birth);
 
-    file && bodyFormData.append("image", file || authState.image);
+    image && bodyFormData.append("image", image || authState.image);
     bodyFormData.append("email", data.email || authState.email);
     bodyFormData.append("phone_no", data.phone || authState.phone_no);
     axios
@@ -223,7 +241,7 @@ const Profile = () => {
             Cancel
           </Button>,
         ]}
-        // width={1000}
+      // width={1000}
       >
         <Card>
           <Form name="edit details" style={{ textAlign: "-webkit-center" }}>
@@ -235,7 +253,7 @@ const Profile = () => {
                   background:
                     "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
                 }}
-                src={file}
+                src={image}
               />
               <input
                 type="file"

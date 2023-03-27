@@ -29,6 +29,8 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { Avatar, Menu, MenuItem, Tooltip } from "@mui/material";
 import { AuthContext } from "../Context/userContext";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
@@ -117,6 +119,49 @@ function Sidebar(props) {
   useEffect(() => {
     if (width < 1200) setOpen(false);
   }, [width]);
+
+  const handleLogout = () => {
+    axios.post(`http://localhost:8000/api/usersLogOut/`, {}, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+      },
+    }).then((res) => {
+      console.log(res);
+      localStorage.clear()
+      nav("/login")
+    }).catch((err) => {
+      console.log(err);
+      Swal.fire(`Something went wrong !`, "", "error");
+    })
+    // console.log("aasdadas");
+    // Swal.fire({
+    //   title: `Are you sure , you want to Logout`,
+    //   icon: "question",
+    //   showDenyButton: true,
+    //   confirmButtonText: "Yes",
+    // }).then((result) => {
+    //   if (result.isConfirmed) {
+    //     console.log("aasdadas");
+    //     axios.post(`http://localhost:8000/api/usersLogOut/`, {}, {
+    //       headers: {
+    //         Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+    //       },
+    //     }).then((res) => {
+    //       console.log(res);
+    //       localStorage.clear()
+    //       nav("/login")
+    //     }).catch((err) => {
+    //       console.log(err);
+    //       Swal.fire(`Something went wrong !`, "", "error");
+    //     }).finally(() => {
+
+    //       console.log("FINAL");
+    //     })
+    //   }
+    // });
+    // console.log("aasdadas");
+  }
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
@@ -218,7 +263,7 @@ function Sidebar(props) {
                 </ListItemIcon>
                 Change Password
               </MenuItem>
-              <MenuItem onClick={() => { }}>
+              <MenuItem onClick={handleLogout}>
                 <ListItemIcon>
                   <Logout fontSize="small" />
                 </ListItemIcon>
