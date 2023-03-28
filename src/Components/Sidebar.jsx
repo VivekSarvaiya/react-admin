@@ -123,7 +123,7 @@ function Sidebar(props) {
   const handleLogout = () => {
     axios.post(`http://localhost:8000/api/usersLogOut/`, {}, {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        Authorization: `Bearer ${localStorage.getItem("REFRESH")}`,
       },
     }).then((res) => {
       console.log(res);

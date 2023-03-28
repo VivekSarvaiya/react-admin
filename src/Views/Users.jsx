@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import MOCK_DATA from "../Components/MOCK_DATA.json";
-import { Dropdown, Tag } from "antd";
+import { Avatar, Dropdown, Tag } from "antd";
 import { DatePicker } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import {
@@ -95,9 +95,9 @@ function Users(props) {
 
   const tableColumns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
       onFilter: (value, record) => console.log(value, record),
       sorter: (a, b) => antdTableSorter(a, b, "name"),
     },
@@ -107,21 +107,24 @@ function Users(props) {
       key: "email",
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
+      title: "Phone Number",
+      dataIndex: "phone_no",
+      key: "phone_no",
       // sorter: (a, b) => antdTableSorter(a, b, "cardNum"),
     },
     {
       title: "City",
       dataIndex: "city",
       key: "city",
+      render: (city) => {
+        return city.city_name
+      },
       sorter: (a, b) => antdTableSorter(a, b, "city"),
     },
     {
-      title: "Joining Date",
-      dataIndex: "jdate",
-      key: "jdate",
+      title: "Date of Birth",
+      dataIndex: "Date_of_birth",
+      key: "Date_of_birth",
       sorter: (a, b) => antdTableSorter(a, b, "jdate"),
     },
     {
@@ -149,24 +152,23 @@ function Users(props) {
   ];
 
 
+  const fetchData = () => {
+    axios
+      .get(`http://localhost:8000/api/UserAllDetails/${localStorage.getItem("USERID")}/`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setLoad(true);
+  };
   useEffect(() => {
     setLoad(true);
-    const fetchData = () => {
-      axios
-        .get("http://localhost:8000/api/v1/users")
-        .then((res) => {
-          console.log(res);
-          setData(res.data.data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      setLoad(true);
-    };
     fetchData();
-    return () => {
-      fetchData();
-    };
   }, []);
 
   return (
@@ -271,7 +273,7 @@ function Users(props) {
                   type="primary"
                   size="large"
                   className="d-flex align-items-center "
-                  onClick={search}
+                // onClick={search}
                 >
                   <SearchOutlined />
                   Search
@@ -339,24 +341,46 @@ function Users(props) {
             open={open1}
             onCancel={() => setOpen1(false)}
             footer={null}
-            width={1000}
+          // width={1000}
           >
             {row !== "" && (
               <Card>
-                <Form.Item name="name" label="Name">
-                  {row?.name}
+                {
+                  row?.image &&
+                  <Avatar
+                    sx={{
+                      width: 96,
+                      height: 96,
+                    }}
+                    src={row?.image}
+                  />
+                }
+                <Form.Item name="name" label="Username">
+                  {row?.username}
                 </Form.Item>
                 <Form.Item name="email" label="Email ID ">
                   {row?.email}
                 </Form.Item>
-                <Form.Item name="address" label="Address">
-                  {row?.address}
+                <Form.Item name="name" label="Firstname">
+                  {row?.first_name}
+                </Form.Item>
+                <Form.Item name="name" label="Lastname">
+                  {row?.last_name}
+                </Form.Item>
+                <Form.Item name="address" label="State">
+                  {row?.state?.state_name}
                 </Form.Item>
                 <Form.Item name="city" label="City">
-                  {row?.city}
+                  {row?.city?.city_name}
                 </Form.Item>
-                <Form.Item name="jdate" label="Joining Date">
-                  {row?.jdate}
+                <Form.Item name="jdate" label="Date Of Birth">
+                  {row?.Date_of_birth}
+                </Form.Item>
+                <Form.Item name="jdate" label="Aadhar Card Number">
+                  {row?.aadhar_no}
+                </Form.Item>
+                <Form.Item name="jdate" label="Phone Number">
+                  {row?.phone_no}
                 </Form.Item>
               </Card>
             )}

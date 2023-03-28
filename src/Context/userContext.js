@@ -58,16 +58,15 @@ const AuthProvider = ({ children }) => {
         }
       )
       .then((res) => {
-        console.log(res, "context");
+        // console.log(res, "context");
         setAuthState(res.data);
       })
       .catch((err) => {
         console.log(err);
-        refreshToken()
       });
   };
   useEffect(() => {
-    console.log(authflag, "authflag");
+    refreshToken()
     getUserData();
   }, [authflag]);
 
