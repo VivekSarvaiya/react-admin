@@ -63,7 +63,7 @@ function Sidebar(props) {
   const [open, setOpen] = React.useState(true);
   const [anchorEl, setAnchorEl] = useState(null);
   const [width, setWidth] = useState();
-  const { authState } = useContext(AuthContext)
+  const { authState } = useContext(AuthContext);
   const openmenu = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -121,46 +121,35 @@ function Sidebar(props) {
   }, [width]);
 
   const handleLogout = () => {
-    axios.post(`http://localhost:8000/api/usersLogOut/`, {}, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("REFRESH")}`,
-      },
-    }).then((res) => {
-      console.log(res);
-      localStorage.clear()
-      nav("/login")
-    }).catch((err) => {
-      console.log(err);
-      Swal.fire(`Something went wrong !`, "", "error");
-    })
-    // console.log("aasdadas");
-    // Swal.fire({
-    //   title: `Are you sure , you want to Logout`,
-    //   icon: "question",
-    //   showDenyButton: true,
-    //   confirmButtonText: "Yes",
-    // }).then((result) => {
-    //   if (result.isConfirmed) {
-    //     console.log("aasdadas");
-    //     axios.post(`http://localhost:8000/api/usersLogOut/`, {}, {
-    //       headers: {
-    //         Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-    //       },
-    //     }).then((res) => {
-    //       console.log(res);
-    //       localStorage.clear()
-    //       nav("/login")
-    //     }).catch((err) => {
-    //       console.log(err);
-    //       Swal.fire(`Something went wrong !`, "", "error");
-    //     }).finally(() => {
-
-    //       console.log("FINAL");
-    //     })
-    //   }
-    // });
-    // console.log("aasdadas");
-  }
+    Swal.fire({
+      title: `Are you sure , you want to Logout`,
+      icon: "question",
+      showDenyButton: true,
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .post(
+            `http://localhost:8000/api/usersLogOut/`,
+            {},
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+              },
+            }
+          )
+          .then((res) => {
+            console.log(res);
+            localStorage.clear();
+            nav("/login");
+          })
+          .catch((err) => {
+            console.log(err);
+            Swal.fire(`Something went wrong !`, "", "error");
+          });
+      }
+    });
+  };
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -291,7 +280,7 @@ function Sidebar(props) {
             <Divider />
             <List className="listItem">
               {SideListItems.map((item, index) => (
-                <ListItem disablePadding key={index} >
+                <ListItem disablePadding key={index}>
                   <NavLink to={item.path} className="navlink">
                     <ThemeProvider theme={theme}>
                       <ListItemButton>
