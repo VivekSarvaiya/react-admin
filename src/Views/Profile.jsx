@@ -1,11 +1,24 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Avatar } from "@mui/material";
 import { EditOutlined, UploadOutlined } from "@ant-design/icons";
-import { Button, Card, Form, Input, message, Modal } from "antd";
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  message,
+  Modal,
+  Row,
+  Tooltip,
+  Typography,
+} from "antd";
 import Sidebar from "../Components/Sidebar";
 import { AuthContext } from "../Context/userContext";
 import axios from "axios";
-import { Verified } from "@mui/icons-material";
+import { MailOutlined, Verified } from "@mui/icons-material";
+import OtpInput from "react-otp-input";
+const { Text } = Typography;
 
 const rules = {
   require: [
@@ -21,6 +34,13 @@ const Profile = () => {
   const [open, setOpen] = useState(true);
   const [openEditModal, setOpenModal] = useState(false);
   const [image, setImage] = useState(authState?.image);
+  const [openVerifyModal, setOpenVerifyModal] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [email, setemail] = useState("");
+  const [otp, setOtp] = useState();
+  const [otperror, setOtperror] = useState();
+  const [pageState, setPageState] = useState("");
+
   const [data, setData] = useState({
     fname: authState?.first_name,
     lname: authState?.last_name,
@@ -48,13 +68,12 @@ const Profile = () => {
     });
   };
 
-
   const handleImageChange = async (event) => {
     // await console.log(e.target.file[0]);
     // setFile(URL.createObjectURL(e.target.files[0]));
     const file = event.target.files[0];
     const base64 = await convertImageToBase64(file);
-    setImage(base64)
+    setImage(base64);
     // console.log(base64);
   };
 
@@ -64,7 +83,6 @@ const Profile = () => {
     bodyFormData.append("first_name", data.fname || authState.first_name);
     bodyFormData.append("last_name", data.lname || authState.last_name);
     bodyFormData.append("Date_of_birth", data.dob || authState.Date_of_birth);
-
     image && bodyFormData.append("image", image || authState.image);
     bodyFormData.append("email", data.email || authState.email);
     bodyFormData.append("phone_no", data.phone || authState.phone_no);
@@ -90,17 +108,25 @@ const Profile = () => {
       });
   };
 
-  const handleCancelUpdate = () => {
-    // debugger
-    setData({
-      fname: authState?.first_name,
-      lname: authState?.last_name,
-      dob: authState?.Date_of_birth,
-      email: authState?.email,
-      phone: authState?.phone_no,
-    });
-    setOpenModal(false);
-  };
+  // const ()=>setOpenModal(false) = () => {
+  //   setOpenModal(false);
+  //   // debugger
+  //   setData({
+  //     fname: authState?.first_name,
+  //     lname: authState?.last_name,
+  //     dob: authState?.Date_of_birth,
+  //     email: authState?.email,
+  //     phone: authState?.phone_no,
+  //   });
+  // };
+
+  // const handleOk = () => {
+  //   setConfirmLoading(true);
+  //   setTimeout(() => {
+  //     setOpen(false);
+  //     setConfirmLoading(false);
+  //   }, 2000);
+  // };
 
   // useEffect(() => {
   //   setData({
@@ -111,6 +137,71 @@ const Profile = () => {
   //     phone: authState?.phone_no,
   //   })
   // }, [])
+  const onSend = () => {
+    console.log(email);
+    setLoading(true);
+    axios
+      .post(
+        `http://localhost:8000/api/UsersEmailVerifySendOTP/`,
+        { email },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        setLoading(false);
+        message.success("OTP has been sent to your email address !", 2);
+        setPageState("VerifyOtp");
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+        message.error(err.response.data.message);
+      });
+  };
+
+  const verifyOtp = () => {
+    setLoading(true);
+    console.log({ email, otp });
+    axios
+      .post(
+        `http://localhost:8000/api/UsersEmailVerifyOTPVerify/`,
+        {
+          email,
+          otp: Number(otp),
+        },
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        setLoading(false);
+        setOtperror(false);
+        setPageState("");
+        setAuthflag(!authflag);
+        message.success("OTP verified successfully !", 1, () =>
+          setOpenVerifyModal(false)
+        );
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoading(false);
+        setOtperror(true);
+        setOtp();
+        message.error(err.response.data.error);
+      });
+  };
+
+  const inputstyle = {
+    width: "40px",
+    height: "56px",
+    background: "#e9e9e9",
+    borderRadius: "3px",
+    border: "none",
+    fontSize: "20px",
+  };
 
   return (
     <>
@@ -136,7 +227,19 @@ const Profile = () => {
                     <div className="col-md-6 mx-4">
                       <dt className="text-sm font-medium text-gray-500">
                         {authState?.username || "N/A"}{" "}
-                        <Verified color="primary" />
+                        {authState?.is_email_verified ? (
+                          <Tooltip title="Verified">
+                            <Verified color="primary" />
+                          </Tooltip>
+                        ) : (
+                          <Button
+                            // type="link"
+                            danger
+                            onClick={() => setOpenVerifyModal(true)}
+                          >
+                            Verify now
+                          </Button>
+                        )}
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900">
                         {authState.email || "N/A"}
@@ -232,16 +335,20 @@ const Profile = () => {
         open={openEditModal}
         maskClosable={false}
         // onSubmit={() => setOpen(false)}
-        onCancel={handleCancelUpdate}
+        onCancel={() => setOpenModal(false)}
         footer={[
           <Button key="submit" onClick={handleUpdate}>
             Save
           </Button>,
-          <Button key="cancel" type="primary" onClick={handleCancelUpdate}>
+          <Button
+            key="cancel"
+            type="primary"
+            onClick={() => setOpenModal(false)}
+          >
             Cancel
           </Button>,
         ]}
-      // width={1000}
+        // width={1000}
       >
         <Card>
           <Form name="edit details" style={{ textAlign: "-webkit-center" }}>
@@ -306,6 +413,11 @@ const Profile = () => {
                 className="selectElement"
               />
             </Form.Item>
+
+            <Text type="secondary">
+              If you Update Email or Phone , then you will have to reverify
+              yourself !
+            </Text>
             <Form.Item
               name="email"
               label="Registered Email"
@@ -335,6 +447,108 @@ const Profile = () => {
             </Form.Item>
           </Form>
         </Card>
+      </Modal>
+      <Modal
+        open={openVerifyModal}
+        onCancel={() => {
+          setOpenVerifyModal(false);
+          setPageState("");
+        }}
+        footer={false}
+      >
+        {pageState !== "VerifyOtp" ? (
+          <div className="m-2">
+            <div className="text-center">
+              <img className="img-fluid" src="/img/logo.png" alt="" />
+              <h3 className="mt-3 font-weight-bold">Verify Admin</h3>
+              <p className="mb-4">
+                Admin, please enter your Email to verify yourself !
+              </p>
+            </div>
+            <Row justify="center">
+              <Col xs={24} sm={24} md={20} lg={20}>
+                <Form
+                  layout="vertical"
+                  name="forget-password"
+                  onFinish={onSend}
+                >
+                  <Form.Item
+                    name="email"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input your email address",
+                      },
+                      {
+                        type: "email",
+                        message: "Please enter valid email address",
+                      },
+                    ]}
+                  >
+                    <Input
+                      onChange={(e) => setemail(e.target.value)}
+                      value={email}
+                      placeholder=" Enter email address"
+                      prefix={<MailOutlined className="text-primary" />}
+                    />
+                  </Form.Item>
+                  <br />
+                  <Form.Item>
+                    <Button
+                      loading={loading}
+                      type="primary"
+                      htmlType="submit"
+                      block
+                    >
+                      {loading ? "Sending" : "Send"}
+                    </Button>
+                  </Form.Item>
+                </Form>
+              </Col>
+            </Row>
+          </div>
+        ) : (
+          <div className="m-2">
+            <div className="text-center">
+              <img className="img-fluid" src="/img/logo.png" alt="" />
+              <h3 className="mt-3 font-weight-bold">Verify Admin</h3>
+              <p className="mb-4">Enter the OTP recieved in your inbox</p>
+            </div>
+            <Row justify="center">
+              <Col xs={24} sm={24} md={20} lg={20}>
+                <OtpInput
+                  value={otp}
+                  onChange={(e) => setOtp(e)}
+                  numInputs={6}
+                  placeholder="••••••"
+                  inputStyle={inputstyle}
+                  isInputNum="true"
+                  containerStyle={{
+                    margin: "0 1rem",
+                    gap: "5px",
+                    justifyContent: "center",
+                  }}
+                  hasErrored={otperror}
+                  errorStyle={{ border: "1px solid red" }}
+                  // focusStyle={{ border: "1px solid red !important" }}
+                  shouldAutoFocus="true"
+                />
+                <br />
+                <Form.Item>
+                  <Button
+                    loading={loading}
+                    type="primary"
+                    htmlType="submit"
+                    block
+                    onClick={verifyOtp}
+                  >
+                    {loading ? "Verifying" : "Verify"}
+                  </Button>
+                </Form.Item>
+              </Col>
+            </Row>
+          </div>
+        )}
       </Modal>
     </>
   );

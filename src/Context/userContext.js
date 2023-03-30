@@ -31,12 +31,9 @@ const AuthProvider = ({ children }) => {
 
   const refreshToken = async () => {
     axios
-      .post(
-        `http://localhost:8000/api/token/refresh/`,
-        {
-          refresh: localStorage.getItem("REFRESH")
-        }
-      )
+      .post(`http://localhost:8000/api/token/refresh/`, {
+        refresh: localStorage.getItem("REFRESH"),
+      })
       .then((res) => {
         console.log(res, "Refresh");
       })
@@ -63,10 +60,10 @@ const AuthProvider = ({ children }) => {
       })
       .catch((err) => {
         console.log(err);
+        // refreshToken()
       });
   };
   useEffect(() => {
-    refreshToken()
     getUserData();
   }, [authflag]);
 
