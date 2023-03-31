@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import MOCK_DATA from "../Components/MOCK_DATA.json";
-import { Avatar, Dropdown, Tag } from "antd";
+import { Dropdown, Tag } from "antd";
 import { DatePicker } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import {
@@ -31,6 +31,8 @@ import { Block } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
 import axios from "axios";
+import { Avatar } from "@mui/material";
+import { Excel } from "antd-table-saveas-excel";
 const { confirm } = Modal;
 const { Option } = Select;
 
@@ -43,10 +45,8 @@ function Users(props) {
   const [data, setData] = useState([]);
   const [open1, setOpen1] = useState(false);
   const [row, setRow] = useState(null);
-  // const [form] = Form.useForm();
-
+  const [searchusername, setSearchusername] = useState();
   const [load, setLoad] = useState(false);
-
   function showConfirm(row) {
     console.log(row);
     Swal.fire({
@@ -60,7 +60,7 @@ function Users(props) {
       }
     });
   }
-
+  console.log(searchusername);
   const dropdownMenu = (row) => (
     <Menu className="selectElement">
       <Menu.Item
@@ -117,7 +117,7 @@ function Users(props) {
       dataIndex: "city",
       key: "city",
       render: (city) => {
-        return city.city_name
+        return city.city_name;
       },
       sorter: (a, b) => antdTableSorter(a, b, "city"),
     },
@@ -151,12 +151,16 @@ function Users(props) {
     },
   ];
 
-
   const fetchData = () => {
     axios
-      .get(`http://localhost:8000/api/UserAllDetails/${localStorage.getItem("USERID")}/`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
-      })
+      .get(
+        `http://localhost:8000/api/UserAllDetails/${localStorage.getItem(
+          "USERID"
+        )}`,
+        {
+          headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+        }
+      )
       .then((res) => {
         console.log(res);
         setData(res.data);
@@ -166,6 +170,26 @@ function Users(props) {
       });
     setLoad(true);
   };
+
+  const exportTableData = (users) => {
+    let arr = [];
+    // console.log(users);
+    users.map((item) => {
+      arr.push({
+        username: item.username,
+        email: item.email,
+        first_name: item.first_name,
+        last_name: item.last_name,
+        state_name: item.state.state_name,
+        city_name: item.city.city_name,
+        Date_of_birth: item.Date_of_birth,
+        aadhar_no: item.aadhar_no,
+        phone_no: item.phone_no,
+      });
+    });
+    return arr.flatMap((item) => item);
+  };
+
   useEffect(() => {
     setLoad(true);
     fetchData();
@@ -199,6 +223,8 @@ function Users(props) {
                     className="my-2 p-2 selectElement"
                     placeholder="Search user by name"
                     name="empId"
+                    value={searchusername}
+                    onChange={(e) => setSearchusername(e.target.value)}
                     prefix={<SearchOutlined />}
                   />
                 </div>
@@ -219,11 +245,11 @@ function Users(props) {
                   </label>
                   <RangePicker
                     className="w-100 my-2 p-2 selectElement"
-                  //   defaultValue={[
-                  // moment("2015/01/01", dateFormat),
-                  // moment("2015/01/01", dateFormat)
-                  //   ]}
-                  //   format={dateFormat}
+                    //   defaultValue={[
+                    // moment("2015/01/01", dateFormat),
+                    // moment("2015/01/01", dateFormat)
+                    //   ]}
+                    //   format={dateFormat}
                   />
                 </div>
 
@@ -273,7 +299,7 @@ function Users(props) {
                   type="primary"
                   size="large"
                   className="d-flex align-items-center "
-                // onClick={search}
+                  onClick={() => fetchData(searchusername)}
                 >
                   <SearchOutlined />
                   Search
@@ -292,20 +318,25 @@ function Users(props) {
                 type="primary"
                 size="large"
                 className="d-flex align-items-center "
-              // onClick={() => {
-              //   // exportTableData(list);
-              //   const excel = new Excel();
-              //   excel
-              //     .addSheet("test")
-              //     .addColumns([
-              //       { title: "Driver Name", dataIndex: "name" },
-              //       { title: "Driver ID", dataIndex: "uuid" },
-              //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-              //       { title: "Department", dataIndex: "deptName" },
-              //     ])
-              //     .addDataSource(exportTableData(list))
-              //     .saveAs("Drivers.xlsx");
-              // }}
+                onClick={() => {
+                  // exportTableData(list);
+                  const excel = new Excel();
+                  excel
+                    .addSheet("MMC")
+                    .addColumns([
+                      { title: "Username", dataIndex: "username" },
+                      { title: "Email ID", dataIndex: "email" },
+                      { title: "Firstname", dataIndex: "first_name" },
+                      { title: "Lastname", dataIndex: "last_name" },
+                      { title: "State", dataIndex: "state_name" },
+                      { title: "City", dataIndex: "city_name" },
+                      { title: "Date Of Birth", dataIndex: "Date_of_birth" },
+                      { title: "Aadhar Card Number", dataIndex: "aadhar_no" },
+                      { title: "Phone Number", dataIndex: "phone_no" },
+                    ])
+                    .addDataSource(exportTableData(data))
+                    .saveAs("Users.xlsx");
+                }}
               >
                 <DownloadOutlined />
                 Export
@@ -341,20 +372,20 @@ function Users(props) {
             open={open1}
             onCancel={() => setOpen1(false)}
             footer={null}
-          // width={1000}
+            // width={1000}
           >
             {row !== "" && (
               <Card>
-                {
-                  row?.image &&
-                  <Avatar
-                    sx={{
-                      width: 96,
-                      height: 96,
-                    }}
-                    src={row?.image}
-                  />
-                }
+                <Avatar
+                  sx={{
+                    m: 1,
+                    width: "8rem",
+                    height: "8rem",
+                    background:
+                      "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+                  }}
+                  src={row?.image}
+                />
                 <Form.Item name="name" label="Username">
                   {row?.username}
                 </Form.Item>
