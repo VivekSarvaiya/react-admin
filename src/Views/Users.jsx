@@ -113,13 +113,13 @@ function Users(props) {
       // sorter: (a, b) => antdTableSorter(a, b, "cardNum"),
     },
     {
-      title: "City",
-      dataIndex: "city",
-      key: "city",
-      render: (city) => {
-        return city.city_name;
+      title: "Area",
+      dataIndex: "area",
+      key: "area",
+      render: (area) => {
+        return area.area_name;
       },
-      sorter: (a, b) => antdTableSorter(a, b, "city"),
+      sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
     {
       title: "Date of Birth",
@@ -132,11 +132,11 @@ function Users(props) {
       dataIndex: "status",
       key: "status",
       render: (status) => {
-        if (status === "active") {
-          return <Tag color="success">Active</Tag>;
-        } else {
-          return <Tag color="red">Blocked</Tag>;
-        }
+        // if (status === "active") {
+        return <Tag color="success">Active</Tag>;
+        // } else {
+        //   return <Tag color="red">Blocked</Tag>;
+        // }
       },
       // sorter: (a, b) => antdTableSorter(a, b, "jdate"),
     },
@@ -151,12 +151,9 @@ function Users(props) {
     },
   ];
 
-  const fetchData = () => {
+  const fetchData = (api) => {
     axios
-      .get(
-        `http://localhost:8000/api/UserAllDetails/${localStorage.getItem(
-          "USERID"
-        )}`,
+      .get(api,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
         }
@@ -190,9 +187,17 @@ function Users(props) {
     return arr.flatMap((item) => item);
   };
 
+  const search = () => {
+    let api = searchusername ? `http://localhost:8000/api/UserAllDetails/${localStorage.getItem("USERID")}/?username=${searchusername}` : `http://localhost:8000/api/UserAllDetails/${localStorage.getItem("USERID")}`
+    fetchData(api)
+  }
+
+  const resetSearch = () => {
+    setSearchusername("")
+  }
+
   useEffect(() => {
-    setLoad(true);
-    fetchData();
+    search();
   }, []);
 
   return (
@@ -203,26 +208,25 @@ function Users(props) {
           className="content-bg"
           style={open ? { margin: "65px 0 0 240px" } : { margin: "65px 0 0 0" }}
         >
-          <div className="px-5">
-            <span className="page-title">Users</span>
+          <div className="px-5 py-3">
             <Card className="selectElement">
               <div
                 style={{
                   display: "flex",
-                  justifyContent: "space-between",
+                  justifyContent: "flex-start",
                   gap: 5,
                 }}
                 className="search-card"
               >
                 <div>
                   <label htmlFor=" " className="font16">
-                    Name
+                    Username
                   </label>
 
                   <Input
                     className="my-2 p-2 selectElement"
-                    placeholder="Search user by name"
-                    name="empId"
+                    placeholder="Search user by username"
+                    name="username"
                     value={searchusername}
                     onChange={(e) => setSearchusername(e.target.value)}
                     prefix={<SearchOutlined />}
@@ -230,26 +234,22 @@ function Users(props) {
                 </div>
                 <div>
                   <label htmlFor="" className="font16">
-                    Email
+                    Area
                   </label>
                   <Input
                     className="my-2 p-2 selectElement"
-                    placeholder="Search user by email-id"
+                    placeholder="Search user by area name"
                     name="empName"
                     prefix={<SearchOutlined />}
                   />
                 </div>
-                <div>
+                {/* <div>
                   <label htmlFor="" className="font16">
                     Date
                   </label>
                   <RangePicker
                     className="w-100 my-2 p-2 selectElement"
-                    //   defaultValue={[
-                    // moment("2015/01/01", dateFormat),
-                    // moment("2015/01/01", dateFormat)
-                    //   ]}
-                    //   format={dateFormat}
+                  
                   />
                 </div>
 
@@ -275,7 +275,7 @@ function Users(props) {
                     placeholder="Search user by city"
                     name="deptId"
                   ></Select>
-                </div>
+                </div> */}
               </div>
               <br />
               <div
@@ -290,7 +290,8 @@ function Users(props) {
                 <Button
                   type="primary"
                   size="large"
-                  className="d-flex align-items-center "
+                  className="d-flex align-items-center"
+                  onClick={resetSearch}
                 >
                   <ReloadOutlined />
                   Reset
@@ -299,7 +300,7 @@ function Users(props) {
                   type="primary"
                   size="large"
                   className="d-flex align-items-center "
-                  onClick={() => fetchData(searchusername)}
+                  onClick={search}
                 >
                   <SearchOutlined />
                   Search
@@ -372,7 +373,7 @@ function Users(props) {
             open={open1}
             onCancel={() => setOpen1(false)}
             footer={null}
-            // width={1000}
+          // width={1000}
           >
             {row !== "" && (
               <Card>
