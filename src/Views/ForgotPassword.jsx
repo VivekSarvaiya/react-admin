@@ -19,7 +19,7 @@ function ForgotPassword(props) {
     console.log(username);
     setLoading(true);
     axios
-      .post(`http://localhost:8000/api/usersForgotPassword/`, { username })
+      .post(` ${process.env.REACT_APP_BASE_URL}/api/usersForgotPassword/`, { username })
       .then((res) => {
         console.log(res);
         setLoading(false);
@@ -36,7 +36,7 @@ function ForgotPassword(props) {
     setLoading(true);
     console.log({ username, otp });
     axios
-      .post(`http://localhost:8000/api/usersForgotPasswordOTPVerify/`, {
+      .post(` ${process.env.REACT_APP_BASE_URL}/api/usersForgotPasswordOTPVerify/`, {
         username,
         otp: Number(otp),
       })
@@ -82,7 +82,7 @@ function ForgotPassword(props) {
   const setNewPassword = (values) => {
     console.log(values);
     setLoading(true);
-    axios.post(`http://localhost:8000/api/usersForgotPasswordChange/`, { username, password: values.password }).then((res) => {
+    axios.post(` ${process.env.REACT_APP_BASE_URL}/api/usersForgotPasswordChange/`, { username, password: values.password }).then((res) => {
       setLoading(false)
       message.success("Password changed successfully !", 1, () => nav('/login'))
     }).catch((err) => {

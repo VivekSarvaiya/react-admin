@@ -80,15 +80,15 @@ const Profile = () => {
   const handleUpdate = () => {
     console.log(data);
     const bodyFormData = new FormData();
-    bodyFormData.append("first_name", data.fname || authState.first_name);
-    bodyFormData.append("last_name", data.lname || authState.last_name);
-    bodyFormData.append("Date_of_birth", data.dob || authState.Date_of_birth);
-    image && bodyFormData.append("image", image || authState.image);
-    bodyFormData.append("email", data.email || authState.email);
-    bodyFormData.append("phone_no", data.phone || authState.phone_no);
+    data.fname && bodyFormData.append("first_name", data.fname);
+    data.lname && bodyFormData.append("last_name", data.lname);
+    data.dob && bodyFormData.append("Date_of_birth", data.dob);
+    image && bodyFormData.append("image", image);
+    data.email && bodyFormData.append("email", data.email);
+    data.phone && bodyFormData.append("phone_no", data.phone);
     axios
       .patch(
-        `http://localhost:8000/api/usersDetailsUpdate/${localStorage.getItem(
+        ` ${process.env.REACT_APP_BASE_URL}/api/usersDetailsUpdate/${localStorage.getItem(
           "USERID"
         )}/`,
         bodyFormData,
@@ -142,7 +142,7 @@ const Profile = () => {
     setLoading(true);
     axios
       .post(
-        `http://localhost:8000/api/UsersEmailVerifySendOTP/`,
+        ` ${process.env.REACT_APP_BASE_URL}/api/UsersEmailVerifySendOTP/`,
         { email },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
@@ -151,7 +151,7 @@ const Profile = () => {
       .then((res) => {
         console.log(res);
         setLoading(false);
-        message.success("OTP has been sent to your email address !", 2);
+        message.success("OTP has been sent to your email address !");
         setPageState("VerifyOtp");
       })
       .catch((err) => {
@@ -166,7 +166,7 @@ const Profile = () => {
     console.log({ email, otp });
     axios
       .post(
-        `http://localhost:8000/api/UsersEmailVerifyOTPVerify/`,
+        ` ${process.env.REACT_APP_BASE_URL}/api/UsersEmailVerifyOTPVerify/`,
         {
           email,
           otp: Number(otp),
@@ -229,7 +229,7 @@ const Profile = () => {
                         {authState?.username || "N/A"}{" "}
                         {authState?.is_email_verified ? (
                           <Tooltip title="Verified">
-                            <Verified color="primary" />
+                            <Verified sx={{ color: "green" }} />
                           </Tooltip>
                         ) : (
                           <Button
@@ -336,6 +336,7 @@ const Profile = () => {
         maskClosable={false}
         // onSubmit={() => setOpen(false)}
         onCancel={() => setOpenModal(false)}
+        zIndex={100}
         footer={[
           <Button key="submit" onClick={handleUpdate}>
             Save
@@ -348,10 +349,9 @@ const Profile = () => {
             Cancel
           </Button>,
         ]}
-        // width={1000}
       >
         <Card>
-          <Form name="edit details" style={{ textAlign: "-webkit-center" }}>
+          <Form name="edit details" layout="vertical" style={{ textAlign: "-webkit-center" }}>
             <div className="">
               <Avatar
                 sx={{
@@ -415,9 +415,11 @@ const Profile = () => {
             </Form.Item>
 
             <Text type="secondary">
-              If you Update Email or Phone , then you will have to reverify
+              <b>Note :- </b> If you want to update email or phone number, then you will have to reverify
               yourself !
             </Text>
+            <br />
+            <br />
             <Form.Item
               name="email"
               label="Registered Email"
@@ -450,6 +452,7 @@ const Profile = () => {
       </Modal>
       <Modal
         open={openVerifyModal}
+        centered
         onCancel={() => {
           setOpenVerifyModal(false);
           setPageState("");

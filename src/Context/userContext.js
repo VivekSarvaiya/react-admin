@@ -12,7 +12,7 @@ const AuthProvider = ({ children }) => {
   // const setUserAuthInfo = (id) => {
   //   console.log(id);
   //   axios
-  //     .get(`http://localhost:8000/api/UserAllDetails/${id}/`, {
+  //     .get(` ${process.env.REACT_APP_BASE_URL}/api/UserAllDetails/${id}/`, {
   //       headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
   //     })
   //     .then((res) => {
@@ -31,7 +31,7 @@ const AuthProvider = ({ children }) => {
 
   const refreshToken = async () => {
     axios
-      .post(`http://localhost:8000/api/token/refresh/`, {
+      .post(` ${process.env.REACT_APP_BASE_URL}/api/token/refresh/`, {
         refresh: localStorage.getItem("REFRESH"),
       })
       .then((res) => {
@@ -45,7 +45,7 @@ const AuthProvider = ({ children }) => {
   const getUserData = async () => {
     axios
       .get(
-        `http://localhost:8000/api/AdminDetail/${localStorage.getItem(
+        ` ${process.env.REACT_APP_BASE_URL}/api/AdminDetail/${localStorage.getItem(
           "USERID"
         )}`,
         {
@@ -55,7 +55,7 @@ const AuthProvider = ({ children }) => {
         }
       )
       .then((res) => {
-        // console.log(res, "context");
+        console.log(res, "context");
         setAuthState(res.data);
       })
       .catch((err) => {

@@ -28,6 +28,7 @@ function GoogleMapComp(props) {
     width: "100vw",
     height: "100vh",
     position: "absolute",
+    zIndex: -1
     // marginTop: "50px",
   };
 
@@ -238,17 +239,16 @@ function GoogleMapComp(props) {
               }}
               icon={{
                 // url: "../assets/images/potholes.png",
-                url: `../assets/images/${
-                  item.type === "Potholes"
-                    ? "pothole.png"
-                    : item.type === "Drainage"
+                url: `../assets/images/${item.type === "Potholes"
+                  ? "pothole.png"
+                  : item.type === "Drainage"
                     ? "drain1.png"
                     : item.type === "Road"
-                    ? "road2.png"
-                    : item.type === "Oil Leakeage"
-                    ? "road2.png"
-                    : ""
-                }`,
+                      ? "road2.png"
+                      : item.type === "Oil Leakeage"
+                        ? "road2.png"
+                        : ""
+                  }`,
               }}
               position={item.location}
             />
@@ -296,38 +296,23 @@ function GoogleMapComp(props) {
               {item}
             </Checkbox>
             <img
-              src={`../assets/images/${
-                item === "Potholes"
-                  ? "potholes.png"
-                  : item === "Drainage"
+              src={`../assets/images/${item === "Potholes"
+                ? "potholes.png"
+                : item === "Drainage"
                   ? "drainage.png"
                   : item === "Road"
-                  ? "road-100.png"
-                  : item === "Oil Leakeage"
-                  ? "road-100.png"
-                  : ""
-              }`}
+                    ? "road-100.png"
+                    : item === "Oil Leakeage"
+                      ? "road-100.png"
+                      : ""
+                }`}
               width={30}
               alt={item}
             />
           </div>
         ))}
 
-        {/* <div className="d-flex align-items-center justify-content-between">
-          <Checkbox defaultChecked>Road</Checkbox>
-          <img src="../assets/images/road.png" alt="road" />
-        </div>
-        <br />
-        <div className="d-flex align-items-center justify-content-between">
-          <Checkbox defaultChecked>Drainage</Checkbox>
-          <img src="../assets/images/drain.png" alt="drain" />
-        </div>
-        <br />
-        <div className="d-flex align-items-center justify-content-between">
-          <Checkbox defaultChecked>Oil Leakeage</Checkbox>
-          <img src="../assets/images/road.png" alt="raod" />
-        </div>
-        <br /> */}
+
       </div>
     </GoogleMap>
   ) : (

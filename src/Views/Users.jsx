@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
-import MOCK_DATA from "../Components/MOCK_DATA.json";
-import { Dropdown, Tag } from "antd";
-import { DatePicker } from "antd";
-import { EllipsisOutlined } from "@ant-design/icons";
+import { DatePicker, Tag } from "antd";
 import {
   Card,
   Table,
@@ -188,7 +185,7 @@ function Users(props) {
   };
 
   const search = () => {
-    let api = searchusername ? `http://localhost:8000/api/UserAllDetails/${localStorage.getItem("USERID")}/?username=${searchusername}` : `http://localhost:8000/api/UserAllDetails/${localStorage.getItem("USERID")}`
+    let api = searchusername ? ` ${process.env.REACT_APP_BASE_URL}/api/UserAllDetails/${localStorage.getItem("USERID")}/?username=${searchusername}` : ` ${process.env.REACT_APP_BASE_URL}/api/UserAllDetails/${localStorage.getItem("USERID")}`
     fetchData(api)
   }
 

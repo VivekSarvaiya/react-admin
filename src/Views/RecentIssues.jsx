@@ -2,10 +2,7 @@ import React, { useState } from "react";
 import { Box } from "@mui/system";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
-
-import { Dropdown } from "antd";
 import { DatePicker } from "antd";
-import { EllipsisOutlined } from "@ant-design/icons";
 import {
   Card,
   Table,
@@ -33,63 +30,15 @@ import {
 // import utils from "utils";
 import { Modal } from "antd";
 // import axios from "axios";
+import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
 const { confirm } = Modal;
 const { Option } = Select;
-
 const { MonthPicker, RangePicker } = DatePicker;
 
 function RecentIssues(props) {
   const [open, setOpen] = useState(true);
   const [list, setList] = useState();
-  const Flex = (props) => {
-    const {
-      children,
-      className,
-      alignItems,
-      justifyContent,
-      mobileFlex,
-      flexDirection,
-    } = props;
-    const getFlexResponsive = () => (mobileFlex ? "d-flex" : "d-md-flex");
-    return (
-      <div
-        className={`${getFlexResponsive()} ${className} ${
-          flexDirection ? "flex-" + flexDirection : ""
-        } ${alignItems ? "align-items-" + alignItems : ""} ${
-          justifyContent ? "justify-content-" + justifyContent : ""
-        }`}
-      >
-        {children}
-      </div>
-    );
-  };
 
-  const EllipsisDropdown = (props) => {
-    return (
-      <Dropdown
-        overlay={props.menu}
-        placement={props.placement}
-        trigger={["click"]}
-      >
-        <div className="ellipsis-dropdown">
-          <EllipsisOutlined />
-        </div>
-      </Dropdown>
-    );
-  };
-
-  const antdTableSorter = (a, b, key) => {
-    if (typeof a[key] === "number" && typeof b[key] === "number") {
-      return a[key] - b[key];
-    }
-
-    if (typeof a[key] === "string" && typeof b[key] === "string") {
-      a = a[key].toLowerCase();
-      b = b[key].toLowerCase();
-      return a > b ? -1 : b > a ? 1 : 0;
-    }
-    return;
-  };
 
   function showConfirm(row) {
     // confirm({
@@ -241,7 +190,7 @@ function RecentIssues(props) {
                     placeholder="Search user by name"
                     name="empId"
                     prefix={<SearchOutlined />}
-                    // onChange={(e) => onChangeFilter(e)}
+                  // onChange={(e) => onChangeFilter(e)}
                   />
                 </div>
                 <div>
@@ -253,7 +202,7 @@ function RecentIssues(props) {
                     placeholder="Search user by email-id"
                     name="empName"
                     prefix={<SearchOutlined />}
-                    // onChange={(e) => onChangeFilter(e)}
+                  // onChange={(e) => onChangeFilter(e)}
                   />
                 </div>
                 <div>
@@ -262,11 +211,11 @@ function RecentIssues(props) {
                   </label>
                   <RangePicker
                     className="w-100 my-2 p-2 selectElement"
-                    //   defaultValue={[
-                    // moment("2015/01/01", dateFormat),
-                    // moment("2015/01/01", dateFormat)
-                    //   ]}
-                    //   format={dateFormat}
+                  //   defaultValue={[
+                  // moment("2015/01/01", dateFormat),
+                  // moment("2015/01/01", dateFormat)
+                  //   ]}
+                  //   format={dateFormat}
                   />
                 </div>
 
@@ -339,20 +288,20 @@ function RecentIssues(props) {
                 type="primary"
                 size="large"
                 className="d-flex align-items-center "
-                // onClick={() => {
-                //   // exportTableData(list);
-                //   const excel = new Excel();
-                //   excel
-                //     .addSheet("test")
-                //     .addColumns([
-                //       { title: "Driver Name", dataIndex: "name" },
-                //       { title: "Driver ID", dataIndex: "uuid" },
-                //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-                //       { title: "Department", dataIndex: "deptName" },
-                //     ])
-                //     .addDataSource(exportTableData(list))
-                //     .saveAs("Drivers.xlsx");
-                // }}
+              // onClick={() => {
+              //   // exportTableData(list);
+              //   const excel = new Excel();
+              //   excel
+              //     .addSheet("test")
+              //     .addColumns([
+              //       { title: "Driver Name", dataIndex: "name" },
+              //       { title: "Driver ID", dataIndex: "uuid" },
+              //       { title: "Staff Pass ID", dataIndex: "cardNo" },
+              //       { title: "Department", dataIndex: "deptName" },
+              //     ])
+              //     .addDataSource(exportTableData(list))
+              //     .saveAs("Drivers.xlsx");
+              // }}
               >
                 <DownloadOutlined />
                 Export
@@ -383,7 +332,7 @@ function RecentIssues(props) {
                       key="submit"
                       htmlType="submit"
                       type="primary"
-                      //   onClick={onSubmitAdd}
+                    //   onClick={onSubmitAdd}
                     >
                       Add
                     </Button>
@@ -472,9 +421,9 @@ function RecentIssues(props) {
                 footer={[
                   <Button
                     key="back"
-                    // onClick={() => {
-                    //   setOpenEdit(false);
-                    // }}
+                  // onClick={() => {
+                  //   setOpenEdit(false);
+                  // }}
                   >
                     Cancel
                   </Button>,
@@ -508,7 +457,7 @@ function RecentIssues(props) {
                     <Form.Item name="driverId" label="Driver ID">
                       <Input
                         name="driverId"
-                        // onChange={(e) => setEditDriverId(e.target.value)}
+                      // onChange={(e) => setEditDriverId(e.target.value)}
                       />
                     </Form.Item>
                     <Form.Item name="name" label="Employee Name" required>

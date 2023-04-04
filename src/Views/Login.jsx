@@ -43,7 +43,7 @@ export const Login = (props) => {
       .then((values) => {
         console.log(loading);
         axios
-          .post(`http://localhost:8000/api/usersLogin/`, values)
+          .post(`${process.env.REACT_APP_BASE_URL}/api/usersLogin/`, values)
           .then((res) => {
             console.log(res);
             localStorage.setItem("TOKEN", res.data.token.access);

@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
-import MOCK_DATA from "../Components/MOCK_DATA.json";
-import { Dropdown, Tag } from "antd";
+import { Tag } from "antd";
 import { DatePicker } from "antd";
-import { EllipsisOutlined } from "@ant-design/icons";
 import {
   Card,
   Table,
@@ -34,7 +32,6 @@ import axios from "axios";
 // import axios from "axios";
 const { confirm } = Modal;
 const { Option } = Select;
-
 const { RangePicker } = DatePicker;
 
 function Staff() {
@@ -45,10 +42,27 @@ function Staff() {
   const [open1, setOpen1] = useState(false);
   const [row, setRow] = useState(null);
   const [data, setData] = useState([]);
-  // const [form] = Form.useForm();
-
   const [load, setLoad] = useState(false);
-
+  const [department, setDepartment] = useState("");
+  const [addData, setAddData] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    username: "",
+    phone_no: null,
+    Date_of_birth: null,
+    area: "",
+    aadhar_no: null,
+  });
+  const changehandler = (event) => {
+    console.log(event);
+    const { name, value } = event.target;
+    setAddData({ ...addData, [name]: value });
+  };
+  const submitStaffDetails = (event) => {
+    event.preventDefault();
+    console.log(addData);
+  };
   function showConfirm(row) {
     console.log(row);
     Swal.fire({
@@ -62,7 +76,6 @@ function Staff() {
       }
     });
   }
-
   const dropdownMenu = (row) => (
     <Menu className="selectElement">
       <Menu.Item
@@ -94,7 +107,6 @@ function Staff() {
       </Menu.Item>
     </Menu>
   );
-
   const tableColumns = [
     {
       title: "Name",
@@ -125,6 +137,7 @@ function Staff() {
       dataIndex: "jdate",
       key: "jdate",
       sorter: (a, b) => antdTableSorter(a, b, "jdate"),
+
     },
     {
       title: "Status",
@@ -149,27 +162,26 @@ function Staff() {
       ),
     },
   ];
-
   useEffect(() => {
-    axios.get("http://127.0.0.1:8000/api/staff/details").then((res) => {
-      console.log(res);
-      setData(res.data)
-    }).catch((err) => {
-      console.log(err);
-    })
-  }, [])
-
+    axios
+      .get("http://127.0.0.1:8000/api/staff/details")
+      .then((res) => {
+        console.log(res);
+        setData(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
   return (
     <div>
       <div className="h-100">
-        {/* <GoogleMap /> */}
         <Sidebar setClose={setOpen} />
         <div
           className="content-bg"
           style={open ? { margin: "65px 0 0 240px" } : { margin: "65px 0 0 0" }}
         >
-          <div className="px-5">
-            <span className="page-title">Staff</span>
+          <div className="px-5 py-3">
             <Card className="selectElement">
               <div
                 style={{
@@ -183,7 +195,6 @@ function Staff() {
                   <label htmlFor=" " className="font16">
                     Name
                   </label>
-
                   <Input
                     className="my-2 p-2 selectElement"
                     placeholder="Search staff member by name"
@@ -206,16 +217,8 @@ function Staff() {
                   <label htmlFor="" className="font16">
                     Date
                   </label>
-                  <RangePicker
-                    className="w-100 my-2 p-2 selectElement"
-                  //   defaultValue={[
-                  // moment("2015/01/01", dateFormat),
-                  // moment("2015/01/01", dateFormat)
-                  //   ]}
-                  //   format={dateFormat}
-                  />
+                  <RangePicker className="w-100 my-2 p-2 selectElement" />
                 </div>
-
                 <div>
                   <label htmlFor="" className="font16">
                     Designation
@@ -255,8 +258,7 @@ function Staff() {
                   size="large"
                   className="d-flex align-items-center "
                 >
-                  <ReloadOutlined />
-                  Reset
+                  <ReloadOutlined /> Reset
                 </Button>
                 <Button
                   type="primary"
@@ -309,16 +311,16 @@ function Staff() {
               </Button>
             </div>
           </div>
-          {/* {load === true && (
-        <Spin
-          tip="Loading..."
-          style={{
-            justifyContent: "center",
-            display: "flex",
-            padding: "20px 0px",
-          }}
-        ></Spin>
-      )} */}
+          {load === true && (
+            <Spin
+              tip="Loading..."
+              style={{
+                justifyContent: "center",
+                display: "flex",
+                padding: "20px 0px",
+              }}
+            ></Spin>
+          )}
           <Card className="selectElement mx-5">
             <Flex
               alignItems="center"
@@ -327,24 +329,19 @@ function Staff() {
             >
               <Flex className="mb-1" mobileFlex={false}></Flex>
             </Flex>
-
             <div className="table-responsive ">
-              <Table
-                columns={tableColumns}
-                dataSource={data}
-                rowKey="id"
-              />
+              <Table columns={tableColumns} dataSource={data} rowKey="id" />
             </div>
           </Card>
           <Modal
-            title="Add Employee"
+            title="Add Staff"
             open={openAdd}
-            // onSubmit={() => setOpen(false)}
-            onCancel={() => {
-              setOpenAdd(false);
-            }}
+            onCancel={() => setOpenAdd(false)}
+            maskClosable={false}
             footer={[
-              <Button key="back">Add</Button>,
+              <Button onClick={submitStaffDetails} key="back">
+                Add
+              </Button>,
               <Button
                 key="submit"
                 type="primary"
@@ -353,73 +350,83 @@ function Staff() {
                 Cancel
               </Button>,
             ]}
-            width={1000}
           >
             <Card>
-              <Form
-                name="login-form"
-              //  onFinish={onLogin}
-              >
-                <Form.Item name="name" label="Employee Name" required>
+              <Form name="login-form">
+                <Form.Item name="first_name" label="First Name" required>
                   <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    name="name"
+                    onChange={changehandler}
+                    name="first_name"
+                    value={addData.first_name}
                     className="selectElement"
                   />
                 </Form.Item>
-                <Form.Item name="cardNos" label="Staff Pass ID" required>
+                <Form.Item name="last_name" label="Last Name" required>
                   <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    // value={dataAdd.cardNos}
-                    name="cardNos"
+                    onChange={changehandler}
+                    value={addData.last_name}
+                    name="last_name"
                     className="selectElement"
                   />
                 </Form.Item>
-                <Form.Item name="driverID" label="Driver ID">
+                <Form.Item name="username" label="Username">
                   <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    // value={dataAdd.driverID}
-                    name="driverID"
-                    className="selectElement"
-                  />
-                </Form.Item>
-                <Form.Item name="job" label="Job">
-                  <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    name="job"
-                    className="selectElement"
-                  />
-                </Form.Item>
-                <Form.Item name="deptId" label="Department Name " required>
-                  <Select
-                    className="w-100 mar10 selectElement"
-                    placeholder="Select department Name"
-                    // onChange={handleChange}
-                    name="deptId"
-                  >
-                    {/* {departId !== "" &&
-                      departId.map((data) => {
-                        return <Option value={data.id}>{data.name}</Option>;
-                      })} */}
-                  </Select>
-                </Form.Item>
-                <Form.Item name="gender" label="Gender">
-                  <Select
-                    className="w-100 mar10 selectElement"
-                    placeholder="Select gender"
-                    // onChange={handleChangeGender}
-                    name="gender"
-                  >
-                    <Option value="0">Male</Option>
-                    <Option value="1">Female</Option>
-                    <Option value="-1">unKnown</Option>
-                  </Select>
-                </Form.Item>
+                    onChange={changehandler}
 
-                <Form.Item name="phoneNumber" label="Phone Number">
+                    value={addData.username}
+                    name="username"
+                    className="selectElement"
+                  />
+                </Form.Item>
+                <Form.Item name="email" label="Email ID">
                   <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    name="phone"
+                    type="email"
+                    onChange={changehandler}
+                    value={addData.email}
+                    name="email"
+                    className="selectElement"
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="staff_department"
+                  label="Staff working department"
+                >
+                  <Select
+                    className="w-100 mar10 selectElement"
+                    placeholder="Select department"
+                    onChange={(e) => setDepartment(e)}
+                    value={department}
+                  >
+                    <Option value="management">Management person</Option>
+                    <Option value="backoffice">Back office worker</Option>
+                    <Option value="road">Road construction</Option>
+                    <Option value="potholes">Potholes reparing</Option>
+                    <Option value="drainage">Drainage and sanitation</Option>
+                  </Select>
+                </Form.Item>
+                <Form.Item name="area" label="Staff Working area">
+                  <Input
+                    onChange={changehandler}
+                    value={addData.area}
+                    name="area"
+                    className="selectElement"
+                  />
+                </Form.Item>
+                <Form.Item name="phone_no" label="Phone Number">
+                  <Input
+                    type="number"
+                    onChange={changehandler}
+                    value={addData.phone_no}
+                    name="phone_no"
+                    className="selectElement"
+                  />
+                </Form.Item>
+                <Form.Item name="aadhar_no" label="Addhar Card Number">
+                  <Input
+                    type="number"
+                    onChange={changehandler}
+                    value={addData.aadhar_no}
+                    name="aadhar_no"
                     className="selectElement"
                   />
                 </Form.Item>
@@ -431,7 +438,6 @@ function Staff() {
             open={open1}
             onCancel={() => setOpen1(false)}
             footer={null}
-            width={1000}
           >
             {row !== "" && (
               <Card>
@@ -458,5 +464,4 @@ function Staff() {
     </div>
   );
 }
-
-export default Staff;
+export default Staff

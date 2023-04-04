@@ -49,7 +49,7 @@ function ChangePassword(props) {
   };
   const onSend = (values) => {
     setLoading(true);
-    axios.post(`http://localhost:8000/api/UsersChangePassword/`, { password: values.newpassword },
+    axios.post(` ${process.env.REACT_APP_BASE_URL}/api/UsersChangePassword/`, { password: values.newpassword },
       {
         headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
       }).then((res) => {

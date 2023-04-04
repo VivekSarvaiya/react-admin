@@ -130,7 +130,7 @@ function Sidebar(props) {
       if (result.isConfirmed) {
         axios
           .post(
-            `http://localhost:8000/api/usersLogOut/`,
+            ` ${process.env.REACT_APP_BASE_URL}/api/usersLogOut/`,
             {},
             {
               headers: {
@@ -154,7 +154,7 @@ function Sidebar(props) {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed" open={open} sx={{ zIndex: "auto" }}>
         <Toolbar style={{ backgroundColor: "rgb(104 131 237)" }}>
           <IconButton
             color="inherit"
