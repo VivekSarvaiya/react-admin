@@ -7,7 +7,6 @@ const { Provider } = AuthContext;
 const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState({});
   const [authflag, setAuthflag] = useState(true);
-  const _authState = useRef(authState).current;
 
   // const setUserAuthInfo = (id) => {
   //   console.log(id);
@@ -45,9 +44,9 @@ const AuthProvider = ({ children }) => {
   const getUserData = async () => {
     axios
       .get(
-        ` ${process.env.REACT_APP_BASE_URL}/api/AdminDetail/${localStorage.getItem(
-          "USERID"
-        )}`,
+        ` ${
+          process.env.REACT_APP_BASE_URL
+        }/api/AdminDetail/${localStorage.getItem("USERID")}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
