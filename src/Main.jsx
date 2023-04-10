@@ -7,9 +7,9 @@ import ForgotPassword from "./Views/ForgotPassword";
 import RecentIssues from "./Views/RecentIssues";
 import ChangePassword from "./Views/ChangePassword";
 import Staff from "./Views/Staff";
-import Reports from "./Views/Reports";
-import { PrivateRoutes } from "./Components/PrivateRoutes";
+import Map from "./Views/Map";
 import Profile from "./Views/Profile";
+import { PrivateRoutes } from "./Components/PrivateRoutes";
 
 function Main(props) {
   return (
@@ -21,7 +21,7 @@ function Main(props) {
           <Route path="/" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
           <Route path="/staff" element={<Staff />} />
-          <Route path="/reports" element={<Reports />} />
+          <Route path="/map" element={<Map />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/recentissues" element={<RecentIssues />} />
           <Route path="/changepassword" element={<ChangePassword />} />

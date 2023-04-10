@@ -28,6 +28,7 @@ function GoogleMapComp(props) {
     width: "100vw",
     height: "100vh",
     position: "absolute",
+    bottom: 0,
     zIndex: -1
     // marginTop: "50px",
   };

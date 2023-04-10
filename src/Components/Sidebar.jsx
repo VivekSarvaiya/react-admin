@@ -17,12 +17,11 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import {
   AccountCircle,
-  Assessment,
   Engineering,
   GridView,
   Logout,
+  MapOutlined,
   PeopleAlt,
-  Report,
   Rule,
   Settings,
 } from "@mui/icons-material";
@@ -31,7 +30,8 @@ import { Avatar, Menu, MenuItem, Tooltip } from "@mui/material";
 import { AuthContext } from "../Context/userContext";
 import axios from "axios";
 import Swal from "sweetalert2";
-
+import { Badge } from "antd";
+import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
@@ -102,23 +102,23 @@ function Sidebar(props) {
       icon: <Rule />,
     },
     {
-      path: "/reports",
-      text: "Reports",
-      icon: <Assessment />,
+      path: "/map",
+      text: "City Map",
+      icon: <MapOutlined />,
     },
   ];
 
-  useEffect(() => {
-    setWidth(window.innerWidth);
-    window.addEventListener("resize", () => setWidth(window.innerWidth));
-    return () => {
-      window.removeEventListener("resize", () => setWidth(window.innerWidth));
-    };
-  }, []);
+  // useEffect(() => {
+  //   setWidth(window.innerWidth);
+  //   window.addEventListener("resize", () => setWidth(window.innerWidth));
+  //   return () => {
+  //     window.removeEventListener("resize", () => setWidth(window.innerWidth));
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    if (width < 1200) setOpen(false);
-  }, [width]);
+  // useEffect(() => {
+  //   if (width < 1200) setOpen(false);
+  // }, [width]);
 
   const handleLogout = () => {
     Swal.fire({
@@ -177,6 +177,8 @@ function Sidebar(props) {
             <img src="../assets/images/logo.png" alt="logo" width={50} />
             Make My City
           </Typography>
+          {/* <div> */}
+
           <div className="profile-icon">
             <Box
               sx={{
@@ -185,6 +187,11 @@ function Sidebar(props) {
                 textAlign: "center",
               }}
             >
+              <Badge title="5">
+                <IconButton>
+                  <NotificationsNoneOutlinedIcon color="action" />
+                </IconButton>
+              </Badge>
               <Tooltip title="Account">
                 <IconButton
                   onClick={handleClick}
@@ -260,7 +267,7 @@ function Sidebar(props) {
               </MenuItem>
             </Menu>
           </div>
-
+          {/* </div> */}
           <Drawer
             sx={{
               width: 240,
