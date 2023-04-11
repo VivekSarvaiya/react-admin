@@ -114,7 +114,7 @@ function Users(props) {
       dataIndex: "area",
       key: "area",
       render: (area) => {
-        return area.area_name;
+        return area?.area_name;
       },
       sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
@@ -150,11 +150,9 @@ function Users(props) {
 
   const fetchData = (api) => {
     axios
-      .get(api,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
-        }
-      )
+      .get(api, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+      })
       .then((res) => {
         console.log(res);
         setData(res.data);
@@ -185,62 +183,64 @@ function Users(props) {
   };
 
   const search = () => {
-    let api = searchusername ? ` ${process.env.REACT_APP_BASE_URL}/api/UserAllDetails/${localStorage.getItem("USERID")}/?username=${searchusername}` : ` ${process.env.REACT_APP_BASE_URL}/api/UserAllDetails/${localStorage.getItem("USERID")}`
-    fetchData(api)
-  }
+    let api = searchusername
+      ? ` ${
+          process.env.REACT_APP_BASE_URL
+        }/api/UserAllDetails/${localStorage.getItem(
+          "USERID"
+        )}/?username=${searchusername}`
+      : ` ${
+          process.env.REACT_APP_BASE_URL
+        }/api/UserAllDetails/${localStorage.getItem("USERID")}`;
+    fetchData(api);
+  };
 
   const resetSearch = () => {
-    setSearchusername("")
-  }
+    setSearchusername("");
+  };
 
   useEffect(() => {
     search();
   }, []);
 
   return (
-    <div>
-      <div className="h-100">
-        <Sidebar setClose={setOpen} />
-        <div
-          className="content-bg"
-          style={open ? { margin: "65px 0 0 240px" } : { margin: "65px 0 0 0" }}
-        >
-          <div className="px-5 py-3">
-            <Card className="selectElement">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-start",
-                  gap: 5,
-                }}
-                className="search-card"
-              >
-                <div>
-                  <label htmlFor=" " className="font16">
-                    Username
-                  </label>
+    <>
+      <div className="">
+        <Card className="selectElement">
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-start",
+              gap: 5,
+            }}
+            className="search-card"
+          >
+            <div>
+              <label htmlFor=" " className="font16">
+                Username
+              </label>
 
-                  <Input
-                    className="my-2 p-2 selectElement"
-                    placeholder="Search user by username"
-                    name="username"
-                    value={searchusername}
-                    onChange={(e) => setSearchusername(e.target.value)}
-                    prefix={<SearchOutlined />}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="" className="font16">
-                    Area
-                  </label>
-                  <Input
-                    className="my-2 p-2 selectElement"
-                    placeholder="Search user by area name"
-                    name="empName"
-                    prefix={<SearchOutlined />}
-                  />
-                </div>
-                {/* <div>
+              <Input
+                className="my-2 p-2 selectElement"
+                placeholder="Search user by username"
+                name="username"
+                value={searchusername}
+                onChange={(e) => setSearchusername(e.target.value)}
+                prefix={<SearchOutlined />}
+              />
+            </div>
+            <div>
+              <label htmlFor="" className="font16">
+                Area
+              </label>
+              <Input
+                className="my-2 p-2 selectElement"
+                placeholder="Search user by area name"
+                name="empName"
+                prefix={<SearchOutlined />}
+              />
+            </div>
+            {/* <div>
                   <label htmlFor="" className="font16">
                     Date
                   </label>
@@ -273,150 +273,143 @@ function Users(props) {
                     name="deptId"
                   ></Select>
                 </div> */}
-              </div>
-              <br />
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "flex-end",
-                  gap: "2%",
-                  marginTop: "30px",
-                }}
-              >
-                {" "}
-                <Button
-                  type="primary"
-                  size="large"
-                  className="d-flex align-items-center"
-                  onClick={resetSearch}
-                >
-                  <ReloadOutlined />
-                  Reset
-                </Button>
-                <Button
-                  type="primary"
-                  size="large"
-                  className="d-flex align-items-center "
-                  onClick={search}
-                >
-                  <SearchOutlined />
-                  Search
-                </Button>
-              </div>
-            </Card>
-            <br />
-            <div
-              style={{
-                display: "flex",
-                gap: "2%",
-                marginBottom: 20,
-              }}
-            >
-              <Button
-                type="primary"
-                size="large"
-                className="d-flex align-items-center "
-                onClick={() => {
-                  // exportTableData(list);
-                  const excel = new Excel();
-                  excel
-                    .addSheet("MMC")
-                    .addColumns([
-                      { title: "Username", dataIndex: "username" },
-                      { title: "Email ID", dataIndex: "email" },
-                      { title: "Firstname", dataIndex: "first_name" },
-                      { title: "Lastname", dataIndex: "last_name" },
-                      { title: "State", dataIndex: "state_name" },
-                      { title: "City", dataIndex: "city_name" },
-                      { title: "Date Of Birth", dataIndex: "Date_of_birth" },
-                      { title: "Aadhar Card Number", dataIndex: "aadhar_no" },
-                      { title: "Phone Number", dataIndex: "phone_no" },
-                    ])
-                    .addDataSource(exportTableData(data))
-                    .saveAs("Users.xlsx");
-                }}
-              >
-                <DownloadOutlined />
-                Export
-              </Button>
-            </div>
           </div>
-          {!load && (
-            <Spin
-              tip="Loading..."
-              style={{
-                justifyContent: "center",
-                display: "flex",
-                padding: "20px 0px",
-              }}
-            ></Spin>
-          )}
-          <Card className="selectElement mx-5">
-            <Flex
-              alignItems="center"
-              justifyContent="between"
-              mobileFlex={false}
-            >
-              <Flex className="mb-1" mobileFlex={false}></Flex>
-            </Flex>
-
-            <div className="table-responsive ">
-              <Table columns={tableColumns} dataSource={data} rowKey="id" />
-            </div>
-          </Card>
-
-          <Modal
-            title="User Details"
-            open={open1}
-            onCancel={() => setOpen1(false)}
-            footer={null}
-          // width={1000}
+          <br />
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              gap: "2%",
+              marginTop: "30px",
+            }}
           >
-            {row !== "" && (
-              <Card>
-                <Avatar
-                  sx={{
-                    m: 1,
-                    width: "8rem",
-                    height: "8rem",
-                    background:
-                      "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
-                  }}
-                  src={row?.image}
-                />
-                <Form.Item name="name" label="Username">
-                  {row?.username}
-                </Form.Item>
-                <Form.Item name="email" label="Email ID ">
-                  {row?.email}
-                </Form.Item>
-                <Form.Item name="name" label="Firstname">
-                  {row?.first_name}
-                </Form.Item>
-                <Form.Item name="name" label="Lastname">
-                  {row?.last_name}
-                </Form.Item>
-                <Form.Item name="address" label="State">
-                  {row?.state?.state_name}
-                </Form.Item>
-                <Form.Item name="city" label="City">
-                  {row?.city?.city_name}
-                </Form.Item>
-                <Form.Item name="jdate" label="Date Of Birth">
-                  {row?.Date_of_birth}
-                </Form.Item>
-                <Form.Item name="jdate" label="Aadhar Card Number">
-                  {row?.aadhar_no}
-                </Form.Item>
-                <Form.Item name="jdate" label="Phone Number">
-                  {row?.phone_no}
-                </Form.Item>
-              </Card>
-            )}
-          </Modal>
+            {" "}
+            <Button
+              type="primary"
+              size="large"
+              className="d-flex align-items-center"
+              onClick={resetSearch}
+            >
+              <ReloadOutlined />
+              Reset
+            </Button>
+            <Button
+              type="primary"
+              size="large"
+              className="d-flex align-items-center "
+              onClick={search}
+            >
+              <SearchOutlined />
+              Search
+            </Button>
+          </div>
+        </Card>
+        <br />
+        <div
+          style={{
+            display: "flex",
+            gap: "2%",
+            marginBottom: 20,
+          }}
+        >
+          <Button
+            type="primary"
+            size="large"
+            className="d-flex align-items-center "
+            onClick={() => {
+              // exportTableData(list);
+              const excel = new Excel();
+              excel
+                .addSheet("MMC")
+                .addColumns([
+                  { title: "Username", dataIndex: "username" },
+                  { title: "Email ID", dataIndex: "email" },
+                  { title: "Firstname", dataIndex: "first_name" },
+                  { title: "Lastname", dataIndex: "last_name" },
+                  { title: "State", dataIndex: "state_name" },
+                  { title: "City", dataIndex: "city_name" },
+                  { title: "Date Of Birth", dataIndex: "Date_of_birth" },
+                  { title: "Aadhar Card Number", dataIndex: "aadhar_no" },
+                  { title: "Phone Number", dataIndex: "phone_no" },
+                ])
+                .addDataSource(exportTableData(data))
+                .saveAs("Users.xlsx");
+            }}
+          >
+            <DownloadOutlined />
+            Export
+          </Button>
         </div>
       </div>
-    </div>
+      {!load && (
+        <Spin
+          tip="Loading..."
+          style={{
+            justifyContent: "center",
+            display: "flex",
+            padding: "20px 0px",
+          }}
+        ></Spin>
+      )}
+      <Card className="selectElement ">
+        <Flex alignItems="center" justifyContent="between" mobileFlex={false}>
+          <Flex className="mb-1" mobileFlex={false}></Flex>
+        </Flex>
+
+        <div className="table-responsive ">
+          <Table columns={tableColumns} dataSource={data} rowKey="id" />
+        </div>
+      </Card>
+
+      <Modal
+        title="User Details"
+        open={open1}
+        onCancel={() => setOpen1(false)}
+        footer={null}
+        // width={1000}
+      >
+        {row !== "" && (
+          <Card>
+            <Avatar
+              sx={{
+                m: 1,
+                width: "8rem",
+                height: "8rem",
+                background: "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+              }}
+              src={row?.image}
+            />
+            <Form.Item name="name" label="Username">
+              {row?.username}
+            </Form.Item>
+            <Form.Item name="email" label="Email ID ">
+              {row?.email}
+            </Form.Item>
+            <Form.Item name="name" label="Firstname">
+              {row?.first_name}
+            </Form.Item>
+            <Form.Item name="name" label="Lastname">
+              {row?.last_name}
+            </Form.Item>
+            <Form.Item name="address" label="State">
+              {row?.state?.state_name}
+            </Form.Item>
+            <Form.Item name="city" label="City">
+              {row?.city?.city_name}
+            </Form.Item>
+            <Form.Item name="jdate" label="Date Of Birth">
+              {row?.Date_of_birth}
+            </Form.Item>
+            <Form.Item name="jdate" label="Aadhar Card Number">
+              {row?.aadhar_no}
+            </Form.Item>
+            <Form.Item name="jdate" label="Phone Number">
+              {row?.phone_no}
+            </Form.Item>
+          </Card>
+        )}
+      </Modal>
+    </>
   );
 }
 

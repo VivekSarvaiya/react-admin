@@ -5,18 +5,27 @@
   --font-3: "DM Serif Display", serif;
   --font-mono: Consolas, "Andale Mono", Courier, "Courier New", monospace;
 } */
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
 
 * {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
 }
 
 .login {
-  background-color: #f5f7ff
+  background-color: #f5f7ff;
 }
-
+.logo {
+  padding: 10px;
+}
+.logo p {
+  padding: 15px;
+  color: white;
+  display: inline;
+  font-size: 15px;
+  font-weight: 600;
+}
 .forgot-password {
-  background-color: #f5f7ff
+  background-color: #f5f7ff;
 }
 
 .navlink {
@@ -65,7 +74,7 @@
 .page-title {
   /* line-height: 14px; */
   font-style: normal;
-  font-size: 40px
+  font-size: 40px;
 }
 
 .ant-select-selector {
@@ -123,5 +132,4 @@ iframe div .gmnoprint{
   color: #6883ed;
   border: 1px solid #6883ed;
   box-shadow: 0 2px 0 rgba(13, 201, 243, 0.02);
-
 }

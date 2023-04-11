@@ -10,6 +10,7 @@ import Staff from "./Views/Staff";
 import Map from "./Views/Map";
 import Profile from "./Views/Profile";
 import { PrivateRoutes } from "./Components/PrivateRoutes";
+import Sidebar from "./Components/Sidebar";
 
 function Main(props) {
   return (
@@ -18,12 +19,14 @@ function Main(props) {
         <Route path="/forgetpassword" element={<ForgotPassword />} />
         <Route path="/login" element={<Login />} />
         <Route element={<PrivateRoutes />}>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/users" element={<Users />} />
-          <Route path="/staff" element={<Staff />} />
-          <Route path="/map" element={<Map />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/recentissues" element={<RecentIssues />} />
+          <Route element={<Sidebar />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/staff" element={<Staff />} />
+            <Route path="/map" element={<Map />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/recentissues" element={<RecentIssues />} />
+          </Route>
           <Route path="/changepassword" element={<ChangePassword />} />
         </Route>
       </Routes>

@@ -88,9 +88,9 @@ const Profile = () => {
     data.phone && bodyFormData.append("phone_no", data.phone);
     axios
       .patch(
-        ` ${process.env.REACT_APP_BASE_URL}/api/usersDetailsUpdate/${localStorage.getItem(
-          "USERID"
-        )}/`,
+        ` ${
+          process.env.REACT_APP_BASE_URL
+        }/api/usersDetailsUpdate/${localStorage.getItem("USERID")}/`,
         bodyFormData,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
@@ -108,35 +108,6 @@ const Profile = () => {
       });
   };
 
-  // const ()=>setOpenModal(false) = () => {
-  //   setOpenModal(false);
-  //   // debugger
-  //   setData({
-  //     fname: authState?.first_name,
-  //     lname: authState?.last_name,
-  //     dob: authState?.Date_of_birth,
-  //     email: authState?.email,
-  //     phone: authState?.phone_no,
-  //   });
-  // };
-
-  // const handleOk = () => {
-  //   setConfirmLoading(true);
-  //   setTimeout(() => {
-  //     setOpen(false);
-  //     setConfirmLoading(false);
-  //   }, 2000);
-  // };
-
-  // useEffect(() => {
-  //   setData({
-  //     fname: authState?.first_name,
-  //     lname: authState?.last_name,
-  //     dob: authState?.Date_of_birth,
-  //     email: authState?.email,
-  //     phone: authState?.phone_no,
-  //   })
-  // }, [])
   const onSend = () => {
     console.log(email);
     setLoading(true);
@@ -205,130 +176,114 @@ const Profile = () => {
 
   return (
     <>
-      <div className="h-100">
-        <Sidebar setClose={setOpen} />
-        <section className="login">
-          <div className="container " style={{ height: "100vh" }}>
-            <div className="row d-flex justify-content-center align-items-center h-100 ">
-              <div className="col-xl-8">
-                <div className="card p-4" style={{ borderRadius: "10px" }}>
-                  <div className="d-flex align-items-center flex-wrap gap-5">
-                    <div>
-                      <Avatar
-                        sx={{
-                          width: "8rem",
-                          height: "8rem",
-                          background:
-                            "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
-                        }}
-                        src={authState?.image}
-                      />
-                    </div>
-                    <div className="col-md-6 mx-4">
-                      <dt className="text-sm font-medium text-gray-500">
-                        {authState?.username || "N/A"}{" "}
-                        {authState?.is_email_verified ? (
-                          <Tooltip title="Verified">
-                            <Verified sx={{ color: "green" }} />
-                          </Tooltip>
-                        ) : (
-                          <Button
-                            // type="link"
-                            danger
-                            onClick={() => setOpenVerifyModal(true)}
-                          >
-                            Verify now
-                          </Button>
-                        )}
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {authState.email || "N/A"}
-                      </dd>
-                      <Button
-                        type="link"
-                        icon={<EditOutlined style={{ fontSize: "20px" }} />}
-                        style={{ paddingLeft: 0 }}
-                        onClick={() => setOpenModal(true)}
-                      >
-                        Edit Details
-                      </Button>
-                    </div>
-                  </div>
-                  <br />
-                  <div>
-                    <div className="mt-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-5">
-                      <h1 className="text-gray-500 font-medium fs-5 mb-0">
-                        Personal Details
-                      </h1>
-                      <br />
-                      <dl className="row row-cols-1 gap-4 gap-md-0 g-md-3">
-                        <div className="col-md-6 mt-3">
-                          <dt className="text-sm font-medium text-gray-500">
-                            First Name
-                          </dt>
-                          <dd className="mt-1 text-sm text-gray-900">
-                            {authState.first_name || "N/A"}
-                          </dd>
-                        </div>
-                        <div className="col-md-6 mt-3">
-                          <dt className="text-sm font-medium text-gray-500">
-                            Last Name
-                          </dt>
-                          <dd className="mt-1 text-sm text-gray-900">
-                            {authState.last_name || "N/A"}
-                          </dd>
-                        </div>
-                        <div className="col-md-6 mt-3">
-                          <dt className="text-sm font-medium text-gray-500">
-                            Administrative State
-                          </dt>
-                          <dd className="mt-1 text-sm text-gray-900">
-                            {authState?.state?.state_name || "N/A"}
-                          </dd>
-                        </div>
-                        <div className="col-md-6 mt-3">
-                          <dt className="text-sm font-medium text-gray-500">
-                            Administrative City
-                          </dt>
-                          <dd className="mt-1 text-sm text-gray-900">
-                            {authState?.city?.city_name || "N/A"}
-                          </dd>
-                        </div>
-                        <div className="col-md-6 mt-3">
-                          <dt className="text-sm font-medium text-gray-500">
-                            Contact Number
-                          </dt>
-                          <dd className="mt-1 text-sm text-gray-900">
-                            {authState.phone_no || "N/A"}
-                          </dd>
-                        </div>
-                        <div className="col-md-6 mt-3">
-                          <dt className="text-sm font-medium text-gray-500">
-                            Adhar Card Number
-                          </dt>
-                          <dd className="mt-1 text-sm text-gray-900">
-                            {authState?.aadhar_no?.replace(
-                              /\d{4}(?=\d)/g,
-                              "$&-"
-                            ) || "N/A"}
-                          </dd>
-                        </div>
-                        <div className="col-md-6 mt-3">
-                          <dt className="text-sm font-medium text-gray-500">
-                            Date Of Birth
-                          </dt>
-                          <dd className="mt-1 text-sm text-gray-900">
-                            {authState?.Date_of_birth || "N/A"}
-                          </dd>
-                        </div>
-                      </dl>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+      <div className="card p-3" style={{ borderRadius: "10px" }}>
+        <div className="d-flex align-items-center flex-wrap gap-5">
+          <div>
+            <Avatar
+              sx={{
+                width: "8rem",
+                height: "8rem",
+                background: "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+              }}
+              src={authState?.image}
+            />
           </div>
-        </section>
+          <div className="col-md-5 mx-4">
+            <dt className="text-sm font-medium text-gray-500">
+              {authState?.username || "N/A"}{" "}
+              {authState?.is_email_verified ? (
+                <Tooltip title="Verified">
+                  <Verified sx={{ color: "green" }} />
+                </Tooltip>
+              ) : (
+                <Button
+                  // type="link"
+                  danger
+                  onClick={() => setOpenVerifyModal(true)}
+                >
+                  Verify now
+                </Button>
+              )}
+            </dt>
+            <dd className="mt-1 text-sm text-gray-900">
+              {authState.email || "N/A"}
+            </dd>
+            <Button
+              type="link"
+              icon={<EditOutlined style={{ fontSize: "20px" }} />}
+              style={{ paddingLeft: 0 }}
+              onClick={() => setOpenModal(true)}
+            >
+              Edit Details
+            </Button>
+          </div>
+        </div>
+        <br />
+        <div>
+          <div className="mt-6 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-gray-500 font-medium fs-5 mb-0">
+              Personal Details
+            </h1>
+            <br />
+            <dl className="row row-cols-1 gap-4 gap-md-0 g-md-3">
+              <div className="col-md-5 mt-3">
+                <dt className="text-sm font-medium text-gray-500">
+                  First Name
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {authState.first_name || "N/A"}
+                </dd>
+              </div>
+              <div className="col-md-5 mt-3">
+                <dt className="text-sm font-medium text-gray-500">Last Name</dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {authState.last_name || "N/A"}
+                </dd>
+              </div>
+              <div className="col-md-5 mt-3">
+                <dt className="text-sm font-medium text-gray-500">
+                  Administrative State
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {authState?.state?.state_name || "N/A"}
+                </dd>
+              </div>
+              <div className="col-md-5 mt-3">
+                <dt className="text-sm font-medium text-gray-500">
+                  Administrative City
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {authState?.city?.city_name || "N/A"}
+                </dd>
+              </div>
+              <div className="col-md-5 mt-3">
+                <dt className="text-sm font-medium text-gray-500">
+                  Contact Number
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {authState.phone_no || "N/A"}
+                </dd>
+              </div>
+              <div className="col-md-5 mt-3">
+                <dt className="text-sm font-medium text-gray-500">
+                  Adhar Card Number
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {authState?.aadhar_no?.replace(/\d{4}(?=\d)/g, "$&-") ||
+                    "N/A"}
+                </dd>
+              </div>
+              <div className="col-md-5 mt-3">
+                <dt className="text-sm font-medium text-gray-500">
+                  Date Of Birth
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {authState?.Date_of_birth || "N/A"}
+                </dd>
+              </div>
+            </dl>
+          </div>
+        </div>
       </div>
       <Modal
         title="Edit Personal Information"
@@ -351,7 +306,11 @@ const Profile = () => {
         ]}
       >
         <Card>
-          <Form name="edit details" layout="vertical" style={{ textAlign: "-webkit-center" }}>
+          <Form
+            name="edit details"
+            layout="vertical"
+            style={{ textAlign: "-webkit-center" }}
+          >
             <div className="">
               <Avatar
                 sx={{
@@ -415,8 +374,8 @@ const Profile = () => {
             </Form.Item>
 
             <Text type="secondary">
-              <b>Note :- </b> If you want to update email or phone number, then you will have to reverify
-              yourself !
+              <b>Note :- </b> If you want to update email or phone number, then
+              you will have to reverify yourself !
             </Text>
             <br />
             <br />
