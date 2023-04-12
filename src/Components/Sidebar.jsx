@@ -329,6 +329,7 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 import { Dropdown, Avatar } from "antd";
 import Swal from "sweetalert2";
 import axios from "axios";
+import zIndex from "@mui/material/styles/zIndex";
 
 const { Header, Sider, Content } = Layout;
 
@@ -403,7 +404,7 @@ const Sidebar = () => {
   );
   return (
     <Layout>
-      <Sider theme="" trigger={null} collapsible collapsed={collapsed}>
+      <Sider theme="" trigger={null} collapsible collapsed={collapsed} style={{ height: "100vh", position: "sticky", top: 0, bottom: 0 }}>
         <div className="logo">
           <img
             src="../assets/images/logo.png"
@@ -416,7 +417,6 @@ const Sidebar = () => {
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={["1"]}
           items={[
             {
               key: "1",
@@ -451,7 +451,7 @@ const Sidebar = () => {
           ]}
         />
       </Sider>
-      <Layout className="site-layout">
+      <Layout className="site-layout" style={{ backgroundColor: "aliceblue" }}>
         <Header
           style={{
             display: "flex",
@@ -459,6 +459,9 @@ const Sidebar = () => {
             alignItems: "center",
             padding: "0 10px",
             background: colorBgContainer,
+            position: "sticky",
+            top: 0,
+            zIndex: 100
           }}
         >
           <div style={{ cursor: "pointer" }}>
@@ -506,8 +509,9 @@ const Sidebar = () => {
           style={{
             margin: "24px 16px",
             padding: 24,
-            minHeight: 280,
-            background: colorBgContainer,
+            // height: "90vh",
+            backgroundColor: "aliceblue",
+            overflow: "hidden"
           }}
         >
           <Outlet />

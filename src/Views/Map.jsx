@@ -1,12 +1,9 @@
-import React, { useState } from "react";
-import GoogleMapComp from "../Components/GoogleMapComp";
+import React from 'react'
 
-function Map(props) {
-  return (
-    <div>
-      <GoogleMapComp />
-    </div>
-  );
+function map() {
+    return (
+        <div></div>
+    )
 }
 
-export default Map;
+export default map

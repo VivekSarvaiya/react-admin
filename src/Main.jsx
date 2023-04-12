@@ -7,10 +7,10 @@ import ForgotPassword from "./Views/ForgotPassword";
 import RecentIssues from "./Views/RecentIssues";
 import ChangePassword from "./Views/ChangePassword";
 import Staff from "./Views/Staff";
-import Map from "./Views/Map";
 import Profile from "./Views/Profile";
 import { PrivateRoutes } from "./Components/PrivateRoutes";
 import Sidebar from "./Components/Sidebar";
+import GoogleMapComp from "./Components/GoogleMapComp";
 
 function Main(props) {
   return (
@@ -23,7 +23,7 @@ function Main(props) {
             <Route path="/" element={<Dashboard />} />
             <Route path="/users" element={<Users />} />
             <Route path="/staff" element={<Staff />} />
-            <Route path="/map" element={<Map />} />
+            <Route path="/map" element={<GoogleMapComp />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/recentissues" element={<RecentIssues />} />
           </Route>

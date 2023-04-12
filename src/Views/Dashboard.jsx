@@ -22,17 +22,22 @@ function Dashboard(props) {
 
   const series = [
     {
-      name: "series1",
+      name: "Reported Issues",
       data: [31, 40, 28, 51, 42, 109, 100],
     },
     {
-      name: "series2",
+      name: "Resolved Issues",
       data: [11, 32, 45, 32, 34, 52, 41],
+    },
+    {
+      name: "Rejected Issues",
+      data: [25, 22, 17, 20, 21, 15, 10],
     },
   ];
   const options = {
     chart: {
       height: 350,
+      width: "100%",
       type: "area",
     },
     dataLabels: {
@@ -196,8 +201,9 @@ function Dashboard(props) {
           height={350}
         />
 
-        <div className="d-flex">
-          <LineChart />
+        <div className="d-flex mt-5">
+          {/* <LineChart /> */}
+          <Donut />
           <Donut />
         </div>
       </div>
