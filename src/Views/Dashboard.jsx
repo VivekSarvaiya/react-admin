@@ -68,7 +68,7 @@ function Dashboard(props) {
   return (
     <>
       <div>
-        <div className="d-flex gap-2 p-4 ">
+        <div className="d-flex gap-2 p-4">
           <Box
             sx={{
               bgcolor: "#ffffff",
@@ -193,7 +193,7 @@ function Dashboard(props) {
           </Box>
         </div>
       </div>
-      <div className="p-4">
+      <div className="p-4 px-2">
         <ReactApexChart
           options={options}
           series={series}
@@ -201,7 +201,7 @@ function Dashboard(props) {
           height={350}
         />
 
-        <div className="d-flex mt-5">
+        <div className="d-flex justify-content-around mt-5">
           {/* <LineChart /> */}
           <Donut />
           <Donut />
