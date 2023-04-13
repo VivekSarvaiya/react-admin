@@ -12,7 +12,7 @@ const allTypes = ["Potholes", "Road", "Drainage", "Oil Leakeage"];
 function GoogleMapComp(props) {
   const [selectedMarker, setSelectedMarker] = useState("");
   const [open, setOpen] = useState(false);
-  const [types, setTypes] = useState(allTypes);
+  const [types, setTypes] = useState(["Potholes", "Road", "Drainage", "Oil Leakeage"]);
   const [flag, setFlag] = useState(false);
   const [markers, setMarkers] = useState([]);
   const { isLoaded } = useJsApiLoader({

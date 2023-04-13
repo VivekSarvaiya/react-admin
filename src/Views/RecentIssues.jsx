@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box } from "@mui/system";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -31,6 +31,7 @@ import {
 import { Modal } from "antd";
 // import axios from "axios";
 import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
+import axios from "axios";
 const { confirm } = Modal;
 const { Option } = Select;
 const { MonthPicker, RangePicker } = DatePicker;
@@ -38,7 +39,7 @@ const { MonthPicker, RangePicker } = DatePicker;
 function RecentIssues(props) {
   const [open, setOpen] = useState(true);
   const [list, setList] = useState();
-
+  const [data, setData] = useState([])
   function showConfirm(row) {
     // confirm({
     //   title:
@@ -140,24 +141,29 @@ function RecentIssues(props) {
       ),
     },
   ];
-  // Store the current URL in the history state
-  window.history.replaceState(
-    { url: window.location.href },
-    "",
-    window.location.href
-  );
 
-  // Get the previous URL from the history state
-  var previousUrl = window.history.state.url;
-
-  // Output the previous URL
-  console.log(previousUrl);
   const rowSelection = {
-    // onChange: (key, rows) => {
-    //   setSelectedRows(rows);
-    //   setSelectedRowKeys(key);
-    // },
+    //   onChange: (key, rows) => {
+    //     setSelectedRows(rows);
+    //     setSelectedRowKeys(key);
+    //   },
   };
+
+  const getIssues = () => {
+    axios.get(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+      },
+    }).then((res) => {
+      console.log(res);
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+
+  useEffect(() => {
+    getIssues()
+  }, [])
 
   return (
     <>
@@ -181,7 +187,7 @@ function RecentIssues(props) {
                 placeholder="Search user by name"
                 name="empId"
                 prefix={<SearchOutlined />}
-                // onChange={(e) => onChangeFilter(e)}
+              // onChange={(e) => onChangeFilter(e)}
               />
             </div>
             <div>
@@ -193,7 +199,7 @@ function RecentIssues(props) {
                 placeholder="Search user by email-id"
                 name="empName"
                 prefix={<SearchOutlined />}
-                // onChange={(e) => onChangeFilter(e)}
+              // onChange={(e) => onChangeFilter(e)}
               />
             </div>
             <div>
@@ -202,11 +208,11 @@ function RecentIssues(props) {
               </label>
               <RangePicker
                 className="w-100 my-2 p-2 selectElement"
-                //   defaultValue={[
-                // moment("2015/01/01", dateFormat),
-                // moment("2015/01/01", dateFormat)
-                //   ]}
-                //   format={dateFormat}
+              //   defaultValue={[
+              // moment("2015/01/01", dateFormat),
+              // moment("2015/01/01", dateFormat)
+              //   ]}
+              //   format={dateFormat}
               />
             </div>
 
@@ -279,20 +285,20 @@ function RecentIssues(props) {
             type="primary"
             size="large"
             className="d-flex align-items-center"
-            // onClick={() => {
-            //   // exportTableData(list);
-            //   const excel = new Excel();
-            //   excel
-            //     .addSheet("test")
-            //     .addColumns([
-            //       { title: "Driver Name", dataIndex: "name" },
-            //       { title: "Driver ID", dataIndex: "uuid" },
-            //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-            //       { title: "Department", dataIndex: "deptName" },
-            //     ])
-            //     .addDataSource(exportTableData(list))
-            //     .saveAs("Drivers.xlsx");
-            // }}
+          // onClick={() => {
+          //   // exportTableData(list);
+          //   const excel = new Excel();
+          //   excel
+          //     .addSheet("test")
+          //     .addColumns([
+          //       { title: "Driver Name", dataIndex: "name" },
+          //       { title: "Driver ID", dataIndex: "uuid" },
+          //       { title: "Staff Pass ID", dataIndex: "cardNo" },
+          //       { title: "Department", dataIndex: "deptName" },
+          //     ])
+          //     .addDataSource(exportTableData(list))
+          //     .saveAs("Drivers.xlsx");
+          // }}
           >
             <DownloadOutlined />
             Export
@@ -323,7 +329,7 @@ function RecentIssues(props) {
                   key="submit"
                   htmlType="submit"
                   type="primary"
-                  //   onClick={onSubmitAdd}
+                //   onClick={onSubmitAdd}
                 >
                   Add
                 </Button>
@@ -412,9 +418,9 @@ function RecentIssues(props) {
             footer={[
               <Button
                 key="back"
-                // onClick={() => {
-                //   setOpenEdit(false);
-                // }}
+              // onClick={() => {
+              //   setOpenEdit(false);
+              // }}
               >
                 Cancel
               </Button>,
@@ -448,7 +454,7 @@ function RecentIssues(props) {
                 <Form.Item name="driverId" label="Driver ID">
                   <Input
                     name="driverId"
-                    // onChange={(e) => setEditDriverId(e.target.value)}
+                  // onChange={(e) => setEditDriverId(e.target.value)}
                   />
                 </Form.Item>
                 <Form.Item name="name" label="Employee Name" required>
