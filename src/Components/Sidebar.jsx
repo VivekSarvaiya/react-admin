@@ -329,11 +329,8 @@ import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNone
 import { Dropdown, Avatar } from "antd";
 import Swal from "sweetalert2";
 import axios from "axios";
-import zIndex from "@mui/material/styles/zIndex";
 
 const { Header, Sider, Content } = Layout;
-
-const profileImg = "";
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -376,8 +373,8 @@ const Sidebar = () => {
   const profileMenu = (
     <div className="nav-profile nav-dropdown">
       <div className="nav-profile-header">
-        <div className="d-flex">
-          <Avatar size={45} src={profileImg} />
+        <div className="d-flex gap-2">
+          <Avatar size={45} src={authState.image} />
           <div className="pl-3">
             <h4 className="mb-0"> {authState?.username}</h4>
             <span className="text-muted">{authState?.email}</span>
@@ -404,7 +401,13 @@ const Sidebar = () => {
   );
   return (
     <Layout>
-      <Sider theme="" trigger={null} collapsible collapsed={collapsed} style={{ height: "100vh", position: "sticky", top: 0, bottom: 0 }}>
+      <Sider
+        theme=""
+        trigger={null}
+        collapsible
+        collapsed={collapsed}
+        style={{ height: "100vh", position: "sticky", top: 0, bottom: 0 }}
+      >
         <div className="logo">
           <img
             src="../assets/images/logo.png"
@@ -461,7 +464,7 @@ const Sidebar = () => {
             background: colorBgContainer,
             position: "sticky",
             top: 0,
-            zIndex: 100
+            zIndex: 100,
           }}
         >
           <div style={{ cursor: "pointer" }}>
@@ -496,7 +499,7 @@ const Sidebar = () => {
             >
               <Menu className="d-flex align-item-center" mode="horizontal">
                 <Menu.Item>
-                  <Avatar src={profileImg} className="w-[25px] h-[25px]" />
+                  <Avatar src={authState.image} className="w-[25px] h-[25px]" />
                 </Menu.Item>
               </Menu>
             </Dropdown>
@@ -511,7 +514,7 @@ const Sidebar = () => {
             padding: 24,
             // height: "90vh",
             backgroundColor: "aliceblue",
-            overflow: "hidden"
+            overflow: "hidden",
           }}
         >
           <Outlet />

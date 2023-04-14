@@ -39,6 +39,7 @@ function Donut(props) {
       <div className="row">
         <div className="mixed-chart">
           <ReactApexChart
+            className="chart-body"
             options={options}
             series={options.series}
             type="donut"

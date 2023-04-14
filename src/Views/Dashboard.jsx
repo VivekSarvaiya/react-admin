@@ -68,7 +68,7 @@ function Dashboard(props) {
   return (
     <>
       <div>
-        <div className="d-flex gap-2 p-4">
+        <div className="d-flex gap-2 py-4">
           <Box
             sx={{
               bgcolor: "#ffffff",
@@ -77,7 +77,7 @@ function Dashboard(props) {
               p: 2,
               width: 300,
             }}
-            className="selectElement "
+            className="selectElement"
           >
             <Box sx={{ color: "grey" }}>Users</Box>
             <Box sx={{ fontSize: 34, fontWeight: "medium" }}>98,369</Box>
@@ -195,6 +195,7 @@ function Dashboard(props) {
       </div>
       <div className="p-4 px-2">
         <ReactApexChart
+          className="chart-body"
           options={options}
           series={series}
           type="area"
