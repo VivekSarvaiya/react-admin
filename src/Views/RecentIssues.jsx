@@ -169,14 +169,7 @@ function RecentIssues(props) {
     <>
       <div className="">
         <Card className="selectElement">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              //   gap: "2",
-            }}
-            className="search-card"
-          >
+          <div className="search-card">
             <div>
               <label htmlFor=" " className="font16">
                 Name

@@ -1,0 +1,101 @@
+Base URL = http://127.0.0.1:8000/api/issue/
+
+=============
+
+----------------------------
+
+1. IssuePost 
+
+---> Only for USER
+
+Required Parameter = ['issue_title','User_issue_description', 'issue_type', 'uploaded_images', 'uploaded_video', 'logitude', 'latitude', 'state', 'city', 'area', 'landmark']
+
+optional = [ 'logitude', 'latitude', ]
+Method = POST
+
+--------------------------------
+
+2. AllIssuesGet 
+
+---> for ALL
+
+Required Parameter = []
+Method = GET
+
+--------------------------------
+
+3. UserIssuesGet
+
+---> For USER
+
+Required Parameter = []
+Method = GET
+
+-----------------------------
+
+4. IssueGet/id
+
+---> for ALL
+
+id = Issue ID
+
+Required Parameter = []
+Method = GET
+
+--------------------------------
+
+5. StaffIssuesGet
+
+--> For staff
+
+Required Parameter = []
+Method = GET
+
+-----------------------------------
+
+6. IssueAssignToStaff/id
+
+id = issue id
+
+Required Parameter = [staff]
+Method = PATCH
+
+--------------------------------
+
+7. IssueStatusChange/id
+
+id = issue id
+
+Required Parameter = [issue_status]
+Method = PATCH
+
+--------------------------------
+
+8. IssueVoteUnvote/id
+
+id = issue id
+
+Required Parameter = []
+Method = POST
+
+-----------------------------
+
+9. IssueBookmark/id
+
+id = issue id
+
+Required Parameter = []
+Method = POST
+
+----------------------------
+
+10. StaffIssuePost/id
+
+id = issue id
+
+Required Parameter = ['Staff_issue_solved_description', 'uploaded_images', 'uploaded_video']
+Method = PATCH
+
+------------------------
+
+===============

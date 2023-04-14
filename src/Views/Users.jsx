@@ -148,20 +148,6 @@ function Users(props) {
     },
   ];
 
-  const fetchData = (api) => {
-    axios
-      .get(api, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
-      })
-      .then((res) => {
-        console.log(res);
-        setData(res.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    setLoad(true);
-  };
 
   const exportTableData = (users) => {
     let arr = [];
@@ -182,16 +168,29 @@ function Users(props) {
     return arr.flatMap((item) => item);
   };
 
+  const fetchData = (api) => {
+    axios
+      .get(api, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.result);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setLoad(true);
+  };
+
   const search = () => {
     let api = searchusername
-      ? ` ${
-          process.env.REACT_APP_BASE_URL
-        }/api/UserAllDetails/${localStorage.getItem(
-          "USERID"
-        )}/?username=${searchusername}`
-      : ` ${
-          process.env.REACT_APP_BASE_URL
-        }/api/UserAllDetails/${localStorage.getItem("USERID")}`;
+      ? ` ${process.env.REACT_APP_BASE_URL
+      }/api/UserAllDetails/${localStorage.getItem(
+        "USERID"
+      )}/?username=${searchusername}`
+      : ` ${process.env.REACT_APP_BASE_URL
+      }/api/UserAllDetails/${localStorage.getItem("USERID")}`;
     fetchData(api);
   };
 
@@ -207,14 +206,7 @@ function Users(props) {
     <>
       <div className="">
         <Card className="selectElement">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "flex-start",
-              gap: 5,
-            }}
-            className="search-card"
-          >
+          <div className="search-card">
             <div>
               <label htmlFor=" " className="font16">
                 Username
@@ -366,7 +358,7 @@ function Users(props) {
         open={open1}
         onCancel={() => setOpen1(false)}
         footer={null}
-        // width={1000}
+      // width={1000}
       >
         {row !== "" && (
           <Card>

@@ -14,9 +14,11 @@
 .login {
   background-color: #f5f7ff;
 }
+
 .logo {
   padding: 10px;
 }
+
 .logo p {
   padding: 15px;
   color: white;
@@ -24,6 +26,7 @@
   font-size: 15px;
   font-weight: 600;
 }
+
 .forgot-password {
   background-color: #f5f7ff;
 }
@@ -66,9 +69,10 @@
   border-radius: 7px;
 }
 
-.search-card * {
-  display: "flex";
-  justify-content: "space-between";
+.search-card {
+  display: flex;
+  justify-content: flex-start;
+  gap: 5px;
 }
 
 .page-title {
@@ -139,6 +143,7 @@ iframe div .gmnoprint{
   padding: 11px;
   border-radius: 12px 12px 0 0;
 }
+
 .chart-body {
   border: 1px solid #c7c7c7;
   border-radius: 7px;

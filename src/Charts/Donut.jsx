@@ -35,17 +35,16 @@ function Donut(props) {
     ],
   };
   return (
-    <div className="app">
-      <div className="row">
-        <div className="mixed-chart">
-          <ReactApexChart
-            className="chart-body"
-            options={options}
-            series={options.series}
-            type="donut"
-            width="500"
-          />
-        </div>
+    <div className="row">
+      <div className="mixed-chart chart-body">
+        <h3>Area wise users</h3>
+        <ReactApexChart
+          className=""
+          options={options}
+          series={options.series}
+          type="donut"
+          width="500"
+        />
       </div>
     </div>
   );

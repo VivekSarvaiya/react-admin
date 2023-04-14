@@ -176,16 +176,9 @@ function Staff() {
     <>
       <div className="">
         <Card className="selectElement">
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: 5,
-            }}
-            className="search-card"
-          >
+          <div className="search-card">
             <div>
-              <label htmlFor=" " className="font16">
+              <label className="font16">
                 Name
               </label>
               <Input
@@ -196,7 +189,7 @@ function Staff() {
               />
             </div>
             <div>
-              <label htmlFor="" className="font16">
+              <label className="font16">
                 Email
               </label>
               <Input
@@ -207,13 +200,13 @@ function Staff() {
               />
             </div>
             <div>
-              <label htmlFor="" className="font16">
+              <label className="font16">
                 Date
               </label>
               <RangePicker className="w-100 my-2 p-2 selectElement" />
             </div>
             <div>
-              <label htmlFor="" className="font16">
+              <label className="font16">
                 Designation
               </label>
               <Select
@@ -226,7 +219,7 @@ function Staff() {
               </Select>
             </div>
             <div>
-              <label htmlFor="" className="font16">
+              <label className="font16">
                 City
               </label>
               <Select
@@ -284,20 +277,20 @@ function Staff() {
             type="primary"
             size="large"
             className="d-flex align-items-center "
-            // onClick={() => {
-            //   // exportTableData(list);
-            //   const excel = new Excel();
-            //   excel
-            //     .addSheet("test")
-            //     .addColumns([
-            //       { title: "Driver Name", dataIndex: "name" },
-            //       { title: "Driver ID", dataIndex: "uuid" },
-            //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-            //       { title: "Department", dataIndex: "deptName" },
-            //     ])
-            //     .addDataSource(exportTableData(list))
-            //     .saveAs("Drivers.xlsx");
-            // }}
+          // onClick={() => {
+          //   // exportTableData(list);
+          //   const excel = new Excel();
+          //   excel
+          //     .addSheet("test")
+          //     .addColumns([
+          //       { title: "Driver Name", dataIndex: "name" },
+          //       { title: "Driver ID", dataIndex: "uuid" },
+          //       { title: "Staff Pass ID", dataIndex: "cardNo" },
+          //       { title: "Department", dataIndex: "deptName" },
+          //     ])
+          //     .addDataSource(exportTableData(list))
+          //     .saveAs("Drivers.xlsx");
+          // }}
           >
             <DownloadOutlined />
             Export
