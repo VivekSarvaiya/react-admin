@@ -200,6 +200,7 @@ function Dashboard(props) {
           series={series}
           type="area"
           height={350}
+          width="100%"
         />
 
         <div className="d-flex justify-content-around mt-5">

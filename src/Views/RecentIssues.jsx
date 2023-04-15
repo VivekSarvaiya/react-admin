@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box } from "@mui/system";
 import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { DatePicker } from "antd";
+import { DatePicker, Tag } from "antd";
 import {
   Card,
   Table,
@@ -32,14 +32,17 @@ import { Modal } from "antd";
 // import axios from "axios";
 import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
 import axios from "axios";
+import moment from "moment";
 const { confirm } = Modal;
 const { Option } = Select;
 const { MonthPicker, RangePicker } = DatePicker;
 
 function RecentIssues(props) {
-  const [open, setOpen] = useState(true);
-  const [list, setList] = useState();
-  const [data, setData] = useState([])
+  // const [list, setList] = useState();
+  const [data, setData] = useState([]);
+  const [row, setRow] = useState(null);
+  const [open, setOpen] = useState(false);
+
   function showConfirm(row) {
     // confirm({
     //   title:
@@ -61,10 +64,10 @@ function RecentIssues(props) {
   const dropdownMenu = (row) => (
     <Menu>
       <Menu.Item
-      // onClick={() => {
-      // setOpen1(true);
-      // setRow((prev) => (prev = row));
-      // }}
+        onClick={() => {
+          setOpen(true);
+          setRow((prev) => (prev = row));
+        }}
       >
         <Flex alignItems="center">
           <EyeOutlined />
@@ -72,10 +75,10 @@ function RecentIssues(props) {
         </Flex>
       </Menu.Item>
       <Menu.Item
-      // onClick={() => {
-      //   setOpenEdit(true);
-      //   setRow((prev) => (prev = row));
-      // }}
+        onClick={() => {
+          // setOpenEdit(true);
+          setRow((prev) => (prev = row));
+        }}
       >
         <Flex alignItems="center">
           <EditOutlined />
@@ -99,37 +102,51 @@ function RecentIssues(props) {
 
   const tableColumns = [
     {
-      title: "Name",
-      dataIndex: ["name", "updateTime"],
+      title: "Posted By",
+      dataIndex: "username",
+      key: "username",
       onFilter: (value, record) => console.log(value, record),
       sorter: (a, b) => antdTableSorter(a, b, "name"),
     },
     {
-      title: "Email",
-      dataIndex: "uuid",
-
-      render: (uuid, elm) => {
-        console.log(uuid, "driver");
-
-        return <span>{uuid !== "" ? uuid : "No Driver ID"}</span>;
+      title: "Title",
+      dataIndex: "issue_title",
+      key: "issue_title",
+      // sorter: (a, b) => antdTableSorter(a, b, "cardNum"),
+    },
+    {
+      title: "Area",
+      dataIndex: "area",
+      key: "area",
+      render: (area) => {
+        return area?.area_name;
       },
+      sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
     {
-      title: "Address",
-      dataIndex: ["cardNo", "createTime"],
-
-      sorter: (a, b) => antdTableSorter(a, b, "cardNum"),
+      title: "Landmark",
+      dataIndex: "landmark",
+      key: "landmark",
+      sorter: (a, b) => antdTableSorter(a, b, "landmark"),
     },
     {
-      title: "City",
-      dataIndex: "deptName",
-
-      sorter: (a, b) => antdTableSorter(a, b, "department"),
+      title: "Posted On",
+      dataIndex: "issue_created_time",
+      key: "issue_created_time",
+      sorter: (a, b) => antdTableSorter(a, b, "issue_created_time"),
     },
     {
-      title: "Joining Date",
-      dataIndex: "deptName",
-      sorter: (a, b) => antdTableSorter(a, b, "department"),
+      title: "Status",
+      dataIndex: "issue_status",
+      key: "issue_status",
+      render: (status) => {
+        if (status === "R") {
+          return <Tag color="success">Recieved</Tag>;
+        } else if (status === "A") {
+          return <Tag color="yellow">Assigned</Tag>;
+        }
+      },
+      // sorter: (a, b) => antdTableSorter(a, b, "jdate"),
     },
     {
       title: "",
@@ -150,20 +167,24 @@ function RecentIssues(props) {
   };
 
   const getIssues = () => {
-    axios.get(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-      },
-    }).then((res) => {
-      console.log(res);
-    }).catch((err) => {
-      console.log(err);
-    })
-  }
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.results);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   useEffect(() => {
-    getIssues()
-  }, [])
+    // getIssues();
+  }, []);
 
   return (
     <>
@@ -180,7 +201,7 @@ function RecentIssues(props) {
                 placeholder="Search user by name"
                 name="empId"
                 prefix={<SearchOutlined />}
-              // onChange={(e) => onChangeFilter(e)}
+                // onChange={(e) => onChangeFilter(e)}
               />
             </div>
             <div>
@@ -192,7 +213,7 @@ function RecentIssues(props) {
                 placeholder="Search user by email-id"
                 name="empName"
                 prefix={<SearchOutlined />}
-              // onChange={(e) => onChangeFilter(e)}
+                // onChange={(e) => onChangeFilter(e)}
               />
             </div>
             <div>
@@ -201,11 +222,13 @@ function RecentIssues(props) {
               </label>
               <RangePicker
                 className="w-100 my-2 p-2 selectElement"
-              //   defaultValue={[
-              // moment("2015/01/01", dateFormat),
-              // moment("2015/01/01", dateFormat)
-              //   ]}
-              //   format={dateFormat}
+                // onChange={(e) => console.log(moment().date(e[0].$d))}
+                // value={}
+                //   defaultValue={[
+                // moment("2015/01/01", dateFormat),
+                // moment("2015/01/01", dateFormat)
+                //   ]}
+                //   format={dateFormat}
               />
             </div>
 
@@ -265,222 +288,29 @@ function RecentIssues(props) {
             <DeleteOutlined />
             Delete
           </Button>
-          {/* <Button
-                type="primary"
-                className="d-flex align-items-center "
-                size="large"
-              >
-                <PlusCircleOutlined />
-                Add Employee
-              </Button> */}
 
           <Button
             type="primary"
             size="large"
             className="d-flex align-items-center"
-          // onClick={() => {
-          //   // exportTableData(list);
-          //   const excel = new Excel();
-          //   excel
-          //     .addSheet("test")
-          //     .addColumns([
-          //       { title: "Driver Name", dataIndex: "name" },
-          //       { title: "Driver ID", dataIndex: "uuid" },
-          //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-          //       { title: "Department", dataIndex: "deptName" },
-          //     ])
-          //     .addDataSource(exportTableData(list))
-          //     .saveAs("Drivers.xlsx");
-          // }}
+            // onClick={() => {
+            //   // exportTableData(list);
+            //   const excel = new Excel();
+            //   excel
+            //     .addSheet("test")
+            //     .addColumns([
+            //       { title: "Driver Name", dataIndex: "name" },
+            //       { title: "Driver ID", dataIndex: "uuid" },
+            //       { title: "Staff Pass ID", dataIndex: "cardNo" },
+            //       { title: "Department", dataIndex: "deptName" },
+            //     ])
+            //     .addDataSource(exportTableData(list))
+            //     .saveAs("Drivers.xlsx");
+            // }}
           >
             <DownloadOutlined />
             Export
           </Button>
-
-          <Modal
-            title="Add Employee"
-            // visible={open}
-            // onSubmit={() => setOpen(false)}
-            onCancel={() => {
-              // formRef.current.resetFields();
-              // setOpen(false);
-              // setOpenAdd(true);
-              // console.log("notjkjkjk");
-            }}
-            footer={[
-              <Button
-                key="back"
-                onClick={() => {
-                  // setOpen(false);
-                  // formRef.current.resetFields();
-                }}
-              >
-                Cancel
-              </Button>,
-              <Form.Item>
-                <Button
-                  key="submit"
-                  htmlType="submit"
-                  type="primary"
-                //   onClick={onSubmitAdd}
-                >
-                  Add
-                </Button>
-              </Form.Item>,
-            ]}
-            width={1000}
-          >
-            <Card>
-              <Form name="login-form">
-                {/* <Input onChange={(e) => handleChangeADD(e)} name="deptId" /> */}
-                <Form.Item name="name" label="Employee Name" required>
-                  <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    name="name"
-                    className="selectElement"
-                  />
-                </Form.Item>
-                <Form.Item name="cardNos" label="Staff Pass ID" required>
-                  <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    // value={dataAdd.cardNos}
-                    name="cardNos"
-                    className="selectElement"
-                  />
-                </Form.Item>
-                <Form.Item name="driverID" label="Driver ID">
-                  <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    // value={dataAdd.driverID}
-                    name="driverID"
-                    className="selectElement"
-                  />
-                </Form.Item>
-                <Form.Item name="job" label="Job">
-                  <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    name="job"
-                    className="selectElement"
-                  />
-                </Form.Item>
-                <Form.Item name="deptId" label="Department Name " required>
-                  <Select
-                    className="w-100 my-2 p-2 selectElement"
-                    placeholder="Select department Name"
-                    // onChange={handleChange}
-                    name="deptId"
-                  >
-                    {/* {departId !== "" &&
-                      departId.map((data) => {
-                        return <Option value={data.id}>{data.name}</Option>;
-                      })} */}
-                  </Select>
-                </Form.Item>
-                <Form.Item name="gender" label="Gender">
-                  <Select
-                    className="w-100 my-2 p-2 selectElement"
-                    placeholder="Select gender"
-                    // onChange={handleChangeGender}
-                    name="gender"
-                  >
-                    <Option value="0">Male</Option>
-                    <Option value="1">Female</Option>
-                    <Option value="-1">unKnown</Option>
-                  </Select>
-                </Form.Item>
-
-                <Form.Item name="phoneNumber" label="Phone Number">
-                  <Input
-                    // onChange={(e) => handleChangeADD(e)}
-                    name="phone"
-                    className="selectElement"
-                  />
-                </Form.Item>
-
-                {/* <Form.Item name="deptUuid" label="Department UUID ">
-                  <Input onChange={(e) => handleChangeADD(e)} name="deptUuid" />
-                </Form.Item> */}
-              </Form>
-            </Card>
-          </Modal>
-
-          <Modal
-            title="Edit Driver Details"
-            // visible={openEdit}
-            // onCancel={() => setOpenEdit(false)}
-            footer={[
-              <Button
-                key="back"
-              // onClick={() => {
-              //   setOpenEdit(false);
-              // }}
-              >
-                Cancel
-              </Button>,
-              <Button key="submit" type="primary">
-                Save
-              </Button>,
-            ]}
-            width={1000}
-          >
-            <Card>
-              <Form
-              // fields={[
-              //   {
-              //     name: ["name"],
-              //     value: editDriverName,
-              //   },
-              //   {
-              //     name: ["driverId"],
-              //     value: editDriverId,
-              //   },
-              //   {
-              //     name: ["cardNos"],
-              //     value: editStaffId,
-              //   },
-              //   {
-              //     name: ["deptId"],
-              //     value: editDeptId,
-              //   },
-              // ]}
-              >
-                <Form.Item name="driverId" label="Driver ID">
-                  <Input
-                    name="driverId"
-                  // onChange={(e) => setEditDriverId(e.target.value)}
-                  />
-                </Form.Item>
-                <Form.Item name="name" label="Employee Name" required>
-                  <Input
-                    // onChange={(e) => handleChangeEdit(e)}
-                    name="name"
-                    className="selectElement"
-                  />
-                </Form.Item>
-                <Form.Item name="cardNos" label="Staff Pass ID" required>
-                  <Input
-                    // onChange={(e) => handleChangeEditCardNo(e)}
-                    name="cardNos"
-                    className="selectElement"
-                  />
-                </Form.Item>
-                <Form.Item name="deptId" label="Department Name ">
-                  <Select
-                    disabled
-                    className="w-100 my-2 p-2 selectElement"
-                    placeholder="Select department Name"
-                    // onChange={(value) => setEditDeptId(value)}
-                    name="deptId"
-                  >
-                    {/* {departId !== "" &&
-                      departId.map((data) => (
-                        <Option value={data.id}>{data.name}</Option>
-                      ))} */}
-                  </Select>
-                </Form.Item>
-              </Form>
-            </Card>
-          </Modal>
         </div>
       </div>
       {/* {load === true && (
@@ -501,28 +331,26 @@ function RecentIssues(props) {
         <div className="table-responsive">
           <Table
             columns={tableColumns}
-            dataSource={list}
+            dataSource={data}
             rowKey="id"
-            rowSelection={{
-              // selectedRowKeys: selectedRowKeys,
-              type: "checkbox",
-              preserveSelectedRowKeys: false,
-              ...rowSelection,
-            }}
+            // rowSelection={{
+            //   // selectedRowKeys: selectedRowKeys,
+            //   type: "checkbox",
+            //   preserveSelectedRowKeys: false,
+            //   ...rowSelection,
+            // }}
           />
-          {/* //#c1dbe7#def4ff */}
-          {/* #cbdaf5 */}
         </div>
       </Card>
 
       <Modal
         title="Employee Details"
-        // visible={open1}
-        // onCancel={() => setOpen1(false)}
+        // visible={open}
+        // onCancel={() => setOpen(false)}
         footer={null}
         width={1000}
       >
-        {/* {row !== "" && (
+        {row !== "" && (
           <Card>
             <Form.Item name="name" label="Community ID">
               {row?.communityId}
@@ -555,7 +383,7 @@ function RecentIssues(props) {
               {row?.phone ? row?.phone : ""}
             </Form.Item>
           </Card>
-        )} */}
+        )}
       </Modal>
     </>
   );
