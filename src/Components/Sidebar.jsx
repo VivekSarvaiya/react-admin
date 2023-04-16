@@ -510,8 +510,8 @@ const Sidebar = () => {
         </Header>
         <Content
           style={{
-            margin: "24px 16px",
-            padding: 24,
+            // margin: "24px 16px",
+            // padding: 24,
             // height: "90vh",
             backgroundColor: "aliceblue",
             overflow: "hidden",

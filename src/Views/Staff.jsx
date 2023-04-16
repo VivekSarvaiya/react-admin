@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Tag } from "antd";
 import { DatePicker } from "antd";
@@ -20,16 +19,13 @@ import {
   ReloadOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-// import NumberFormat from "react-number-format";
-// import { useHistory } from "react-router-dom";
-// import utils from "utils";
 import { Modal } from "antd";
 import moment from "moment/moment";
 import { AddCircleOutlineOutlined, Block } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
 import axios from "axios";
-// import axios from "axios";
+import { Excel } from "antd-table-saveas-excel";
 const { confirm } = Modal;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
@@ -43,25 +39,46 @@ function Staff() {
   const [row, setRow] = useState(null);
   const [data, setData] = useState([]);
   const [load, setLoad] = useState(false);
-  const [department, setDepartment] = useState("");
+  const [department, setDepartment] = useState([]);
+  const [staff_department, setstaff_department] = useState();
   const [addData, setAddData] = useState({
     first_name: "",
     last_name: "",
     email: "",
     username: "",
-    phone_no: null,
-    Date_of_birth: null,
+    phone_no: "",
     area: "",
-    aadhar_no: null,
+    aadhar_no: "",
+    is_staff_verified: false,
   });
+  const [searchusername, setSearchusername] = useState("");
+  const [searchArea, setSearchArea] = useState("");
+  const [searchEmail, setSearchEmail] = useState("");
+  const [searchphone_no, setSearchphone_no] = useState("");
+  const [Date_of_birth, setDate_of_birth] = useState()
+  const [searchStatus, setSearchStatus] = useState("");
+
   const changehandler = (event) => {
-    console.log(event);
+    // console.log(event);
     const { name, value } = event.target;
-    setAddData({ ...addData, [name]: value });
+    setAddData({ ...addData, [name]: value || event });
   };
   const submitStaffDetails = (event) => {
-    event.preventDefault();
-    console.log(addData);
+    console.log({ ...addData, department, Date_of_birth: moment(Date_of_birth).format('YYYY/MM/DD') })
+    // event.preventDefault();
+    // debugger
+    // console.log(addData);
+    // console.log(event, "hello");
+    axios.post(`${process.env.REACT_APP_BASE_URL}/api/StaffCreate/`, { ...addData, staff_department, Date_of_birth: moment(Date_of_birth).format('YYYY/MM/DD') }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+      },
+    }).then((res) => {
+      console.log(res);
+      // setDepartment(res.data.results)
+    }).catch((err) => {
+      console.log(err);
+    })
   };
   function showConfirm(row) {
     console.log(row);
@@ -109,9 +126,9 @@ function Staff() {
   );
   const tableColumns = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "Username",
+      dataIndex: "username",
+      key: "username",
       onFilter: (value, record) => console.log(value, record),
       sorter: (a, b) => antdTableSorter(a, b, "name"),
     },
@@ -121,32 +138,38 @@ function Staff() {
       key: "email",
     },
     {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
+      title: "Department",
+      dataIndex: "staff_department",
+      key: "staff_department",
+      render: (staff_department) => {
+        return staff_department?.department_name;
+      },
       // sorter: (a, b) => antdTableSorter(a, b, "cardNum"),
     },
     {
-      title: "City",
-      dataIndex: "city",
-      key: "city",
-      sorter: (a, b) => antdTableSorter(a, b, "city"),
+      title: "Area",
+      dataIndex: "area",
+      key: "area",
+      render: (area) => {
+        return area?.area_name;
+      },
+      sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
     {
       title: "Joining Date",
-      dataIndex: "jdate",
-      key: "jdate",
+      dataIndex: "date_joined",
+      key: "date_joined",
       sorter: (a, b) => antdTableSorter(a, b, "jdate"),
     },
     {
       title: "Status",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "staff_work_status",
+      key: "staff_work_status",
       render: (status) => {
-        if (status === "Active") {
-          return <Tag color="success">Active</Tag>;
-        } else {
-          return <Tag color="red">Blocked</Tag>;
+        if (status === "F") {
+          return <Tag color="success">Available</Tag>;
+        } else if (status === "W") {
+          return <Tag color="red">Angaged</Tag>;
         }
       },
       // sorter: (a, b) => antdTableSorter(a, b, "jdate"),
@@ -161,167 +184,257 @@ function Staff() {
       ),
     },
   ];
-  useEffect(() => {
+
+  const search = () => {
+    let api = `${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/?search=${searchusername}${searchEmail}${searchArea}${searchphone_no}`
+    fetchData(api);
+  };
+
+  const resetSearch = () => {
+    setSearchusername("");
+    setSearchArea("")
+    setSearchEmail("")
+    setSearchphone_no("")
+    setSearchStatus()
+    fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/`);
+  };
+
+  const fetchData = (api) => {
     axios
-      .get("http://127.0.0.1:8000/api/staff/details")
+      .get(api, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+      })
       .then((res) => {
         console.log(res);
-        setData(res.data);
+        setData(res.data.results);
       })
       .catch((err) => {
         console.log(err);
       });
+  }
+
+  useEffect(() => {
+    fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/`);
+
+    axios.get(`${process.env.REACT_APP_BASE_URL}/api/details/departmentDetail/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+      },
+    }).then((res) => {
+      console.log(res, "department");
+      setDepartment(res.data.results)
+    }).catch((err) => {
+      console.log(err);
+    })
+    console.log(addData);
   }, []);
+
+  const exportTableData = (users) => {
+    let arr = [];
+    // console.log(users);
+    users.map((item) => {
+      arr.push({
+        username: item.username,
+        email: item.email,
+        first_name: item.first_name,
+        last_name: item.last_name,
+        state_name: item.state.state_name,
+        city_name: item.city.city_name,
+        Date_of_birth: item.Date_of_birth,
+        aadhar_no: item.aadhar_no,
+        phone_no: item.phone_no,
+      });
+    });
+    return arr.flatMap((item) => item);
+  };
   return (
     <>
-      <div className="">
-        <Card className="selectElement">
-          <div className="search-card">
-            <div>
-              <label className="font16">
-                Name
-              </label>
-              <Input
-                className="my-2 p-2 selectElement"
-                placeholder="Search staff member by name"
-                name="empId"
-                prefix={<SearchOutlined />}
-              />
+      <div style={{
+        margin: "24px 16px",
+        padding: 24,
+      }}>
+        <div className="">
+          <Card className="selectElement">
+            <div className="search-card">
+              <div>
+                <label htmlFor=" " className="font16">
+                  Username
+                </label>
+
+                <Input
+                  className="my-2 p-2 selectElement"
+                  placeholder="Search by username"
+                  name="username"
+                  value={searchusername}
+                  onChange={(e) => setSearchusername(e.target.value)}
+                  prefix={<SearchOutlined />}
+                />
+              </div>
+              <div>
+                <label htmlFor="" className="font16">
+                  Email
+                </label>
+                <Input
+                  className="my-2 p-2 selectElement"
+                  placeholder="Search by email"
+                  name="email"
+                  onChange={(e) => setSearchEmail(e.target.value)}
+                  value={searchEmail}
+                  prefix={<SearchOutlined />}
+                />
+              </div>
+              <div>
+                <label htmlFor="" className="font16">
+                  Phone Number
+                </label>
+                <Input
+                  className="my-2 p-2 selectElement"
+                  placeholder="Search by email"
+                  name="phono"
+                  onChange={(e) => setSearchphone_no(e.target.value)}
+                  value={searchphone_no}
+                  prefix={<SearchOutlined />}
+                />
+              </div>
+              <div>
+                <label htmlFor="" className="font16">
+                  Area
+                </label>
+                <Input
+                  className="my-2 p-2 selectElement"
+                  placeholder="Search by area"
+                  name="area"
+                  onChange={(e) => setSearchArea(e.target.value)}
+                  value={searchArea}
+                  prefix={<SearchOutlined />}
+                />
+              </div>
+              {/* <div>
+                <label className="font16">
+                  Department
+                </label>
+                <Select
+                  className="w-100 my-2 selectElement"
+                  placeholder="Search by department"
+                  name="status"
+                  onChange={(e) => setSearchStatus(e)}
+                >
+                  <Option value="F">Available</Option>;
+                  <Option value="W">Angaged</Option>;
+                </Select>
+              </div>
+              <div>
+                <label className="font16">
+                  City
+                </label>
+                <Select
+                  className="w-100 my-2 selectElement"
+                  placeholder="Search by city"
+                  name="deptId"
+                ></Select>
+              </div> */}
             </div>
-            <div>
-              <label className="font16">
-                Email
-              </label>
-              <Input
-                className="my-2 p-2 selectElement"
-                placeholder="Search staff member by email-id"
-                name="empName"
-                prefix={<SearchOutlined />}
-              />
-            </div>
-            <div>
-              <label className="font16">
-                Date
-              </label>
-              <RangePicker className="w-100 my-2 p-2 selectElement" />
-            </div>
-            <div>
-              <label className="font16">
-                Designation
-              </label>
-              <Select
-                className="w-100 my-2 selectElement"
-                placeholder="Search staff member by city"
-                name="deptId"
+            <br />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "2%",
+                marginTop: "30px",
+              }}
+            >
+              {" "}
+              <Button
+                type="primary"
+                size="large"
+                onClick={resetSearch}
+                className="d-flex align-items-center"
               >
-                <Option value="Active">Active</Option>;
-                <Option value="Blocked">Blocked</Option>;
-              </Select>
+                <ReloadOutlined /> Reset
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                onClick={search}
+                className="d-flex align-items-center"
+              >
+                <SearchOutlined />
+                Search
+              </Button>
             </div>
-            <div>
-              <label className="font16">
-                City
-              </label>
-              <Select
-                className="w-100 my-2 selectElement"
-                placeholder="Search staff member by city"
-                name="deptId"
-              ></Select>
-            </div>
-          </div>
+          </Card>
           <br />
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end",
               gap: "2%",
-              marginTop: "30px",
+              marginBottom: 20,
             }}
           >
-            {" "}
             <Button
               type="primary"
               size="large"
               className="d-flex align-items-center "
+              onClick={() => setOpenAdd(true)}
             >
-              <ReloadOutlined /> Reset
+              <AddCircleOutlineOutlined />
+              Add Staff member
             </Button>
             <Button
               type="primary"
               size="large"
               className="d-flex align-items-center "
+              onClick={() => {
+                // exportTableData(list);
+                const excel = new Excel();
+                excel
+                  .addSheet("MMC")
+                  .addColumns([
+                    { title: "Username", dataIndex: "username" },
+                    { title: "Email ID", dataIndex: "email" },
+                    { title: "Firstname", dataIndex: "first_name" },
+                    { title: "Lastname", dataIndex: "last_name" },
+                    { title: "State", dataIndex: "state_name" },
+                    { title: "City", dataIndex: "city_name" },
+                    { title: "Date Of Birth", dataIndex: "Date_of_birth" },
+                    { title: "Aadhar Card Number", dataIndex: "aadhar_no" },
+                    { title: "Phone Number", dataIndex: "phone_no" },
+                  ])
+                  .addDataSource(exportTableData(data))
+                  .saveAs("Staff.xlsx");
+              }}
             >
-              <SearchOutlined />
-              Search
+              <DownloadOutlined />
+              Export
             </Button>
           </div>
+        </div>
+        {load === true && (
+          <Spin
+            tip="Loading..."
+            style={{
+              justifyContent: "center",
+              display: "flex",
+              padding: "20px 0px",
+            }}
+          ></Spin>
+        )}
+        <Card className="selectElement">
+          <Flex alignItems="center" justifyContent="between" mobileFlex={false}>
+            <Flex className="mb-1" mobileFlex={false}></Flex>
+          </Flex>
+          <div className="table-responsive">
+            <Table columns={tableColumns} dataSource={data} rowKey="id" />
+          </div>
         </Card>
-        <br />
-        <div
-          style={{
-            display: "flex",
-            gap: "2%",
-            marginBottom: 20,
-          }}
-        >
-          <Button
-            type="primary"
-            size="large"
-            className="d-flex align-items-center "
-            onClick={() => setOpenAdd(true)}
-          >
-            <AddCircleOutlineOutlined />
-            Add Staff member
-          </Button>
-          <Button
-            type="primary"
-            size="large"
-            className="d-flex align-items-center "
-          // onClick={() => {
-          //   // exportTableData(list);
-          //   const excel = new Excel();
-          //   excel
-          //     .addSheet("test")
-          //     .addColumns([
-          //       { title: "Driver Name", dataIndex: "name" },
-          //       { title: "Driver ID", dataIndex: "uuid" },
-          //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-          //       { title: "Department", dataIndex: "deptName" },
-          //     ])
-          //     .addDataSource(exportTableData(list))
-          //     .saveAs("Drivers.xlsx");
-          // }}
-          >
-            <DownloadOutlined />
-            Export
-          </Button>
-        </div>
       </div>
-      {load === true && (
-        <Spin
-          tip="Loading..."
-          style={{
-            justifyContent: "center",
-            display: "flex",
-            padding: "20px 0px",
-          }}
-        ></Spin>
-      )}
-      <Card className="selectElement">
-        <Flex alignItems="center" justifyContent="between" mobileFlex={false}>
-          <Flex className="mb-1" mobileFlex={false}></Flex>
-        </Flex>
-        <div className="table-responsive ">
-          <Table columns={tableColumns} dataSource={data} rowKey="id" />
-        </div>
-      </Card>
       <Modal
         title="Add Staff"
         open={openAdd}
         onCancel={() => setOpenAdd(false)}
         maskClosable={false}
         footer={[
-          <Button onClick={submitStaffDetails} key="back">
+          <Button onClick={() => submitStaffDetails(true)}>
             Add
           </Button>,
           <Button key="submit" type="primary" onClick={() => setOpenAdd(false)}>
@@ -330,7 +443,7 @@ function Staff() {
         ]}
       >
         <Card>
-          <Form name="login-form">
+          <Form >
             <Form.Item name="first_name" label="First Name" required>
               <Input
                 onChange={changehandler}
@@ -364,18 +477,33 @@ function Staff() {
                 className="selectElement"
               />
             </Form.Item>
+            <Form.Item name="Date_of_birth" label="Date of Birth">
+              {/* <Input
+                type="date"
+                onChange={changehandler}
+                value={addData.Date_of_birth}
+                name="Date_of_birth"
+                className="selectElement"
+              /> */}
+              <DatePicker format='YYYY/MM/DD' onChange={(e) => setDate_of_birth(e)}
+                value={addData.Date_of_birth}
+                name="Date_of_birth"
+                className="selectElement" />
+            </Form.Item>
             <Form.Item name="staff_department" label="Staff working department">
               <Select
                 className="w-100 mar10 selectElement"
                 placeholder="Select department"
-                onChange={(e) => setDepartment(e)}
-                value={department}
+                onChange={(e) => setstaff_department(e)}
+                // value={department}
+                name="staff_department"
               >
-                <Option value="management">Management person</Option>
-                <Option value="backoffice">Back office worker</Option>
-                <Option value="road">Road construction</Option>
-                <Option value="potholes">Potholes reparing</Option>
-                <Option value="drainage">Drainage and sanitation</Option>
+                {
+                  department.map((elem) => (
+
+                    <Option value={elem.department_name}>{elem.department_name}</Option>
+                  ))
+                }
               </Select>
             </Form.Item>
             <Form.Item name="area" label="Staff Working area">
@@ -415,21 +543,35 @@ function Staff() {
       >
         {row !== "" && (
           <Card>
-            <Form.Item name="name" label="Name">
-              {row?.name}
-            </Form.Item>
-            <Form.Item name="email" label="Email ID ">
-              {row?.email}
-            </Form.Item>
-            <Form.Item name="address" label="Address">
-              {row?.address}
-            </Form.Item>
-            <Form.Item name="city" label="City">
-              {row?.city}
-            </Form.Item>
-            <Form.Item name="jdate" label="Joining Date">
-              {row?.jdate}
-            </Form.Item>
+            <Form>
+              <Form.Item name="name" label="Username">
+                {row?.username}
+              </Form.Item>
+              <Form.Item name="email" label="Email ID ">
+                {row?.email}
+              </Form.Item>
+              <Form.Item name="name" label="Firstname">
+                {row?.first_name}
+              </Form.Item>
+              <Form.Item name="name" label="Lastname">
+                {row?.last_name}
+              </Form.Item>
+              <Form.Item name="address" label="State">
+                {row?.state?.state_name}
+              </Form.Item>
+              <Form.Item name="city" label="City">
+                {row?.city?.city_name}
+              </Form.Item>
+              <Form.Item name="jdate" label="Date Of Birth">
+                {row?.Date_of_birth}
+              </Form.Item>
+              <Form.Item name="jdate" label="Aadhar Card Number">
+                {row?.aadhar_no}
+              </Form.Item>
+              <Form.Item name="jdate" label="Phone Number">
+                {row?.phone_no}
+              </Form.Item>
+            </Form>
           </Card>
         )}
       </Modal>

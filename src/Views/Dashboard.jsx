@@ -67,146 +67,153 @@ function Dashboard(props) {
 
   return (
     <>
-      <div>
-        <div className="d-flex gap-2 py-4">
-          <Box
-            sx={{
-              bgcolor: "#ffffff",
-              boxShadow: 2,
-              borderRadius: 2,
-              p: 2,
-              width: 300,
-            }}
-            className="selectElement"
-          >
-            <Box sx={{ color: "grey" }}>Users</Box>
-            <Box sx={{ fontSize: 34, fontWeight: "medium" }}>98,369</Box>
-            <Box
-              sx={{
-                color: "darkgreen",
-                display: "inline",
-                fontWeight: "bold",
-                mx: 0.5,
-                fontSize: 14,
-              }}
-            >
-              +18.77%
-            </Box>
-            <Box
-              sx={{
-                color: "",
-                display: "inline",
-                fontSize: 14,
-              }}
-            >
-              vs. last week
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              bgcolor: "#ffffff",
-              boxShadow: 2,
-              borderRadius: 2,
-              p: 2,
-              width: 300,
-            }}
-            className="selectElement"
-          >
-            <Box sx={{ color: "grey" }}>Staff</Box>
-            <Box sx={{ fontSize: 34, fontWeight: "medium" }}>128 </Box>
+      <div style={{
+        margin: "24px 16px",
+        padding: 24,
+      }}>
 
+
+        <div>
+          <div className="d-flex gap-2 py-4">
             <Box
               sx={{
-                color: "text.secondary",
-                display: "inline",
-                fontSize: 14,
+                bgcolor: "#ffffff",
+                boxShadow: 2,
+                borderRadius: 2,
+                p: 2,
+                width: 300,
               }}
+              className="selectElement"
             >
-              Active Staff Members
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              bgcolor: "#ffffff",
-              boxShadow: 2,
-              borderRadius: 2,
-              p: 2,
-              width: 300,
-            }}
-            className="selectElement"
-          >
-            <Box sx={{ color: "grey" }}>Reported Issues</Box>
-            <Box sx={{ fontSize: 34, fontWeight: "medium" }}>56,756</Box>
-            <Box
-              sx={{
-                color: "darkgreen",
-                display: "inline",
-                fontWeight: "bold",
-                mx: 0.5,
-                fontSize: 14,
-              }}
-            >
-              +18.77%
-            </Box>
-            <Box
-              sx={{
-                color: "text.secondary",
-                display: "inline",
-                fontSize: 14,
-              }}
-            >
-              vs. last week
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              bgcolor: "#ffffff",
-              boxShadow: 2,
-              borderRadius: 2,
-              p: 2,
-              width: 300,
-            }}
-            className="selectElement"
-          >
-            <Box sx={{ color: "grey" }}>Solved Issues</Box>
-            <Box sx={{ fontSize: 34, fontWeight: "medium" }}>15,460</Box>
-            <Box
-              sx={{
-                color: "darkgreen",
-                display: "inline",
-                fontWeight: "bold",
-                mx: 0.5,
-                fontSize: 14,
-              }}
-            >
-              +18.77%
+              <Box sx={{ color: "grey" }}>Users</Box>
+              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>98,369</Box>
+              <Box
+                sx={{
+                  color: "darkgreen",
+                  display: "inline",
+                  fontWeight: "bold",
+                  mx: 0.5,
+                  fontSize: 14,
+                }}
+              >
+                +18.77%
+              </Box>
+              <Box
+                sx={{
+                  color: "",
+                  display: "inline",
+                  fontSize: 14,
+                }}
+              >
+                vs. last week
+              </Box>
             </Box>
             <Box
               sx={{
-                color: "text.secondary",
-                display: "inline",
-                fontSize: 14,
+                bgcolor: "#ffffff",
+                boxShadow: 2,
+                borderRadius: 2,
+                p: 2,
+                width: 300,
               }}
+              className="selectElement"
             >
-              vs. last week
+              <Box sx={{ color: "grey" }}>Staff</Box>
+              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>128 </Box>
+
+              <Box
+                sx={{
+                  color: "text.secondary",
+                  display: "inline",
+                  fontSize: 14,
+                }}
+              >
+                Active Staff Members
+              </Box>
             </Box>
-          </Box>
+            <Box
+              sx={{
+                bgcolor: "#ffffff",
+                boxShadow: 2,
+                borderRadius: 2,
+                p: 2,
+                width: 300,
+              }}
+              className="selectElement"
+            >
+              <Box sx={{ color: "grey" }}>Reported Issues</Box>
+              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>56,756</Box>
+              <Box
+                sx={{
+                  color: "darkgreen",
+                  display: "inline",
+                  fontWeight: "bold",
+                  mx: 0.5,
+                  fontSize: 14,
+                }}
+              >
+                +18.77%
+              </Box>
+              <Box
+                sx={{
+                  color: "text.secondary",
+                  display: "inline",
+                  fontSize: 14,
+                }}
+              >
+                vs. last week
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                bgcolor: "#ffffff",
+                boxShadow: 2,
+                borderRadius: 2,
+                p: 2,
+                width: 300,
+              }}
+              className="selectElement"
+            >
+              <Box sx={{ color: "grey" }}>Solved Issues</Box>
+              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>15,460</Box>
+              <Box
+                sx={{
+                  color: "darkgreen",
+                  display: "inline",
+                  fontWeight: "bold",
+                  mx: 0.5,
+                  fontSize: 14,
+                }}
+              >
+                +18.77%
+              </Box>
+              <Box
+                sx={{
+                  color: "text.secondary",
+                  display: "inline",
+                  fontSize: 14,
+                }}
+              >
+                vs. last week
+              </Box>
+            </Box>
+          </div>
         </div>
-      </div>
-      <div className="p-4 px-2">
-        <ReactApexChart
-          className="chart-body"
-          options={options}
-          series={series}
-          type="area"
-          height={350}
-          width="100%"
-        />
+        <div className="p-4 px-2">
+          <ReactApexChart
+            className="chart-body"
+            options={options}
+            series={series}
+            type="area"
+            height={350}
+            width="100%"
+          />
 
-        <div className="d-flex justify-content-around mt-5">
-          {/* <LineChart /> */}
-          <Donut />
-          <Donut />
+          <div className="d-flex justify-content-around mt-5">
+            {/* <LineChart /> */}
+            <Donut />
+            <Donut />
+          </div>
         </div>
       </div>
     </>

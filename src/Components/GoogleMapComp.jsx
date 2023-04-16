@@ -7,26 +7,28 @@ import {
 } from "@react-google-maps/api";
 import { Card, Checkbox, Divider, Form, Modal } from "antd";
 import MapTheme from "./MapTheme"
+import axios from "axios";
 
-const allTypes = ["Potholes", "Road", "Drainage", "Oil Leakeage"];
+const allTypes = ["Potholes", "Road", "Drainage", "Oil Leakage"];
 function GoogleMapComp(props) {
   const [selectedMarker, setSelectedMarker] = useState("");
   const [open, setOpen] = useState(false);
-  const [types, setTypes] = useState(["Potholes", "Road", "Drainage", "Oil Leakeage"]);
+  const [types, setTypes] = useState(["Potholes", "Road", "Drainage", "Oil Leakage"]);
   const [flag, setFlag] = useState(false);
-  const [markers, setMarkers] = useState([]);
+  // const [markers, setMarkers] = useState([]);
+  const [data, setData] = useState([])
   const { isLoaded } = useJsApiLoader({
     id: "AIzaSyBIdCLzkLBCvy1qua21hklBXhY_XH2h-IA",
     googleMapsApiKey: "AIzaSyBIdCLzkLBCvy1qua21hklBXhY_XH2h-IA",
   });
 
   const containerStyle = {
-    width: "85%",
-    height: "85%",
+    width: "87%",
+    height: "91.7%",
     position: "absolute",
     // bottom: 0,
-    zIndex: 100000000000,
-    overflow: "hidden"
+    zIndex: 1000,
+    overflow: "clip"
     // marginTop: "50px",
   };
 
@@ -43,40 +45,19 @@ function GoogleMapComp(props) {
   };
 
   useEffect(() => {
-    setMarkers([
-      {
-        name: "Railway Station",
-        type: "Drainage",
-        location: {
-          lat: 21.1266,
-          lng: 72.8312,
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
-      },
-      {
-        name: "Katargam",
-        type: "Road",
-        location: {
-          lat: 21.2339372,
-          lng: 72.811659,
-        },
-      },
-      {
-        name: "Adajan",
-        type: "Potholes",
-        location: {
-          lat: 21.228125,
-          lng: 72.833771,
-        },
-      },
-      {
-        name: "varachha",
-        type: "Oil Leakeage",
-        location: {
-          lat: 21.1959,
-          lng: 72.7933,
-        },
-      },
-    ]);
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.data?.results);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, [flag]);
 
   return isLoaded ? (
@@ -106,7 +87,7 @@ function GoogleMapComp(props) {
         zoomControl: true,
       }}
     >
-      {markers.map((item, index) => {
+      {data.map((item, index) => {
         if (types.includes(item.type)) {
           return (
             <Marker
@@ -116,7 +97,6 @@ function GoogleMapComp(props) {
                 setOpen(true);
               }}
               icon={{
-                // url: "../assets/images/potholes.png",
                 url: `../assets/images/${item.type === "Potholes"
                   ? "pothole.png"
                   : item.type === "Drainage"
@@ -185,7 +165,7 @@ function GoogleMapComp(props) {
                       : ""
                 }`}
               width={30}
-              alt={item}
+              alt=""
             />
           </div>
         ))}

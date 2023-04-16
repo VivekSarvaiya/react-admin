@@ -44,9 +44,8 @@ const AuthProvider = ({ children }) => {
   const getUserData = async () => {
     axios
       .get(
-        ` ${
-          process.env.REACT_APP_BASE_URL
-        }/api/AdminDetail/${localStorage.getItem("USERID")}`,
+        ` ${process.env.REACT_APP_BASE_URL
+        }/api/AdminDetail`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,

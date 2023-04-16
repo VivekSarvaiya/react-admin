@@ -20,16 +20,10 @@ import {
   EyeOutlined,
   DeleteOutlined,
   SearchOutlined,
-  PlusCircleOutlined,
   ReloadOutlined,
   DownloadOutlined,
-  EditOutlined,
 } from "@ant-design/icons";
-// import NumberFormat from "react-number-format";
-// import { useHistory } from "react-router-dom";
-// import utils from "utils";
 import { Modal } from "antd";
-// import axios from "axios";
 import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
 import axios from "axios";
 import moment from "moment";
@@ -38,10 +32,12 @@ const { Option } = Select;
 const { MonthPicker, RangePicker } = DatePicker;
 
 function RecentIssues(props) {
-  // const [list, setList] = useState();
   const [data, setData] = useState([]);
   const [row, setRow] = useState(null);
   const [open, setOpen] = useState(false);
+  const [load, setLoad] = useState(false)
+  const [staffList, setStaffList] = useState([])
+  const [selectedStaff, setSelectedStaff] = useState()
 
   function showConfirm(row) {
     // confirm({
@@ -60,9 +56,8 @@ function RecentIssues(props) {
     //   onCancel() {},
     // });
   }
-
   const dropdownMenu = (row) => (
-    <Menu>
+    <Menu className="selectElement">
       <Menu.Item
         onClick={() => {
           setOpen(true);
@@ -70,31 +65,23 @@ function RecentIssues(props) {
         }}
       >
         <Flex alignItems="center">
-          <EyeOutlined />
-          <span className="ml-2">View Details</span>
+          <EyeOutlined style={{ fontSize: "15px" }} />
+          <span className="mx-2">View Details</span>
         </Flex>
       </Menu.Item>
       <Menu.Item
+        style={{
+          color: "#cf1322",
+          background: "#fff1f0",
+          borderColor: "#ffa39e",
+        }}
         onClick={() => {
-          // setOpenEdit(true);
-          setRow((prev) => (prev = row));
+          setRow(row);
         }}
       >
         <Flex alignItems="center">
-          <EditOutlined />
-          <span className="ml-2">Edit Details</span>
-        </Flex>
-      </Menu.Item>
-      {/* onClick={() => deleteRow(row)}  */}
-      <Menu.Item onClick={() => showConfirm(row)}>
-        <Flex alignItems="center">
-          <DeleteOutlined />
-          <span className="ml-2">
-            {/* {selectedRows.length > 0
-              ? `Delete (${selectedRows.length})`
-              : "Delete"} */}
-            Delete
-          </span>
+          <DeleteOutlined style={{ fontSize: "15px" }} />
+          <span className="mx-2">Reject Issue</span>
         </Flex>
       </Menu.Item>
     </Menu>
@@ -103,8 +90,11 @@ function RecentIssues(props) {
   const tableColumns = [
     {
       title: "Posted By",
-      dataIndex: "username",
-      key: "username",
+      dataIndex: "user",
+      key: "user",
+      render: (user) => {
+        return user?.username;
+      },
       onFilter: (value, record) => console.log(value, record),
       sorter: (a, b) => antdTableSorter(a, b, "name"),
     },
@@ -124,16 +114,19 @@ function RecentIssues(props) {
       sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
     {
-      title: "Landmark",
-      dataIndex: "landmark",
-      key: "landmark",
-      sorter: (a, b) => antdTableSorter(a, b, "landmark"),
+      title: "Type",
+      dataIndex: "issue_type",
+      key: "issue_type",
+      render: (issue_type) => {
+        return issue_type?.Issue_Type_Name;
+      },
+      sorter: (a, b) => antdTableSorter(a, b, "type"),
     },
     {
       title: "Posted On",
       dataIndex: "issue_created_time",
       key: "issue_created_time",
-      sorter: (a, b) => antdTableSorter(a, b, "issue_created_time"),
+      // sorter: (a, b) => antdTableSorter(a, b, "issue_created_time"),
     },
     {
       title: "Status",
@@ -159,14 +152,8 @@ function RecentIssues(props) {
     },
   ];
 
-  const rowSelection = {
-    //   onChange: (key, rows) => {
-    //     setSelectedRows(rows);
-    //     setSelectedRowKeys(key);
-    //   },
-  };
-
   const getIssues = () => {
+    setLoad(true)
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`, {
         headers: {
@@ -175,124 +162,154 @@ function RecentIssues(props) {
       })
       .then((res) => {
         console.log(res);
-        setData(res.results);
+        setData(res.data?.results);
+        setLoad(false)
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoad(false)
+      });
+  };
+
+  const getStaffList = (id) => {
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/StaffList/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setStaffList(res.data?.Staff_List);
       })
       .catch((err) => {
         console.log(err);
       });
-  };
+  }
 
+  const assignIssue = (id) => {
+    axios
+      .patch(`${process.env.REACT_APP_BASE_URL}/api/issue/IssueAssignToStaff/${id}`, { staff: selectedStaff }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  console.log(selectedStaff);
   useEffect(() => {
-    // getIssues();
+    getIssues();
   }, []);
 
   return (
     <>
-      <div className="">
-        <Card className="selectElement">
-          <div className="search-card">
-            <div>
-              <label htmlFor=" " className="font16">
-                Name
-              </label>
+      <div style={{
+        margin: "24px 16px",
+        padding: 24,
+      }}>
+        <div className="" >
+          <Card className="selectElement">
+            <div className="search-card">
+              <div>
+                <label htmlFor=" " className="font16">
+                  Name
+                </label>
 
-              <Input
-                className="my-2 p-2 selectElement"
-                placeholder="Search user by name"
-                name="empId"
-                prefix={<SearchOutlined />}
+                <Input
+                  className="my-2 p-2 selectElement"
+                  placeholder="Search user by name"
+                  name="empId"
+                  prefix={<SearchOutlined />}
                 // onChange={(e) => onChangeFilter(e)}
-              />
-            </div>
-            <div>
-              <label htmlFor="" className="font16">
-                Email
-              </label>
-              <Input
-                className="my-2 p-2 selectElement"
-                placeholder="Search user by email-id"
-                name="empName"
-                prefix={<SearchOutlined />}
+                />
+              </div>
+              <div>
+                <label htmlFor="" className="font16">
+                  Email
+                </label>
+                <Input
+                  className="my-2 p-2 selectElement"
+                  placeholder="Search user by email-id"
+                  name="empName"
+                  prefix={<SearchOutlined />}
                 // onChange={(e) => onChangeFilter(e)}
-              />
-            </div>
-            <div>
-              <label htmlFor="" className="font16">
-                Date
-              </label>
-              <RangePicker
-                className="w-100 my-2 p-2 selectElement"
-                // onChange={(e) => console.log(moment().date(e[0].$d))}
-                // value={}
-                //   defaultValue={[
-                // moment("2015/01/01", dateFormat),
-                // moment("2015/01/01", dateFormat)
-                //   ]}
-                //   format={dateFormat}
-              />
-            </div>
+                />
+              </div>
+              <div>
+                <label htmlFor="" className="font16">
+                  Date
+                </label>
+                <RangePicker
+                  className="w-100 my-2 p-2 selectElement"
+                />
+              </div>
 
-            <div>
-              <label htmlFor="" className="font16">
-                City
-              </label>
-              <Select
-                className="w-100 my-2 selectElement"
-                placeholder="Search user by city"
-                // onChange={onChangeFilterDepartId}
-                name="deptId"
-              ></Select>
+              <div>
+                <label htmlFor="" className="font16">
+                  City
+                </label>
+                <Select
+                  className="w-100 my-2 selectElement"
+                  placeholder="Search user by city"
+                  // onChange={onChangeFilterDepartId}
+                  name="deptId"
+                ></Select>
+              </div>
             </div>
-          </div>
+            <br />
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "2%",
+                marginTop: "30px",
+              }}
+            >
+              {" "}
+              <Button
+                type="primary"
+                size="large"
+                className="d-flex align-items-center "
+              >
+                <ReloadOutlined />
+                Reset
+              </Button>
+              <Button
+                type="primary"
+                size="large"
+                className="d-flex align-items-center "
+              >
+                <SearchOutlined />
+                Search
+              </Button>
+            </div>
+          </Card>
           <br />
           <div
             style={{
               display: "flex",
-              justifyContent: "flex-end",
               gap: "2%",
-              marginTop: "30px",
+              marginBottom: 20,
             }}
           >
-            {" "}
             <Button
               type="primary"
-              size="large"
               className="d-flex align-items-center "
-            >
-              <ReloadOutlined />
-              Reset
-            </Button>
-            <Button
-              type="primary"
               size="large"
-              className="d-flex align-items-center "
             >
-              <SearchOutlined />
-              Search
+              <DeleteOutlined />
+              Delete
             </Button>
-          </div>
-        </Card>
-        <br />
-        <div
-          style={{
-            display: "flex",
-            gap: "2%",
-            marginBottom: 20,
-          }}
-        >
-          <Button
-            type="primary"
-            className="d-flex align-items-center "
-            size="large"
-          >
-            <DeleteOutlined />
-            Delete
-          </Button>
 
-          <Button
-            type="primary"
-            size="large"
-            className="d-flex align-items-center"
+            <Button
+              type="primary"
+              size="large"
+              className="d-flex align-items-center"
             // onClick={() => {
             //   // exportTableData(list);
             //   const excel = new Excel();
@@ -307,81 +324,119 @@ function RecentIssues(props) {
             //     .addDataSource(exportTableData(list))
             //     .saveAs("Drivers.xlsx");
             // }}
-          >
-            <DownloadOutlined />
-            Export
-          </Button>
+            >
+              <DownloadOutlined />
+              Export
+            </Button>
+          </div>
         </div>
-      </div>
-      {/* {load === true && (
-        <Spin
-          tip="Loading..."
-          style={{
-            justifyContent: "center",
-            display: "flex",
-            padding: "20px 0px",
-          }}
-        ></Spin>
-      )} */}
-      <Card className="selectElement">
-        <Flex alignItems="center" justifyContent="between" mobileFlex={false}>
-          <Flex className="mb-1" mobileFlex={false}></Flex>
-        </Flex>
+        {load === true && (
+          <Spin
+            tip="Loading..."
+            style={{
+              justifyContent: "center",
+              display: "flex",
+              padding: "20px 0px",
+            }}
+          ></Spin>
+        )}
+        <Card className="selectElement">
+          <Flex alignItems="center" justifyContent="between" mobileFlex={false}>
+            <Flex className="mb-1" mobileFlex={false}></Flex>
+          </Flex>
 
-        <div className="table-responsive">
-          <Table
-            columns={tableColumns}
-            dataSource={data}
-            rowKey="id"
-            // rowSelection={{
-            //   // selectedRowKeys: selectedRowKeys,
-            //   type: "checkbox",
-            //   preserveSelectedRowKeys: false,
-            //   ...rowSelection,
-            // }}
-          />
-        </div>
-      </Card>
+          <div className="table-responsive">
+            <Table
+              columns={tableColumns}
+              dataSource={data}
+              rowKey="id"
+            />
+          </div>
+        </Card>
+      </div>
 
       <Modal
-        title="Employee Details"
-        // visible={open}
-        // onCancel={() => setOpen(false)}
+        title="Issue Details"
+        open={open}
+        onCancel={() => setOpen(false)}
         footer={null}
         width={1000}
       >
         {row !== "" && (
           <Card>
-            <Form.Item name="name" label="Community ID">
-              {row?.communityId}
-            </Form.Item>
-            <Form.Item name="name" label="Department ID ">
-              {row?.deptId}
-            </Form.Item>
-            <Form.Item name="name" label="Department UUID ">
-              {row?.uuid}
-            </Form.Item>
-            <Form.Item name="name" label="Employee Name">
-              {row?.name}
-            </Form.Item>
-            <Form.Item name="name" label="Card Number">
-              {row?.cardNo}
-            </Form.Item>
-            <Form.Item name="name" label="Job ">
-              {row?.job}
-            </Form.Item>
-            <Form.Item name="name" label="Gender">
-              {row?.gender === 1
-                ? "Female"
-                : row?.gender === 0
-                ? "Male"
-                : row?.gender === -1
-                ? "Unknown"
-                : ""}
-            </Form.Item>
-            <Form.Item name="name" label="Phone Number">
-              {row?.phone ? row?.phone : ""}
-            </Form.Item>
+            <Form>
+              <Form.Item className="mb-3" label="Title">
+                {row?.issue_title || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Description">
+                {row?.User_issue_description || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Type">
+                {row?.issue_type?.Issue_Type_Name || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Created On">
+                {moment(row?.issue_created_time).format('MMMM Do YYYY, h:mm:ss a') || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Area">
+                {row?.area?.area_name || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Landmark">
+                {row?.landmark || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Coordinates">
+                {row?.latitude ? row.latitude + " , " + row.logitude : "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Site Images">
+                {
+                  row?.User_Issue_Images.length > 0 ?
+                    row?.User_Issue_Images.map((elem) => (
+                      <img src={elem.image} width="100%" alt="" key={elem.Issue} />
+                    ))
+                    :
+                    "N/A"
+                }
+              </Form.Item>
+              <Form.Item className="mb-3" label="Site Videos">
+                {
+                  row?.User_Issue_Videos.length > 0 ?
+                    row?.User_Issue_Videos.map((elem) => (
+                      <img src={elem.video} width="100%" alt="" key={elem.Issue} />
+                    ))
+                    :
+                    "N/A"
+                }
+              </Form.Item>
+              <Form.Item className="mb-3" label="No. of Votes">
+                {row?.issue_votes}
+              </Form.Item>
+              <Form.Item className="mb-3 " label="Assign this issue to staff member">
+                <div className="d-flex gap-5">
+                  <Select
+                    className="selectElement"
+                    placeholder="Select Staff"
+                    name="assig_to_staff"
+                    onClick={() => getStaffList(row?.id)}
+                    onChange={(e) => setSelectedStaff(e)}
+                  >
+                    {
+                      staffList.map((elem, i) => (
+                        <Option key={i} value={elem.username}>{elem.username} {
+                          elem.staff_work_status === "F" ? <Tag style={{ float: "right" }} color="green">Available</Tag> : <Tag color="volcano" style={{ float: "right" }}>Angaged</Tag>
+                        }</Option>
+                      ))
+                    }
+                  </Select>
+                  <Button
+                    type="primary"
+                    size="large"
+                    className="d-flex align-items-center"
+                    onClick={() => assignIssue(row?.id)}
+                  >
+                    Assign
+                  </Button>
+                </div>
+              </Form.Item>
+            </Form>
           </Card>
         )}
       </Modal>
