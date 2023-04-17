@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { DatePicker, Tag } from "antd";
+import { DatePicker, Tag, message } from "antd";
 import {
   Card,
   Table,
@@ -91,12 +91,13 @@ function Users(props) {
       dataIndex: "username",
       key: "username",
       onFilter: (value, record) => console.log(value, record),
-      sorter: (a, b) => antdTableSorter(a, b, "name"),
+      sorter: (a, b) => antdTableSorter(a, b, "username"),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      sorter: (a, b) => antdTableSorter(a, b, "email"),
     },
     {
       title: "Phone Number",
@@ -111,13 +112,13 @@ function Users(props) {
       render: (area) => {
         return area?.area_name;
       },
-      sorter: (a, b) => antdTableSorter(a, b, "area"),
+      // sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
     {
       title: "Date of Birth",
       dataIndex: "Date_of_birth",
       key: "Date_of_birth",
-      sorter: (a, b) => antdTableSorter(a, b, "jdate"),
+      sorter: (a, b) => antdTableSorter(a, b, "Date_of_birth"),
     },
     {
       title: "Status",
@@ -164,6 +165,7 @@ function Users(props) {
   };
 
   const fetchData = (api) => {
+    setLoad(true);
     axios
       .get(api, {
         headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
@@ -171,11 +173,14 @@ function Users(props) {
       .then((res) => {
         console.log(res);
         setData(res.data?.results);
+        setLoad(false);
       })
       .catch((err) => {
         console.log(err);
+        message.error("Something went wrong while fetching data !")
+        setLoad(false);
       });
-    setLoad(true);
+
   };
 
   const search = () => {
@@ -193,7 +198,6 @@ function Users(props) {
 
   useEffect(() => {
     fetchData(`${process.env.REACT_APP_BASE_URL}/api/UserAllDetails`);
-    // search();
   }, []);
 
   return (
@@ -303,7 +307,6 @@ function Users(props) {
               size="large"
               className="d-flex align-items-center "
               onClick={() => {
-                // exportTableData(list);
                 const excel = new Excel();
                 excel
                   .addSheet("MMC")
@@ -327,7 +330,7 @@ function Users(props) {
             </Button>
           </div>
         </div>
-        {!load && (
+        {load && (
           <Spin
             tip="Loading..."
             style={{

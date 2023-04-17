@@ -28,19 +28,6 @@ const AuthProvider = ({ children }) => {
     setAuthflag(flag);
   };
 
-  const refreshToken = async () => {
-    axios
-      .post(` ${process.env.REACT_APP_BASE_URL}/api/token/refresh/`, {
-        refresh: localStorage.getItem("REFRESH"),
-      })
-      .then((res) => {
-        console.log(res, "Refresh");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-
   const getUserData = async () => {
     axios
       .get(
@@ -54,11 +41,12 @@ const AuthProvider = ({ children }) => {
       )
       .then((res) => {
         console.log(res, "context");
+        localStorage.setItem("CITY_NAME", res.data.city.city_name)
+        localStorage.setItem("CITY_ID", res.data.city.id)
         setAuthState(res.data);
       })
       .catch((err) => {
         console.log(err);
-        // refreshToken()
       });
   };
   useEffect(() => {

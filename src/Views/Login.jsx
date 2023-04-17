@@ -63,7 +63,6 @@ export const Login = (props) => {
           });
       })
       .catch((info) => {
-        console.log("Validate Failed:", info);
         setLoading(false);
       });
   };

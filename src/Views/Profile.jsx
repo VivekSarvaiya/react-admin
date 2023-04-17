@@ -42,6 +42,7 @@ const Profile = () => {
   const [otperror, setOtperror] = useState();
   const [pageState, setPageState] = useState("");
   const [imagePreview, setImagePreview] = useState()
+  const [areas, setAreas] = useState([])
   const [data, setData] = useState({
     fname: authState?.first_name,
     lname: authState?.last_name,
@@ -56,18 +57,18 @@ const Profile = () => {
     // console.log(data);
   };
 
-  // const convertImageToBase64 = (file) => {
-  //   return new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload = () => {
-  //       resolve(reader.result);
-  //     };
-  //     reader.onerror = (error) => {
-  //       reject(error);
-  //     };
-  //   });
-  // };
+  const convertImageToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        resolve(reader.result);
+      };
+      reader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  };
 
   const handleImageChange = async (event) => {
     console.log(event, "image");
@@ -172,6 +173,8 @@ const Profile = () => {
       });
   };
 
+
+
   const inputstyle = {
     width: "40px",
     height: "56px",
@@ -180,8 +183,20 @@ const Profile = () => {
     border: "none",
     fontSize: "20px",
   };
+
+  const fetchAreaDetails = async () => {
+    await axios
+      .get(`http://127.0.0.1:8000/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`)
+      .then(res => {
+        console.log(res);
+        setAreas(res.data.results)
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  };
   useEffect(() => {
-    console.log(authState, "profile");
+    fetchAreaDetails()
   }, [authState])
 
   return (
@@ -303,6 +318,25 @@ const Profile = () => {
                 <dd className="mt-1 text-sm text-gray-900">
                   {moment(authState?.date_joined).format('MMMM Do YYYY, h:mm:ss a') || "N/A"}
                 </dd>
+              </div>
+              <div className="col-md-5 mt-3">
+                <dt className="text-sm font-medium text-gray-500">
+                  Areas Under Administration
+                </dt>
+                {
+                  areas.map((elem) => (
+                    <dd key={elem.area_name} className="mt-1 text-sm text-gray-900">
+                      {elem.area_name}
+                    </dd>
+                  ))
+                }
+                <Button
+                  type="primary"
+                  // size="large"
+                  className="d-flex align-items-center"
+                >
+                  Add new
+                </Button>
               </div>
             </dl>
           </div>

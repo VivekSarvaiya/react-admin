@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Tag } from "antd";
+import { Avatar, Tag, message } from "antd";
 import { DatePicker } from "antd";
 import {
   Card,
@@ -40,14 +40,15 @@ function Staff() {
   const [data, setData] = useState([]);
   const [load, setLoad] = useState(false);
   const [department, setDepartment] = useState([]);
+  const [areas, setAreas] = useState([])
   const [staff_department, setstaff_department] = useState();
+  const [area, setArea] = useState()
   const [addData, setAddData] = useState({
     first_name: "",
     last_name: "",
     email: "",
     username: "",
     phone_no: "",
-    area: "",
     aadhar_no: "",
     is_staff_verified: false,
   });
@@ -59,27 +60,10 @@ function Staff() {
   const [searchStatus, setSearchStatus] = useState("");
 
   const changehandler = (event) => {
-    // console.log(event);
     const { name, value } = event.target;
     setAddData({ ...addData, [name]: value || event });
   };
-  const submitStaffDetails = (event) => {
-    console.log({ ...addData, department, Date_of_birth: moment(Date_of_birth).format('YYYY/MM/DD') })
-    // event.preventDefault();
-    // debugger
-    // console.log(addData);
-    // console.log(event, "hello");
-    axios.post(`${process.env.REACT_APP_BASE_URL}/api/StaffCreate/`, { ...addData, staff_department, Date_of_birth: moment(Date_of_birth).format('YYYY/MM/DD') }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-      },
-    }).then((res) => {
-      console.log(res);
-      // setDepartment(res.data.results)
-    }).catch((err) => {
-      console.log(err);
-    })
-  };
+
   function showConfirm(row) {
     console.log(row);
     Swal.fire({
@@ -130,7 +114,7 @@ function Staff() {
       dataIndex: "username",
       key: "username",
       onFilter: (value, record) => console.log(value, record),
-      sorter: (a, b) => antdTableSorter(a, b, "name"),
+      sorter: (a, b) => antdTableSorter(a, b, "username"),
     },
     {
       title: "Email",
@@ -144,7 +128,7 @@ function Staff() {
       render: (staff_department) => {
         return staff_department?.department_name;
       },
-      // sorter: (a, b) => antdTableSorter(a, b, "cardNum"),
+      // sorter: (a, b) => antdTableSorter(a, b, "staff_department"),
     },
     {
       title: "Area",
@@ -153,13 +137,16 @@ function Staff() {
       render: (area) => {
         return area?.area_name;
       },
-      sorter: (a, b) => antdTableSorter(a, b, "area"),
+      // sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
     {
       title: "Joining Date",
       dataIndex: "date_joined",
       key: "date_joined",
-      sorter: (a, b) => antdTableSorter(a, b, "jdate"),
+      render: (date_joined) => {
+        return moment(date_joined).format('MMMM Do YYYY, h:mm:ss a')
+      },
+      sorter: (a, b) => antdTableSorter(a, b, "date_joined"),
     },
     {
       title: "Status",
@@ -196,26 +183,21 @@ function Staff() {
     setSearchEmail("")
     setSearchphone_no("")
     setSearchStatus()
-    fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/`);
+    fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`);
   };
 
-  const fetchData = (api) => {
-    axios
-      .get(api, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
-      })
-      .then((res) => {
+  const fetchAreaDetails = async () => {
+    await axios
+      .get(`http://127.0.0.1:8000/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`)
+      .then(res => {
         console.log(res);
-        setData(res.data.results);
+        setAreas(res.data.results)
       })
-      .catch((err) => {
-        console.log(err);
+      .catch(error => {
+        console.log(error);
       });
-  }
-
-  useEffect(() => {
-    fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/`);
-
+  };
+  const fetchDepartmentDetails = () => {
     axios.get(`${process.env.REACT_APP_BASE_URL}/api/details/departmentDetail/`, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
@@ -226,12 +208,50 @@ function Staff() {
     }).catch((err) => {
       console.log(err);
     })
-    console.log(addData);
+  }
+  const fetchData = (api) => {
+    setLoad(true)
+    axios
+      .get(api, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.data.results);
+        setLoad(false)
+      })
+      .catch((err) => {
+        console.log(err);
+        setLoad(false)
+        message.error("Something went wrong while fetching data !")
+      });
+  }
+
+  const submitStaffDetails = (event) => {
+    // console.log({ ...addData, department, Date_of_birth: moment(Date_of_birth).format('YYYY-MM-DD') })
+    axios.post(`${process.env.REACT_APP_BASE_URL}/api/StaffCreate/`, { ...addData, staff_department, area, Date_of_birth: moment(Date_of_birth).format('YYYY-MM-DD') }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+      },
+    }).then((res) => {
+      console.log(res);
+      message.success(res.data.success)
+      setOpenAdd(false)
+      fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`);
+    }).catch((err) => {
+      console.log(err);
+      message.error("Something went wrong while creating new staff !")
+    })
+  };
+
+  useEffect(() => {
+    fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`);
+    fetchDepartmentDetails()
+    fetchAreaDetails()
   }, []);
 
   const exportTableData = (users) => {
     let arr = [];
-    // console.log(users);
     users.map((item) => {
       arr.push({
         username: item.username,
@@ -309,30 +329,6 @@ function Staff() {
                   prefix={<SearchOutlined />}
                 />
               </div>
-              {/* <div>
-                <label className="font16">
-                  Department
-                </label>
-                <Select
-                  className="w-100 my-2 selectElement"
-                  placeholder="Search by department"
-                  name="status"
-                  onChange={(e) => setSearchStatus(e)}
-                >
-                  <Option value="F">Available</Option>;
-                  <Option value="W">Angaged</Option>;
-                </Select>
-              </div>
-              <div>
-                <label className="font16">
-                  City
-                </label>
-                <Select
-                  className="w-100 my-2 selectElement"
-                  placeholder="Search by city"
-                  name="deptId"
-                ></Select>
-              </div> */}
             </div>
             <br />
             <div
@@ -409,7 +405,7 @@ function Staff() {
             </Button>
           </div>
         </div>
-        {load === true && (
+        {load && (
           <Spin
             tip="Loading..."
             style={{
@@ -429,7 +425,7 @@ function Staff() {
         </Card>
       </div>
       <Modal
-        title="Add Staff"
+        title="Add New Staff Member"
         open={openAdd}
         onCancel={() => setOpenAdd(false)}
         maskClosable={false}
@@ -478,13 +474,7 @@ function Staff() {
               />
             </Form.Item>
             <Form.Item name="Date_of_birth" label="Date of Birth">
-              {/* <Input
-                type="date"
-                onChange={changehandler}
-                value={addData.Date_of_birth}
-                name="Date_of_birth"
-                className="selectElement"
-              /> */}
+
               <DatePicker format='YYYY/MM/DD' onChange={(e) => setDate_of_birth(e)}
                 value={addData.Date_of_birth}
                 name="Date_of_birth"
@@ -500,19 +490,31 @@ function Staff() {
               >
                 {
                   department.map((elem) => (
-
-                    <Option value={elem.department_name}>{elem.department_name}</Option>
+                    <Option key={elem.id} value={elem.id}>{elem.department_name}</Option>
                   ))
                 }
               </Select>
             </Form.Item>
             <Form.Item name="area" label="Staff Working area">
-              <Input
+              {/* <Input
                 onChange={changehandler}
                 value={addData.area}
                 name="area"
                 className="selectElement"
-              />
+              /> */}
+              <Select
+                className="w-100 mar10 selectElement"
+                placeholder="Select department"
+                onChange={(e) => setArea(e)}
+                value={area}
+                name="area"
+              >
+                {
+                  areas.map((elem) => (
+                    <Option key={elem.id} value={elem.id}>{elem.area_name}</Option>
+                  ))
+                }
+              </Select>
             </Form.Item>
             <Form.Item name="phone_no" label="Phone Number">
               <Input
@@ -544,6 +546,15 @@ function Staff() {
         {row !== "" && (
           <Card>
             <Form>
+              <Avatar
+                sx={{
+                  m: 1,
+                  width: "8rem",
+                  height: "8rem",
+                  background: "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+                }}
+                src={row?.image}
+              />
               <Form.Item name="name" label="Username">
                 {row?.username}
               </Form.Item>

@@ -31,7 +31,7 @@ const { confirm } = Modal;
 const { Option } = Select;
 const { MonthPicker, RangePicker } = DatePicker;
 
-function RecentIssues(props) {
+function SolvedIssues(props) {
   const [data, setData] = useState([]);
   const [row, setRow] = useState(null);
   const [open, setOpen] = useState(false);
@@ -96,12 +96,13 @@ function RecentIssues(props) {
         return user?.username;
       },
       onFilter: (value, record) => console.log(value, record),
-      sorter: (a, b) => antdTableSorter(a, b, "user"),
+      sorter: (a, b) => antdTableSorter(a, b, "name"),
     },
     {
       title: "Title",
       dataIndex: "issue_title",
       key: "issue_title",
+      // sorter: (a, b) => antdTableSorter(a, b, "cardNum"),
     },
     {
       title: "Area",
@@ -110,6 +111,7 @@ function RecentIssues(props) {
       render: (area) => {
         return area?.area_name;
       },
+      sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
     {
       title: "Type",
@@ -118,15 +120,13 @@ function RecentIssues(props) {
       render: (issue_type) => {
         return issue_type?.Issue_Type_Name;
       },
+      sorter: (a, b) => antdTableSorter(a, b, "type"),
     },
     {
       title: "Posted On",
       dataIndex: "issue_created_time",
       key: "issue_created_time",
-      render: (issue_created_time) => {
-        return moment(issue_created_time).format('MMMM Do YYYY, h:mm:ss a');
-      },
-      sorter: (a, b) => antdTableSorter(a, b, "issue_created_time"),
+      // sorter: (a, b) => antdTableSorter(a, b, "issue_created_time"),
     },
     {
       title: "Status",
@@ -134,18 +134,12 @@ function RecentIssues(props) {
       key: "issue_status",
       render: (status) => {
         if (status === "R") {
-          return <Tag color="magenta">Recieved</Tag>;
+          return <Tag color="success">Recieved</Tag>;
         } else if (status === "A") {
           return <Tag color="yellow">Assigned</Tag>;
-
-        } else if (status === "S") {
-          return <Tag color="volcano">Ready for Review</Tag>;
-
-        } else if (status === "VA") {
-          return <Tag color="success">Verified</Tag>;
         }
       },
-      sorter: (a, b) => antdTableSorter(a, b, "issue_status"),
+      // sorter: (a, b) => antdTableSorter(a, b, "jdate"),
     },
     {
       title: "",
@@ -187,8 +181,8 @@ function RecentIssues(props) {
       })
       .then((res) => {
         console.log(res);
-        // console.log(res.data[Object.keys(res.data)[0]]);
-        setStaffList(res.data.Staff_List);
+        console.log(res.data[Object.keys(res.data)[0]]);
+        setStaffList(res.data[Object.keys(res.data)[0]]);
       })
       .catch((err) => {
         console.log(err);
@@ -223,7 +217,7 @@ function RecentIssues(props) {
         padding: 24,
       }}>
         <div className="" >
-          {/* <Card className="selectElement">
+          <Card className="selectElement">
             <div className="search-card">
               <div>
                 <label htmlFor=" " className="font16">
@@ -298,8 +292,8 @@ function RecentIssues(props) {
                 Search
               </Button>
             </div>
-          </Card> */}
-          {/* <br />
+          </Card>
+          <br />
           <div
             style={{
               display: "flex",
@@ -307,6 +301,14 @@ function RecentIssues(props) {
               marginBottom: 20,
             }}
           >
+            <Button
+              type="primary"
+              className="d-flex align-items-center "
+              size="large"
+            >
+              <DeleteOutlined />
+              Delete
+            </Button>
 
             <Button
               type="primary"
@@ -329,8 +331,8 @@ function RecentIssues(props) {
             >
               <DownloadOutlined />
               Export
-            </Button> 
-          </div>*/}
+            </Button>
+          </div>
         </div>
         {load === true && (
           <Spin
@@ -411,37 +413,33 @@ function RecentIssues(props) {
               <Form.Item className="mb-3" label="No. of Votes">
                 {row?.issue_votes}
               </Form.Item>
-              {
-                row?.issue_status === "R" &&
-
-                <Form.Item className="mb-3 " label="Assign this issue to staff member">
-                  <div className="d-flex gap-5">
-                    <Select
-                      className="selectElement"
-                      placeholder="Select Staff"
-                      name="assig_to_staff"
-                      onClick={() => getStaffList(row?.id)}
-                      onChange={(e) => setSelectedStaff(e)}
-                    >
-                      {
-                        staffList?.map((elem, i) => (
-                          <Option key={i} value={elem.id}>{elem.username} {
-                            elem.staff_work_status === "F" ? <Tag style={{ float: "right" }} color="green">Available</Tag> : <Tag color="volcano" style={{ float: "right" }}>Angaged</Tag>
-                          }</Option>
-                        ))
-                      }
-                    </Select>
-                    <Button
-                      type="primary"
-                      size="large"
-                      className="d-flex align-items-center"
-                      onClick={() => assignIssue(row?.id)}
-                    >
-                      Assign
-                    </Button>
-                  </div>
-                </Form.Item>
-              }
+              <Form.Item className="mb-3 " label="Assign this issue to staff member">
+                <div className="d-flex gap-5">
+                  <Select
+                    className="selectElement"
+                    placeholder="Select Staff"
+                    name="assig_to_staff"
+                    onClick={() => getStaffList(row?.id)}
+                    onChange={(e) => setSelectedStaff(e)}
+                  >
+                    {
+                      staffList?.map((elem, i) => (
+                        <Option key={i} value={elem.id}>{elem.username} {
+                          elem.staff_work_status === "F" ? <Tag style={{ float: "right" }} color="green">Available</Tag> : <Tag color="volcano" style={{ float: "right" }}>Angaged</Tag>
+                        }</Option>
+                      ))
+                    }
+                  </Select>
+                  <Button
+                    type="primary"
+                    size="large"
+                    className="d-flex align-items-center"
+                    onClick={() => assignIssue(row?.id)}
+                  >
+                    Assign
+                  </Button>
+                </div>
+              </Form.Item>
             </Form>
           </Card>
         )}
@@ -450,4 +448,4 @@ function RecentIssues(props) {
   );
 }
 
-export default RecentIssues;
+export default SolvedIssues;
