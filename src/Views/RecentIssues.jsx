@@ -1,19 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Box } from "@mui/system";
-import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { DatePicker, Tag } from "antd";
 import {
   Card,
   Table,
   Select,
-  Input,
   Button,
-  Badge,
   Menu,
   Form,
   message,
-  Alert,
   Spin,
 } from "antd";
 import {
@@ -27,6 +22,7 @@ import { Modal } from "antd";
 import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
 import axios from "axios";
 import moment from "moment";
+import { Excel } from "antd-table-saveas-excel";
 const { confirm } = Modal;
 const { Option } = Select;
 const { MonthPicker, RangePicker } = DatePicker;
@@ -38,6 +34,8 @@ function RecentIssues(props) {
   const [load, setLoad] = useState(false)
   const [staffList, setStaffList] = useState([])
   const [selectedStaff, setSelectedStaff] = useState()
+  const [allIssueTypse, setAllIssueTypes] = useState([])
+  const [searchIssueType, setSearchIssueType] = useState("")
 
   function showConfirm(row) {
     // confirm({
@@ -120,6 +118,15 @@ function RecentIssues(props) {
       },
     },
     {
+      title: "Votes",
+      dataIndex: "votes",
+      key: "votes",
+      render: (votes) => {
+        return votes.length;
+      },
+      sorter: (a, b) => antdTableSorter(a, b, "votes"),
+    },
+    {
       title: "Posted On",
       dataIndex: "issue_created_time",
       key: "issue_created_time",
@@ -158,10 +165,10 @@ function RecentIssues(props) {
     },
   ];
 
-  const getIssues = () => {
+  const getIssues = (api) => {
     setLoad(true)
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`, {
+      .get(api, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
@@ -212,8 +219,69 @@ function RecentIssues(props) {
         message.error("Something went wrong")
       });
   }
+
+  const changeIssueStatus = (id) => {
+    axios.patch(`${process.env.REACT_APP_BASE_URL}/api/issue/IssueStatusChange/${id}`, {
+      issue_status: "VA"
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+      }
+    }).then((res) => {
+      console.log(res);
+      message.success("Issue verified succesfully !")
+    }).catch((err) => {
+      console.log(err);
+      message.error("Issue verification failed !")
+    })
+  }
+
+  const search = () => {
+    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?search=${searchIssueType}`
+    getIssues(api);
+  };
+
+
+  const fetchIssueTypes = () => {
+    axios.get(`${process.env.REACT_APP_BASE_URL}/api/details/departmentDetail/`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+      },
+    }).then((res) => {
+      console.log(res, "department");
+      setAllIssueTypes(res.data.results)
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
+
+  // const exportTableData = (users) => {
+  //   let arr = [];
+  //   // console.log(users);
+  //   users.map((item) => {
+  //     arr.push({
+  //       username: item.username,
+  //       email: item.email,
+  //       first_name: item.first_name,
+  //       last_name: item.last_name,
+  //       state_name: item.state.state_name,
+  //       city_name: item.city.city_name,
+  //       Date_of_birth: item.Date_of_birth,
+  //       aadhar_no: item.aadhar_no,
+  //       phone_no: item.phone_no,
+  //     });
+  //   });
+  //   return arr.flatMap((item) => item);
+  // };
+
+  const resetSearch = () => {
+    setSearchIssueType();
+    getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
+  };
+
   useEffect(() => {
-    getIssues();
+    getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
+    fetchIssueTypes()
   }, []);
 
   return (
@@ -223,52 +291,25 @@ function RecentIssues(props) {
         padding: 24,
       }}>
         <div className="" >
-          {/* <Card className="selectElement">
+          <Card className="selectElement">
             <div className="search-card">
-              <div>
-                <label htmlFor=" " className="font16">
-                  Name
-                </label>
-
-                <Input
-                  className="my-2 p-2 selectElement"
-                  placeholder="Search user by name"
-                  name="empId"
-                  prefix={<SearchOutlined />}
-                // onChange={(e) => onChangeFilter(e)}
-                />
-              </div>
-              <div>
-                <label htmlFor="" className="font16">
-                  Email
-                </label>
-                <Input
-                  className="my-2 p-2 selectElement"
-                  placeholder="Search user by email-id"
-                  name="empName"
-                  prefix={<SearchOutlined />}
-                // onChange={(e) => onChangeFilter(e)}
-                />
-              </div>
-              <div>
-                <label htmlFor="" className="font16">
-                  Date
-                </label>
-                <RangePicker
-                  className="w-100 my-2 p-2 selectElement"
-                />
-              </div>
 
               <div>
                 <label htmlFor="" className="font16">
-                  City
+                  Issue Type
                 </label>
                 <Select
-                  className="w-100 my-2 selectElement"
-                  placeholder="Search user by city"
-                  // onChange={onChangeFilterDepartId}
-                  name="deptId"
-                ></Select>
+                  className="w-100 mar10 selectElement"
+                  placeholder="Select an Issue Type"
+                  onChange={(e) => setSearchIssueType(e)}
+                  value={searchIssueType}
+                >
+                  {
+                    allIssueTypse.map((elem) => (
+                      <Option key={elem.id} value={elem.department_name}>{elem.department_name}</Option>
+                    ))
+                  }
+                </Select>
               </div>
             </div>
             <br />
@@ -280,11 +321,11 @@ function RecentIssues(props) {
                 marginTop: "30px",
               }}
             >
-              {" "}
               <Button
                 type="primary"
                 size="large"
-                className="d-flex align-items-center "
+                className="d-flex align-items-center"
+                onClick={resetSearch}
               >
                 <ReloadOutlined />
                 Reset
@@ -292,14 +333,15 @@ function RecentIssues(props) {
               <Button
                 type="primary"
                 size="large"
-                className="d-flex align-items-center "
+                className="d-flex align-items-center"
+                onClick={search}
               >
                 <SearchOutlined />
                 Search
               </Button>
             </div>
-          </Card> */}
-          {/* <br />
+          </Card>
+          <br />
           <div
             style={{
               display: "flex",
@@ -307,30 +349,34 @@ function RecentIssues(props) {
               marginBottom: 20,
             }}
           >
-
             <Button
               type="primary"
               size="large"
               className="d-flex align-items-center"
-            // onClick={() => {
-            //   // exportTableData(list);
-            //   const excel = new Excel();
-            //   excel
-            //     .addSheet("test")
-            //     .addColumns([
-            //       { title: "Driver Name", dataIndex: "name" },
-            //       { title: "Driver ID", dataIndex: "uuid" },
-            //       { title: "Staff Pass ID", dataIndex: "cardNo" },
-            //       { title: "Department", dataIndex: "deptName" },
-            //     ])
-            //     .addDataSource(exportTableData(list))
-            //     .saveAs("Drivers.xlsx");
-            // }}
+              onClick={() => {
+                // exportTableData(list);
+                // const excel = new Excel();
+                // excel
+                //   .addSheet("MMC")
+                //   .addColumns([
+                //     { title: "Username", dataIndex: "username" },
+                //     { title: "Email ID", dataIndex: "email" },
+                //     { title: "Firstname", dataIndex: "first_name" },
+                //     { title: "Lastname", dataIndex: "last_name" },
+                //     { title: "State", dataIndex: "state_name" },
+                //     { title: "City", dataIndex: "city_name" },
+                //     { title: "Date Of Birth", dataIndex: "Date_of_birth" },
+                //     { title: "Aadhar Card Number", dataIndex: "aadhar_no" },
+                //     { title: "Phone Number", dataIndex: "phone_no" },
+                //   ])
+                //   .addDataSource(exportTableData(data))
+                //   .saveAs("issues.xlsx");
+              }}
             >
               <DownloadOutlined />
               Export
-            </Button> 
-          </div>*/}
+            </Button>
+          </div>
         </div>
         {load === true && (
           <Spin
@@ -412,35 +458,44 @@ function RecentIssues(props) {
                 {row?.issue_votes}
               </Form.Item>
               {
-                row?.issue_status === "R" &&
+                row?.issue_status === "R" ?
 
-                <Form.Item className="mb-3 " label="Assign this issue to staff member">
-                  <div className="d-flex gap-5">
-                    <Select
-                      className="selectElement"
-                      placeholder="Select Staff"
-                      name="assig_to_staff"
-                      onClick={() => getStaffList(row?.id)}
-                      onChange={(e) => setSelectedStaff(e)}
-                    >
-                      {
-                        staffList?.map((elem, i) => (
-                          <Option key={i} value={elem.id}>{elem.username} {
-                            elem.staff_work_status === "F" ? <Tag style={{ float: "right" }} color="green">Available</Tag> : <Tag color="volcano" style={{ float: "right" }}>Angaged</Tag>
-                          }</Option>
-                        ))
-                      }
-                    </Select>
-                    <Button
-                      type="primary"
-                      size="large"
-                      className="d-flex align-items-center"
-                      onClick={() => assignIssue(row?.id)}
-                    >
-                      Assign
-                    </Button>
-                  </div>
-                </Form.Item>
+                  <Form.Item className="mb-3 " label="Assign this issue to staff member">
+                    <div className="d-flex gap-5">
+                      <Select
+                        className="selectElement"
+                        placeholder="Select Staff"
+                        name="assig_to_staff"
+                        onClick={() => getStaffList(row?.id)}
+                        onChange={(e) => setSelectedStaff(e)}
+                      >
+                        {
+                          staffList?.map((elem, i) => (
+                            <Option key={i} value={elem.id}>{elem.username} {
+                              elem.staff_work_status === "F" ? <Tag style={{ float: "right" }} color="green">Available</Tag> : <Tag color="volcano" style={{ float: "right" }}>Angaged</Tag>
+                            }</Option>
+                          ))
+                        }
+                      </Select>
+                      <Button
+                        type="primary"
+                        size="large"
+                        className="d-flex align-items-center"
+                        onClick={() => assignIssue(row?.id)}
+                      >
+                        Assign
+                      </Button>
+                    </div>
+                  </Form.Item>
+                  :
+                  <Button
+                    type="primary"
+                    size="large"
+                    className="d-flex align-items-center"
+                    onClick={() => changeIssueStatus(row?.id)}
+                  >
+                    Verify this issue
+                  </Button>
               }
             </Form>
           </Card>

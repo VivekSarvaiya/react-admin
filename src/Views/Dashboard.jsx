@@ -1,22 +1,69 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Box } from "@mui/system";
-import GoogleMapComp from "../Components/GoogleMapComp";
-import Sidebar from "../Components/Sidebar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../Context/userContext";
-import LineChart from "../Charts/LineChart";
 import Donut from "../Charts/Donut";
 import ReactApexChart from "react-apexcharts";
+import Donut2 from "../Charts/Donut2";
 
 function Dashboard(props) {
   const [open, setOpen] = useState(true);
   const nav = useNavigate();
   const { authState } = useContext(AuthContext);
-  localStorage.setItem("URL", window.location.pathname);
+  const [users, setUsers] = useState("")
+  const [staff, setStaff] = useState("")
+  const [issues, setIssues] = useState("")
+  // localStorage.setItem("URL", window.location.pathname);
+  const fetchUsers = () => {
+    console.log("asdjashdashbdhasb");
+    // debugger
+    axios.get(`${process.env.REACT_APP_BASE_URL}/api/UserAllDetails`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+    })
+      .then((res) => {
+        console.log("asdjashdashbdhasb");
+        console.log(res, "users");
+        setUsers(res.data?.count)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+  const fetchStaff = () => {
 
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
+      })
+      .then((res) => {
+        console.log(res);
+        setStaff(res.data?.count)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  const fetchIssues = () => {
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setIssues(res.data?.count)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   useEffect(() => {
+    fetchUsers()
+    fetchStaff()
+    fetchIssues()
     console.log(authState);
   }, []);
 
@@ -86,7 +133,7 @@ function Dashboard(props) {
               className="selectElement"
             >
               <Box sx={{ color: "grey" }}>Users</Box>
-              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>98,369</Box>
+              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>{users}</Box>
               <Box
                 sx={{
                   color: "darkgreen",
@@ -96,9 +143,9 @@ function Dashboard(props) {
                   fontSize: 14,
                 }}
               >
-                +18.77%
+                Number of current users
               </Box>
-              <Box
+              {/* <Box
                 sx={{
                   color: "",
                   display: "inline",
@@ -106,7 +153,7 @@ function Dashboard(props) {
                 }}
               >
                 vs. last week
-              </Box>
+              </Box> */}
             </Box>
             <Box
               sx={{
@@ -119,12 +166,14 @@ function Dashboard(props) {
               className="selectElement"
             >
               <Box sx={{ color: "grey" }}>Staff</Box>
-              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>128 </Box>
+              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>{staff} </Box>
 
               <Box
                 sx={{
-                  color: "text.secondary",
+                  color: "darkgreen",
                   display: "inline",
+                  fontWeight: "bold",
+                  mx: 0.5,
                   fontSize: 14,
                 }}
               >
@@ -141,8 +190,8 @@ function Dashboard(props) {
               }}
               className="selectElement"
             >
-              <Box sx={{ color: "grey" }}>Reported Issues</Box>
-              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>56,756</Box>
+              <Box sx={{ color: "grey" }}>Issues</Box>
+              <Box sx={{ fontSize: 34, fontWeight: "medium" }}>{issues}</Box>
               <Box
                 sx={{
                   color: "darkgreen",
@@ -152,9 +201,9 @@ function Dashboard(props) {
                   fontSize: 14,
                 }}
               >
-                +18.77%
+                Issues reported till date
               </Box>
-              <Box
+              {/* <Box
                 sx={{
                   color: "text.secondary",
                   display: "inline",
@@ -162,9 +211,9 @@ function Dashboard(props) {
                 }}
               >
                 vs. last week
-              </Box>
+              </Box> */}
             </Box>
-            <Box
+            {/* <Box
               sx={{
                 bgcolor: "#ffffff",
                 boxShadow: 2,
@@ -196,7 +245,7 @@ function Dashboard(props) {
               >
                 vs. last week
               </Box>
-            </Box>
+            </Box> */}
           </div>
         </div>
         <div className="p-4 px-2">
@@ -212,7 +261,7 @@ function Dashboard(props) {
           <div className="d-flex justify-content-around mt-5">
             {/* <LineChart /> */}
             <Donut />
-            <Donut />
+            <Donut2 />
           </div>
         </div>
       </div>

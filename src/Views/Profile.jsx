@@ -74,9 +74,9 @@ const Profile = () => {
     console.log(event, "image");
     setImagePreview(URL.createObjectURL(event.target.files[0]));
     const file = event.target.files[0];
-    setImage(file)
-    // const base64 = await convertImageToBase64(file);
-    // setImage(base64);
+    // setImage(file)
+    const base64 = await convertImageToBase64(file);
+    setImage(base64);
     // console.log(base64);
   };
 
@@ -86,7 +86,7 @@ const Profile = () => {
     data.fname && bodyFormData.append("first_name", data.fname);
     data.lname && bodyFormData.append("last_name", data.lname);
     data.dob && bodyFormData.append("Date_of_birth", data.dob);
-    image && bodyFormData.append("image", image);
+    image && bodyFormData.append("image", image.split(",").slice(1));
     data.email && bodyFormData.append("email", data.email);
     data.phone && bodyFormData.append("phone_no", data.phone);
 
@@ -172,7 +172,7 @@ const Profile = () => {
         message.error(err.response.data.error);
       });
   };
-
+  console.log(authState?.image);
 
 
   const inputstyle = {
@@ -330,13 +330,13 @@ const Profile = () => {
                     </dd>
                   ))
                 }
-                <Button
+                {/* <Button
                   type="primary"
                   // size="large"
                   className="d-flex align-items-center"
                 >
                   Add new
-                </Button>
+                </Button> */}
               </div>
             </dl>
           </div>
