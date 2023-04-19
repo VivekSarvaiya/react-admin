@@ -1,16 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { DatePicker, Tag } from "antd";
-import {
-  Card,
-  Table,
-  Select,
-  Button,
-  Menu,
-  Form,
-  message,
-  Spin,
-} from "antd";
+import { Card, Table, Select, Button, Menu, Form, message, Spin } from "antd";
 import {
   EyeOutlined,
   DeleteOutlined,
@@ -22,6 +13,7 @@ import { Modal } from "antd";
 import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
 import axios from "axios";
 import moment from "moment";
+import { Carousel } from "antd";
 import { Excel } from "antd-table-saveas-excel";
 const { confirm } = Modal;
 const { Option } = Select;
@@ -31,29 +23,14 @@ function RecentIssues(props) {
   const [data, setData] = useState([]);
   const [row, setRow] = useState(null);
   const [open, setOpen] = useState(false);
-  const [load, setLoad] = useState(false)
-  const [staffList, setStaffList] = useState([])
-  const [selectedStaff, setSelectedStaff] = useState()
-  const [allIssueTypse, setAllIssueTypes] = useState([])
-  const [searchIssueType, setSearchIssueType] = useState("")
+  const [load, setLoad] = useState(false);
+  const [staffList, setStaffList] = useState([]);
+  const [selectedStaff, setSelectedStaff] = useState();
+  const [allIssueTypse, setAllIssueTypes] = useState([]);
+  const [areas, setAreas] = useState([]);
+  const [selectedArea, setSelectedArea] = useState("");
+  const [searchIssueType, setSearchIssueType] = useState("");
 
-  function showConfirm(row) {
-    // confirm({
-    //   title:
-    //     row.length > 0
-    //       ? `Do you want to delete these  ${selectedRows.length} employees?`
-    //       : row.id
-    //       ? `Do you want to delete this employee?`
-    //       : `Please first select any employee!`,
-    //   async onOk() {
-    //     try {
-    //     } catch (e) {
-    //       return console.log("Oops errors!");
-    //     }
-    //   },
-    //   onCancel() {},
-    // });
-  }
   const dropdownMenu = (row) => (
     <Menu className="selectElement">
       <Menu.Item
@@ -131,7 +108,7 @@ function RecentIssues(props) {
       dataIndex: "issue_created_time",
       key: "issue_created_time",
       render: (issue_created_time) => {
-        return moment(issue_created_time).format('MMMM Do YYYY, h:mm:ss a');
+        return moment(issue_created_time).format("MMMM Do YYYY, h:mm:ss a");
       },
       sorter: (a, b) => antdTableSorter(a, b, "issue_created_time"),
     },
@@ -144,10 +121,8 @@ function RecentIssues(props) {
           return <Tag color="magenta">Recieved</Tag>;
         } else if (status === "A") {
           return <Tag color="yellow">Assigned</Tag>;
-
         } else if (status === "S") {
           return <Tag color="volcano">Ready for Review</Tag>;
-
         } else if (status === "VA") {
           return <Tag color="success">Verified</Tag>;
         }
@@ -166,7 +141,7 @@ function RecentIssues(props) {
   ];
 
   const getIssues = (api) => {
-    setLoad(true)
+    setLoad(true);
     axios
       .get(api, {
         headers: {
@@ -176,12 +151,12 @@ function RecentIssues(props) {
       .then((res) => {
         console.log(res);
         setData(res.data?.results);
-        setLoad(false)
+        setLoad(false);
       })
       .catch((err) => {
         console.log(err);
-        message.error("Something went wrong while fetching data !")
-        setLoad(false)
+        message.error("Something went wrong while fetching data !");
+        setLoad(false);
       });
   };
 
@@ -200,60 +175,73 @@ function RecentIssues(props) {
       .catch((err) => {
         console.log(err);
       });
-  }
+  };
 
   const assignIssue = (id) => {
     axios
-      .patch(`${process.env.REACT_APP_BASE_URL}/api/issue/IssueAssignToStaff/${id}`, { staff: selectedStaff }, {
+      .patch(
+        `${process.env.REACT_APP_BASE_URL}/api/issue/IssueAssignToStaff/${id}`,
+        { staff: selectedStaff },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        message.success("Issue assigned successfully");
+        setOpen(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Something went wrong");
+      });
+  };
+
+  const changeIssueStatus = (id) => {
+    axios
+      .patch(
+        `${process.env.REACT_APP_BASE_URL}/api/issue/IssueStatusChange/${id}`,
+        {
+          issue_status: "VA",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        message.success("Issue verified succesfully !");
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Issue verification failed !");
+      });
+  };
+
+  const search = () => {
+    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?search=${searchIssueType}`;
+    getIssues(api);
+  };
+
+  const fetchIssueTypes = () => {
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/details/departmentDetail/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
         },
       })
       .then((res) => {
-        console.log(res);
-        message.success("Issue assigned successfully")
-        setOpen(false)
+        console.log(res, "department");
+        setAllIssueTypes(res.data.results);
       })
       .catch((err) => {
         console.log(err);
-        message.error("Something went wrong")
       });
-  }
-
-  const changeIssueStatus = (id) => {
-    axios.patch(`${process.env.REACT_APP_BASE_URL}/api/issue/IssueStatusChange/${id}`, {
-      issue_status: "VA"
-    }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-      }
-    }).then((res) => {
-      console.log(res);
-      message.success("Issue verified succesfully !")
-    }).catch((err) => {
-      console.log(err);
-      message.error("Issue verification failed !")
-    })
-  }
-
-  const search = () => {
-    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?search=${searchIssueType}`
-    getIssues(api);
   };
-
-
-  const fetchIssueTypes = () => {
-    axios.get(`${process.env.REACT_APP_BASE_URL}/api/details/departmentDetail/`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-      },
-    }).then((res) => {
-      console.log(res, "department");
-      setAllIssueTypes(res.data.results)
-    }).catch((err) => {
-      console.log(err);
-    })
-  }
 
   // const exportTableData = (users) => {
   //   let arr = [];
@@ -274,26 +262,51 @@ function RecentIssues(props) {
   //   return arr.flatMap((item) => item);
   // };
 
+  const contentStyle = {
+    margin: 0,
+    height: "80%",
+    color: "#364d79",
+    lineHeight: "160px",
+    textAlign: "center",
+  };
+
   const resetSearch = () => {
     setSearchIssueType();
     getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
   };
+  const fetchAreaDetails = async () => {
+    await axios
+      .get(
+        `${
+          process.env.REACT_APP_BASE_URL
+        }/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`
+      )
+      .then((res) => {
+        console.log(res);
+        setAreas(res.data.results);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   useEffect(() => {
     getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
-    fetchIssueTypes()
+    fetchIssueTypes();
+    fetchAreaDetails();
   }, []);
 
   return (
     <>
-      <div style={{
-        margin: "24px 16px",
-        padding: 24,
-      }}>
-        <div className="" >
+      <div
+        style={{
+          margin: "24px 16px",
+          padding: 24,
+        }}
+      >
+        <div className="">
           <Card className="selectElement">
             <div className="search-card">
-
               <div>
                 <label htmlFor="" className="font16">
                   Issue Type
@@ -302,13 +315,32 @@ function RecentIssues(props) {
                   className="w-100 mar10 selectElement"
                   placeholder="Select an Issue Type"
                   onChange={(e) => setSearchIssueType(e)}
-                  value={searchIssueType}
+                  // style={{ width: 200 }}
+                  // value={searchIssueType}
                 >
-                  {
-                    allIssueTypse.map((elem) => (
-                      <Option key={elem.id} value={elem.department_name}>{elem.department_name}</Option>
-                    ))
-                  }
+                  {allIssueTypse.map((elem) => (
+                    <Option key={elem.id} value={elem.department_name}>
+                      {elem.department_name}
+                    </Option>
+                  ))}
+                </Select>
+              </div>
+              <div>
+                <label htmlFor="" className="font16">
+                  Area Name
+                </label>
+                <Select
+                  className="w-100 mar10 selectElement"
+                  placeholder="Select an area name"
+                  onChange={(e) => setSelectedArea(e)}
+                  // style={{ width: 200 }}
+                  // value={searchIssueType}
+                >
+                  {areas.map((elem) => (
+                    <Option key={elem.id} value={elem.area_name}>
+                      {elem.area_name}
+                    </Option>
+                  ))}
                 </Select>
               </div>
             </div>
@@ -394,11 +426,7 @@ function RecentIssues(props) {
           </Flex>
 
           <div className="table-responsive">
-            <Table
-              columns={tableColumns}
-              dataSource={data}
-              rowKey="id"
-            />
+            <Table columns={tableColumns} dataSource={data} rowKey="id" />
           </div>
         </Card>
       </div>
@@ -412,6 +440,25 @@ function RecentIssues(props) {
       >
         {row !== "" && (
           <Card>
+            <Carousel autoplay>
+              {row?.User_Issue_Images.length > 0 ? (
+                row?.User_Issue_Images.map((elem) => (
+                  <div>
+                    <img
+                      src={elem.image}
+                      width="100%"
+                      alt=""
+                      key={elem.Issue}
+                      style={contentStyle}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div>
+                  <h3 style={contentStyle}>No Images Available</h3>
+                </div>
+              )}
+            </Carousel>
             <Form>
               <Form.Item className="mb-3" label="Title">
                 {row?.issue_title || "N/A"}
@@ -423,7 +470,9 @@ function RecentIssues(props) {
                 {row?.issue_type?.Issue_Type_Name || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Created On">
-                {moment(row?.issue_created_time).format('MMMM Do YYYY, h:mm:ss a') || "N/A"}
+                {moment(row?.issue_created_time).format(
+                  "MMMM Do YYYY, h:mm:ss a"
+                ) || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Area">
                 {row?.area?.area_name || "N/A"}
@@ -434,69 +483,70 @@ function RecentIssues(props) {
               <Form.Item className="mb-3" label="Coordinates">
                 {row?.latitude ? row.latitude + " , " + row.logitude : "N/A"}
               </Form.Item>
-              <Form.Item className="mb-3" label="Site Images">
-                {
-                  row?.User_Issue_Images.length > 0 ?
-                    row?.User_Issue_Images.map((elem) => (
-                      <img src={elem.image} width="100%" alt="" key={elem.Issue} />
+
+              {/* <Form.Item className="mb-3" label="Site Videos">
+                {row?.User_Issue_Videos.length > 0
+                  ? row?.User_Issue_Videos.map((elem) => (
+                      <img
+                        src={elem.video}
+                        width="100%"
+                        alt=""
+                        key={elem.Issue}
+                      />
                     ))
-                    :
-                    "N/A"
-                }
-              </Form.Item>
-              <Form.Item className="mb-3" label="Site Videos">
-                {
-                  row?.User_Issue_Videos.length > 0 ?
-                    row?.User_Issue_Videos.map((elem) => (
-                      <img src={elem.video} width="100%" alt="" key={elem.Issue} />
-                    ))
-                    :
-                    "N/A"
-                }
-              </Form.Item>
+                  : "N/A"}
+              </Form.Item> */}
               <Form.Item className="mb-3" label="No. of Votes">
                 {row?.issue_votes}
               </Form.Item>
-              {
-                row?.issue_status === "R" ?
-
-                  <Form.Item className="mb-3 " label="Assign this issue to staff member">
-                    <div className="d-flex gap-5">
-                      <Select
-                        className="selectElement"
-                        placeholder="Select Staff"
-                        name="assig_to_staff"
-                        onClick={() => getStaffList(row?.id)}
-                        onChange={(e) => setSelectedStaff(e)}
-                      >
-                        {
-                          staffList?.map((elem, i) => (
-                            <Option key={i} value={elem.id}>{elem.username} {
-                              elem.staff_work_status === "F" ? <Tag style={{ float: "right" }} color="green">Available</Tag> : <Tag color="volcano" style={{ float: "right" }}>Angaged</Tag>
-                            }</Option>
-                          ))
-                        }
-                      </Select>
-                      <Button
-                        type="primary"
-                        size="large"
-                        className="d-flex align-items-center"
-                        onClick={() => assignIssue(row?.id)}
-                      >
-                        Assign
-                      </Button>
-                    </div>
-                  </Form.Item>
-                  :
-                  <Button
-                    type="primary"
-                    size="large"
-                    className="d-flex align-items-center"
-                    onClick={() => changeIssueStatus(row?.id)}
-                  >
-                    Verify this issue
-                  </Button>
-              }
+              {row?.issue_status === "R" ? (
+                <Form.Item
+                  className="mb-3 "
+                  label="Assign this issue to staff member"
+                >
+                  <div className="d-flex gap-5">
+                    <Select
+                      className="selectElement"
+                      placeholder="Select Staff"
+                      name="assig_to_staff"
+                      onClick={() => getStaffList(row?.id)}
+                      onChange={(e) => setSelectedStaff(e)}
+                    >
+                      {staffList?.map((elem, i) => (
+                        <Option key={i} value={elem.id}>
+                          {elem.username}{" "}
+                          {elem.staff_work_status === "F" ? (
+                            <Tag style={{ float: "right" }} color="green">
+                              Available
+                            </Tag>
+                          ) : (
+                            <Tag color="volcano" style={{ float: "right" }}>
+                              Angaged
+                            </Tag>
+                          )}
+                        </Option>
+                      ))}
+                    </Select>
+                    <Button
+                      type="primary"
+                      size="large"
+                      className="d-flex align-items-center"
+                      onClick={() => assignIssue(row?.id)}
+                    >
+                      Assign
+                    </Button>
+                  </div>
+                </Form.Item>
+              ) : (
+                <Button
+                  type="primary"
+                  size="large"
+                  className="d-flex align-items-center"
+                  onClick={() => changeIssueStatus(row?.id)}
+                >
+                  Verify this issue
+                </Button>
+              )}
             </Form>
           </Card>
         )}
