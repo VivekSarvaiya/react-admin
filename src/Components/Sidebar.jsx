@@ -406,7 +406,13 @@ const Sidebar = () => {
         trigger={null}
         collapsible
         collapsed={collapsed}
-        style={{ height: "100vh", position: "sticky", top: 0, bottom: 0 }}
+        style={{
+          height: "100vh",
+          position: "sticky",
+          top: 0,
+          bottom: 0,
+          zIndex: 100,
+        }}
       >
         <div className="logo">
           <img

@@ -24,13 +24,15 @@ function GoogleMapComp(props) {
   });
 
   const containerStyle = {
-    width: "88%",
-    height: "90%",
+    width: "100%",
+    height: "100%",
     position: "absolute",
-    // bottom: 0,
-    zIndex: 1000000000,
-    overflow: "hidden",
-    // marginTop: "50px",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    // zIndex: 1000000000,
+    // overflow: "hidden",
   };
 
   const changeIssueType = (event) => {
