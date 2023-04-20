@@ -134,12 +134,15 @@ function Users(props) {
       // sorter: (a, b) => antdTableSorter(a, b, "jdate"),
     },
     {
-      title: "",
+      title: "Actions",
       dataIndex: "actions",
       render: (_, elm) => (
-        <div className="text-right">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        </div>
+        <Button type="link" className="p-0" onClick={() => {
+          setOpen1(true);
+          setRow(elm);
+        }}>
+          View
+        </Button>
       ),
     },
   ];

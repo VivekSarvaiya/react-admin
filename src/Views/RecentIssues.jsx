@@ -21,7 +21,7 @@ const { MonthPicker, RangePicker } = DatePicker;
 
 function RecentIssues(props) {
   const [data, setData] = useState([]);
-  const [row, setRow] = useState(null);
+  const [issueView, setIssueView] = useState(null);
   const [open, setOpen] = useState(false);
   const [load, setLoad] = useState(false);
   const [staffList, setStaffList] = useState([]);
@@ -31,36 +31,36 @@ function RecentIssues(props) {
   const [selectedArea, setSelectedArea] = useState("");
   const [searchIssueType, setSearchIssueType] = useState("");
 
-  const dropdownMenu = (row) => (
-    <Menu className="selectElement">
-      <Menu.Item
-        onClick={() => {
-          setOpen(true);
-          setRow((prev) => (prev = row));
-        }}
-      >
-        <Flex alignItems="center">
-          <EyeOutlined style={{ fontSize: "15px" }} />
-          <span className="mx-2">View Details</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item
-        style={{
-          color: "#cf1322",
-          background: "#fff1f0",
-          borderColor: "#ffa39e",
-        }}
-        onClick={() => {
-          setRow(row);
-        }}
-      >
-        <Flex alignItems="center">
-          <DeleteOutlined style={{ fontSize: "15px" }} />
-          <span className="mx-2">Reject Issue</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
+  // const dropdownMenu = (row) => (
+  //   <Menu className="selectElement">
+  //     <Menu.Item
+  //       onClick={() => {
+  //         setOpen(true);
+  //         setIssueView((prev) => (prev = row));
+  //       }}
+  //     >
+  //       <Flex alignItems="center">
+  //         <EyeOutlined style={{ fontSize: "15px" }} />
+  //         <span className="mx-2">View Details</span>
+  //       </Flex>
+  //     </Menu.Item>
+  //     <Menu.Item
+  //       style={{
+  //         color: "#cf1322",
+  //         background: "#fff1f0",
+  //         borderColor: "#ffa39e",
+  //       }}
+  //       onClick={() => {
+  //         setRow(row);
+  //       }}
+  //     >
+  //       <Flex alignItems="center">
+  //         <DeleteOutlined style={{ fontSize: "15px" }} />
+  //         <span className="mx-2">Reject Issue</span>
+  //       </Flex>
+  //     </Menu.Item>
+  //   </Menu>
+  // );
 
   const tableColumns = [
     {
@@ -68,12 +68,17 @@ function RecentIssues(props) {
       dataIndex: "user",
       key: "user",
       fixed: "center",
-      render: (name) => (
-        <Button type="link" className="p-0">
-          {name?.first_name + " " + name?.last_name}
-        </Button>
-      ),
-      sorter: (a, b) => antdTableSorter(a, b, "user"),
+      render: (name, elem) => {
+        // console.log(elem);
+        const uname = name?.first_name
+        return (
+
+          <Button type="link" className="p-0" >
+            {name?.first_name + " " + name?.last_name}
+          </Button>
+        )
+      },
+      sorter: (a, b) => antdTableSorter(a, b, "uname"),
     },
     {
       title: "Title",
@@ -100,12 +105,12 @@ function RecentIssues(props) {
     },
     {
       title: "Votes",
-      dataIndex: "votes",
-      key: "votes",
-      render: (votes) => {
-        return votes.length;
+      dataIndex: "issue_votes",
+      key: "issue_votes",
+      render: (issue_votes) => {
+        return issue_votes
       },
-      sorter: (a, b) => antdTableSorter(a, b, "votes"),
+      sorter: (a, b) => antdTableSorter(a, b, "issue_votes"),
     },
     {
       title: "Posted On",
@@ -137,8 +142,10 @@ function RecentIssues(props) {
       title: "Actions",
       dataIndex: "actions",
       render: (_, elm) => (
-        <Button type="link" className="p-0">
-          {" "}
+        <Button type="link" className="p-0" onClick={() => {
+          setOpen(true);
+          setIssueView(elm);
+        }}>
           View
         </Button>
       ),
@@ -147,6 +154,7 @@ function RecentIssues(props) {
 
   const getIssues = (api) => {
     setLoad(true);
+    console.log(api);
     axios
       .get(api, {
         headers: {
@@ -228,7 +236,13 @@ function RecentIssues(props) {
   };
 
   const search = () => {
-    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?search=${searchIssueType}${selectedArea}`;
+    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?search=`
+    if (searchIssueType !== undefined) {
+      api = api + searchIssueType
+    }
+    if (selectedArea !== undefined) {
+      api = api + selectedArea
+    }
     getIssues(api);
   };
 
@@ -270,8 +284,7 @@ function RecentIssues(props) {
   const fetchAreaDetails = async () => {
     await axios
       .get(
-        `${
-          process.env.REACT_APP_BASE_URL
+        `${process.env.REACT_APP_BASE_URL
         }/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`
       )
       .then((res) => {
@@ -308,8 +321,9 @@ function RecentIssues(props) {
                   className="w-100 mar10 selectElement"
                   placeholder="Select an Issue Type"
                   onChange={(e) => setSearchIssueType(e)}
-                  // style={{ width: 200 }}
-                  // value={searchIssueType}
+                  allowClear
+                  style={{ width: 200 }}
+                  value={searchIssueType}
                 >
                   {["Potholes", "Road", "Drainage", "Oil Leakeage"].map(
                     (elem, i) => (
@@ -328,8 +342,9 @@ function RecentIssues(props) {
                   className="w-100 mar10 selectElement"
                   placeholder="Select an area name"
                   onChange={(e) => setSelectedArea(e)}
-                  // style={{ width: 200 }}
-                  // value={searchIssueType}
+                  allowClear
+                  style={{ width: 200 }}
+                  value={selectedArea}
                 >
                   {areas.map((elem) => (
                     <Option key={elem.id} value={elem.area_name}>
@@ -433,11 +448,11 @@ function RecentIssues(props) {
         footer={null}
         width={1000}
       >
-        {row !== "" && (
+        {issueView !== "" && (
           <Card>
             <Carousel autoplay>
-              {row?.User_Issue_Images.length > 0 ? (
-                row?.User_Issue_Images.map((elem) => (
+              {issueView?.User_Issue_Images.length > 0 ? (
+                issueView?.User_Issue_Images.map((elem) => (
                   <div>
                     <img
                       src={elem.image}
@@ -456,32 +471,32 @@ function RecentIssues(props) {
             </Carousel>
             <Form>
               <Form.Item className="mb-3" label="Title">
-                {row?.issue_title || "N/A"}
+                {issueView?.issue_title || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Description">
-                {row?.User_issue_description || "N/A"}
+                {issueView?.User_issue_description || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Type">
-                {row?.issue_type?.Issue_Type_Name || "N/A"}
+                {issueView?.issue_type?.Issue_Type_Name || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Created On">
-                {moment(row?.issue_created_time).format(
+                {moment(issueView?.issue_created_time).format(
                   "MMMM Do YYYY, h:mm:ss a"
                 ) || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Area">
-                {row?.area?.area_name || "N/A"}
+                {issueView?.area?.area_name || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Landmark">
-                {row?.landmark || "N/A"}
+                {issueView?.landmark || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Coordinates">
-                {row?.latitude ? row.latitude + " , " + row.logitude : "N/A"}
+                {issueView?.latitude ? issueView.latitude + " , " + issueView.logitude : "N/A"}
               </Form.Item>
 
               {/* <Form.Item className="mb-3" label="Site Videos">
-                {row?.User_Issue_Videos.length > 0
-                  ? row?.User_Issue_Videos.map((elem) => (
+                {issueView?.User_Issue_Videos.length > 0
+                  ? issueView?.User_Issue_Videos.map((elem) => (
                       <img
                         src={elem.video}
                         width="100%"
@@ -492,9 +507,9 @@ function RecentIssues(props) {
                   : "N/A"}
               </Form.Item> */}
               <Form.Item className="mb-3" label="No. of Votes">
-                {row?.issue_votes}
+                {issueView?.issue_votes}
               </Form.Item>
-              {row?.issue_status === "R" ? (
+              {issueView?.issue_status === "R" ? (
                 <Form.Item
                   className="mb-3 "
                   label="Assign this issue to staff member"
@@ -504,7 +519,7 @@ function RecentIssues(props) {
                       className="selectElement"
                       placeholder="Select Staff"
                       name="assig_to_staff"
-                      onClick={() => getStaffList(row?.id)}
+                      onClick={() => getStaffList(issueView?.id)}
                       onChange={(e) => setSelectedStaff(e)}
                     >
                       {staffList?.map((elem, i) => (
@@ -526,7 +541,7 @@ function RecentIssues(props) {
                       type="primary"
                       size="large"
                       className="d-flex align-items-center"
-                      onClick={() => assignIssue(row?.id)}
+                      onClick={() => assignIssue(issueView?.id)}
                     >
                       Assign
                     </Button>
@@ -537,7 +552,7 @@ function RecentIssues(props) {
                   type="primary"
                   size="large"
                   className="d-flex align-items-center"
-                  onClick={() => changeIssueStatus(row?.id)}
+                  onClick={() => changeIssueStatus(issueView?.id)}
                 >
                   Verify this issue
                 </Button>

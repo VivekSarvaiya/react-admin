@@ -7,11 +7,9 @@ const Flex = (props) => {
     props;
   return (
     <div
-      className={`${className} ${
-        flexDirection ? "flex-" + flexDirection : ""
-      } ${alignItems ? "align-items-" + alignItems : ""} ${
-        justifyContent ? "justify-content-" + justifyContent : ""
-      }`}
+      className={`${className} ${flexDirection ? "flex-" + flexDirection : ""
+        } ${alignItems ? "align-items-" + alignItems : ""} ${justifyContent ? "justify-content-" + justifyContent : ""
+        }`}
     >
       {children}
     </div>

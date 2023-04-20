@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Avatar, Tag, message } from "antd";
+import { Tag, message } from "antd";
 import { DatePicker } from "antd";
 import {
   Card,
@@ -19,6 +19,7 @@ import {
   ReloadOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
+import { Avatar } from "@mui/material";
 import { Modal } from "antd";
 import moment from "moment/moment";
 import { AddCircleOutlineOutlined, Block } from "@mui/icons-material";
@@ -162,12 +163,15 @@ function Staff() {
       // sorter: (a, b) => antdTableSorter(a, b, "jdate"),
     },
     {
-      title: "",
+      title: "Actions",
       dataIndex: "actions",
       render: (_, elm) => (
-        <div className="text-right">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        </div>
+        <Button type="link" className="p-0" onClick={() => {
+          setOpen1(true);
+          setRow(elm);
+        }}>
+          View
+        </Button>
       ),
     },
   ];
@@ -566,17 +570,17 @@ function Staff() {
       >
         {row !== "" && (
           <Card>
+            <Avatar
+              sx={{
+                m: 1,
+                width: "8rem",
+                height: "8rem",
+                background:
+                  "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+              }}
+              src={row?.image}
+            />
             <Form>
-              <Avatar
-                sx={{
-                  m: 1,
-                  width: "8rem",
-                  height: "8rem",
-                  background:
-                    "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
-                }}
-                src={row?.image}
-              />
               <Form.Item name="name" label="Username">
                 {row?.username}
               </Form.Item>
