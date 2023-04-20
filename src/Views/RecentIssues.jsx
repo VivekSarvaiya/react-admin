@@ -26,7 +26,7 @@ function RecentIssues(props) {
   const [load, setLoad] = useState(false);
   const [staffList, setStaffList] = useState([]);
   const [selectedStaff, setSelectedStaff] = useState();
-  const [allIssueTypse, setAllIssueTypes] = useState([]);
+  // const [allIssueTypse, setAllIssueTypes] = useState([]);
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState("");
   const [searchIssueType, setSearchIssueType] = useState("");
@@ -67,16 +67,20 @@ function RecentIssues(props) {
       title: "Posted By",
       dataIndex: "user",
       key: "user",
-      render: (user) => {
-        return user?.username;
-      },
-      onFilter: (value, record) => console.log(value, record),
+      fixed: "center",
+      render: (name) => (
+        <Button type="link" className="p-0">
+          {name?.first_name + " " + name?.last_name}
+        </Button>
+      ),
       sorter: (a, b) => antdTableSorter(a, b, "user"),
     },
     {
       title: "Title",
       dataIndex: "issue_title",
       key: "issue_title",
+      ellipsis: true,
+      width: 200,
     },
     {
       title: "Area",
@@ -108,7 +112,7 @@ function RecentIssues(props) {
       dataIndex: "issue_created_time",
       key: "issue_created_time",
       render: (issue_created_time) => {
-        return moment(issue_created_time).format("MMMM Do YYYY, h:mm:ss a");
+        return moment(issue_created_time).format("Do MMMM YYYY");
       },
       sorter: (a, b) => antdTableSorter(a, b, "issue_created_time"),
     },
@@ -130,12 +134,13 @@ function RecentIssues(props) {
       sorter: (a, b) => antdTableSorter(a, b, "issue_status"),
     },
     {
-      title: "",
+      title: "Actions",
       dataIndex: "actions",
       render: (_, elm) => (
-        <div className="text-right">
-          <EllipsisDropdown menu={dropdownMenu(elm)} />
-        </div>
+        <Button type="link" className="p-0">
+          {" "}
+          View
+        </Button>
       ),
     },
   ];
@@ -223,44 +228,32 @@ function RecentIssues(props) {
   };
 
   const search = () => {
-    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?search=${searchIssueType}`;
+    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?search=${searchIssueType}${selectedArea}`;
     getIssues(api);
   };
 
-  const fetchIssueTypes = () => {
-    axios
-      .get(`${process.env.REACT_APP_BASE_URL}/api/details/departmentDetail/`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-        },
-      })
-      .then((res) => {
-        console.log(res, "department");
-        setAllIssueTypes(res.data.results);
-      })
-      .catch((err) => {
-        console.log(err);
+  const exportTableData = (users) => {
+    let arr = [];
+    // console.log(users);
+    data.map((item) => {
+      arr.push({
+        id: item?.id,
+        name: item?.user?.first_name + " " + item?.user?.last_name,
+        title: item?.issue_title,
+        description: item?.User_issue_description,
+        type: item?.issue_type.Issue_Type_Name,
+        area: item?.area.area_name,
+        city: item?.city.city_name,
+        state: item?.state.state_name,
+        created_on: moment(item?.issue_created_time).format(
+          "MMMM Do YYYY, h:mm:ss a"
+        ),
+        votes: item?.issue_votes,
+        coordinates: item?.latitude + " , " + item?.logitude,
       });
+    });
+    return arr.flatMap((item) => item);
   };
-
-  // const exportTableData = (users) => {
-  //   let arr = [];
-  //   // console.log(users);
-  //   users.map((item) => {
-  //     arr.push({
-  //       username: item.username,
-  //       email: item.email,
-  //       first_name: item.first_name,
-  //       last_name: item.last_name,
-  //       state_name: item.state.state_name,
-  //       city_name: item.city.city_name,
-  //       Date_of_birth: item.Date_of_birth,
-  //       aadhar_no: item.aadhar_no,
-  //       phone_no: item.phone_no,
-  //     });
-  //   });
-  //   return arr.flatMap((item) => item);
-  // };
 
   const contentStyle = {
     margin: 0,
@@ -292,7 +285,7 @@ function RecentIssues(props) {
 
   useEffect(() => {
     getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
-    fetchIssueTypes();
+    // fetchIssueTypes();
     fetchAreaDetails();
   }, []);
 
@@ -318,11 +311,13 @@ function RecentIssues(props) {
                   // style={{ width: 200 }}
                   // value={searchIssueType}
                 >
-                  {allIssueTypse.map((elem) => (
-                    <Option key={elem.id} value={elem.department_name}>
-                      {elem.department_name}
-                    </Option>
-                  ))}
+                  {["Potholes", "Road", "Drainage", "Oil Leakeage"].map(
+                    (elem, i) => (
+                      <Option key={i} value={elem}>
+                        {elem}
+                      </Option>
+                    )
+                  )}
                 </Select>
               </div>
               <div>
@@ -386,23 +381,23 @@ function RecentIssues(props) {
               size="large"
               className="d-flex align-items-center"
               onClick={() => {
-                // exportTableData(list);
-                // const excel = new Excel();
-                // excel
-                //   .addSheet("MMC")
-                //   .addColumns([
-                //     { title: "Username", dataIndex: "username" },
-                //     { title: "Email ID", dataIndex: "email" },
-                //     { title: "Firstname", dataIndex: "first_name" },
-                //     { title: "Lastname", dataIndex: "last_name" },
-                //     { title: "State", dataIndex: "state_name" },
-                //     { title: "City", dataIndex: "city_name" },
-                //     { title: "Date Of Birth", dataIndex: "Date_of_birth" },
-                //     { title: "Aadhar Card Number", dataIndex: "aadhar_no" },
-                //     { title: "Phone Number", dataIndex: "phone_no" },
-                //   ])
-                //   .addDataSource(exportTableData(data))
-                //   .saveAs("issues.xlsx");
+                const excel = new Excel();
+                excel
+                  .addSheet("MMC")
+                  .addColumns([
+                    { title: "ID", dataIndex: "id" },
+                    { title: "User Name", dataIndex: "name" },
+                    { title: "Title", dataIndex: "title" },
+                    { title: "Description", dataIndex: "description" },
+                    { title: "Type", dataIndex: "type" },
+                    { title: "Area", dataIndex: "area" },
+                    { title: "State", dataIndex: "state" },
+                    { title: "Issue created on", dataIndex: "created_on" },
+                    { title: "Votes", dataIndex: "votes" },
+                    { title: "Coordinates", dataIndex: "coordinates" },
+                  ])
+                  .addDataSource(exportTableData(data))
+                  .saveAs("issues.xlsx");
               }}
             >
               <DownloadOutlined />

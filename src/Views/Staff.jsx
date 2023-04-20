@@ -40,9 +40,9 @@ function Staff() {
   const [data, setData] = useState([]);
   const [load, setLoad] = useState(false);
   const [department, setDepartment] = useState([]);
-  const [areas, setAreas] = useState([])
+  const [areas, setAreas] = useState([]);
   const [staff_department, setstaff_department] = useState();
-  const [area, setArea] = useState()
+  const [area, setArea] = useState();
   const [addData, setAddData] = useState({
     first_name: "",
     last_name: "",
@@ -56,7 +56,7 @@ function Staff() {
   const [searchArea, setSearchArea] = useState("");
   const [searchEmail, setSearchEmail] = useState("");
   const [searchphone_no, setSearchphone_no] = useState("");
-  const [Date_of_birth, setDate_of_birth] = useState()
+  const [Date_of_birth, setDate_of_birth] = useState();
   const [searchStatus, setSearchStatus] = useState("");
 
   const changehandler = (event) => {
@@ -144,7 +144,7 @@ function Staff() {
       dataIndex: "date_joined",
       key: "date_joined",
       render: (date_joined) => {
-        return moment(date_joined).format('MMMM Do YYYY, h:mm:ss a')
+        return moment(date_joined).format("Do MMMM YYYY");
       },
       sorter: (a, b) => antdTableSorter(a, b, "date_joined"),
     },
@@ -173,44 +173,51 @@ function Staff() {
   ];
 
   const search = () => {
-    let api = `${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/?search=${searchusername}${searchEmail}${searchArea}${searchphone_no}`
+    let api = `${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/?search=${searchusername}${searchEmail}${searchArea}${searchphone_no}`;
     fetchData(api);
   };
 
   const resetSearch = () => {
     setSearchusername("");
-    setSearchArea("")
-    setSearchEmail("")
-    setSearchphone_no("")
-    setSearchStatus()
+    setSearchArea("");
+    setSearchEmail("");
+    setSearchphone_no("");
+    setSearchStatus();
     fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`);
   };
 
   const fetchAreaDetails = async () => {
     await axios
-      .get(`http://127.0.0.1:8000/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`)
-      .then(res => {
+      .get(
+        `http://127.0.0.1:8000/api/details/areaDetail/${localStorage.getItem(
+          "CITY_ID"
+        )}`
+      )
+      .then((res) => {
         console.log(res);
-        setAreas(res.data.results)
+        setAreas(res.data.results);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   };
   const fetchDepartmentDetails = () => {
-    axios.get(`${process.env.REACT_APP_BASE_URL}/api/details/departmentDetail/`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-      },
-    }).then((res) => {
-      console.log(res, "department");
-      setDepartment(res.data.results)
-    }).catch((err) => {
-      console.log(err);
-    })
-  }
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/details/departmentDetail/`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res, "department");
+        setDepartment(res.data.results);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
   const fetchData = (api) => {
-    setLoad(true)
+    setLoad(true);
     axios
       .get(api, {
         headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
@@ -218,36 +225,48 @@ function Staff() {
       .then((res) => {
         console.log(res);
         setData(res.data.results);
-        setLoad(false)
+        setLoad(false);
       })
       .catch((err) => {
         console.log(err);
-        setLoad(false)
-        message.error("Something went wrong while fetching data !")
+        setLoad(false);
+        message.error("Something went wrong while fetching data !");
       });
-  }
+  };
 
   const submitStaffDetails = (event) => {
     // console.log({ ...addData, department, Date_of_birth: moment(Date_of_birth).format('YYYY-MM-DD') })
-    axios.post(`${process.env.REACT_APP_BASE_URL}/api/StaffCreate/`, { ...addData, staff_department, area, Date_of_birth: moment(Date_of_birth).format('YYYY-MM-DD') }, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
-      },
-    }).then((res) => {
-      console.log(res);
-      message.success(res.data.success)
-      setOpenAdd(false)
-      fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`);
-    }).catch((err) => {
-      console.log(err);
-      message.error("Something went wrong while creating new staff !")
-    })
+    axios
+      .post(
+        `${process.env.REACT_APP_BASE_URL}/api/StaffCreate/`,
+        {
+          ...addData,
+          staff_department,
+          area,
+          Date_of_birth: moment(Date_of_birth).format("YYYY-MM-DD"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res);
+        message.success(res.data.success);
+        setOpenAdd(false);
+        fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Something went wrong while creating new staff !");
+      });
   };
 
   useEffect(() => {
     fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`);
-    fetchDepartmentDetails()
-    fetchAreaDetails()
+    fetchDepartmentDetails();
+    fetchAreaDetails();
   }, []);
 
   const exportTableData = (users) => {
@@ -269,10 +288,12 @@ function Staff() {
   };
   return (
     <>
-      <div style={{
-        margin: "24px 16px",
-        padding: 24,
-      }}>
+      <div
+        style={{
+          margin: "24px 16px",
+          padding: 24,
+        }}
+      >
         <div className="">
           <Card className="selectElement">
             <div className="search-card">
@@ -430,16 +451,14 @@ function Staff() {
         onCancel={() => setOpenAdd(false)}
         maskClosable={false}
         footer={[
-          <Button onClick={() => submitStaffDetails(true)}>
-            Add
-          </Button>,
+          <Button onClick={() => submitStaffDetails(true)}>Add</Button>,
           <Button key="submit" type="primary" onClick={() => setOpenAdd(false)}>
             Cancel
           </Button>,
         ]}
       >
         <Card>
-          <Form >
+          <Form>
             <Form.Item name="first_name" label="First Name" required>
               <Input
                 onChange={changehandler}
@@ -474,11 +493,13 @@ function Staff() {
               />
             </Form.Item>
             <Form.Item name="Date_of_birth" label="Date of Birth">
-
-              <DatePicker format='YYYY/MM/DD' onChange={(e) => setDate_of_birth(e)}
+              <DatePicker
+                format="YYYY/MM/DD"
+                onChange={(e) => setDate_of_birth(e)}
                 value={addData.Date_of_birth}
                 name="Date_of_birth"
-                className="selectElement" />
+                className="selectElement"
+              />
             </Form.Item>
             <Form.Item name="staff_department" label="Staff working department">
               <Select
@@ -488,11 +509,11 @@ function Staff() {
                 // value={department}
                 name="staff_department"
               >
-                {
-                  department.map((elem) => (
-                    <Option key={elem.id} value={elem.id}>{elem.department_name}</Option>
-                  ))
-                }
+                {department.map((elem) => (
+                  <Option key={elem.id} value={elem.id}>
+                    {elem.department_name}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
             <Form.Item name="area" label="Staff Working area">
@@ -509,11 +530,11 @@ function Staff() {
                 value={area}
                 name="area"
               >
-                {
-                  areas.map((elem) => (
-                    <Option key={elem.id} value={elem.id}>{elem.area_name}</Option>
-                  ))
-                }
+                {areas.map((elem) => (
+                  <Option key={elem.id} value={elem.id}>
+                    {elem.area_name}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
             <Form.Item name="phone_no" label="Phone Number">
@@ -551,7 +572,8 @@ function Staff() {
                   m: 1,
                   width: "8rem",
                   height: "8rem",
-                  background: "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+                  background:
+                    "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
                 }}
                 src={row?.image}
               />
