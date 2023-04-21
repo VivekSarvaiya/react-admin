@@ -41,8 +41,8 @@ const Profile = () => {
   const [otp, setOtp] = useState();
   const [otperror, setOtperror] = useState();
   const [pageState, setPageState] = useState("");
-  const [imagePreview, setImagePreview] = useState()
-  const [areas, setAreas] = useState([])
+  const [imagePreview, setImagePreview] = useState();
+  const [areas, setAreas] = useState([]);
   const [data, setData] = useState({
     fname: authState?.first_name,
     lname: authState?.last_name,
@@ -81,7 +81,6 @@ const Profile = () => {
   };
 
   const handleUpdate = () => {
-
     const bodyFormData = new FormData();
     data.fname && bodyFormData.append("first_name", data.fname);
     data.lname && bodyFormData.append("last_name", data.lname);
@@ -95,8 +94,7 @@ const Profile = () => {
     }
     axios
       .patch(
-        ` ${process.env.REACT_APP_BASE_URL
-        }/api/usersDetailsUpdate/`,
+        ` ${process.env.REACT_APP_BASE_URL}/api/usersDetailsUpdate/`,
         bodyFormData,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
@@ -106,7 +104,7 @@ const Profile = () => {
         console.log(res);
         setOpenModal(false);
         message.success("Details Updated Successfully !");
-        setImagePreview()
+        setImagePreview();
         setAuthflag(!authflag);
       })
       .catch((err) => {
@@ -114,7 +112,6 @@ const Profile = () => {
         message.error(err.response?.data?.message);
       });
   };
-
 
   const onSendEmail = () => {
     console.log(email);
@@ -174,7 +171,6 @@ const Profile = () => {
   };
   console.log(authState?.image);
 
-
   const inputstyle = {
     width: "40px",
     height: "56px",
@@ -186,26 +182,33 @@ const Profile = () => {
 
   const fetchAreaDetails = async () => {
     await axios
-      .get(`http://127.0.0.1:8000/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`)
-      .then(res => {
+      .get(
+        `http://127.0.0.1:8000/api/details/areaDetail/${localStorage.getItem(
+          "CITY_ID"
+        )}`
+      )
+      .then((res) => {
         console.log(res);
-        setAreas(res.data.results)
+        setAreas(res.data.results);
       })
-      .catch(error => {
+      .catch((error) => {
         console.log(error);
       });
   };
   useEffect(() => {
-    fetchAreaDetails()
-  }, [authState])
+    fetchAreaDetails();
+  }, [authState]);
 
   return (
     <>
-      <div className="card p-3" style={{
-        borderRadius: "10px",
-        margin: "24px 16px",
-        padding: 24,
-      }}>
+      <div
+        className="card p-3"
+        style={{
+          borderRadius: "10px",
+          margin: "10px 20rem 0",
+          padding: 24,
+        }}
+      >
         <div className="d-flex align-items-center flex-wrap gap-5">
           <div>
             <Avatar
@@ -255,7 +258,7 @@ const Profile = () => {
               Personal Details
             </h1>
             <br />
-            <dl className="row row-cols-1 gap-4 gap-md-0 g-md-3">
+            <dl className="row row-cols-1 gap-4 gap-md-0 g-md-2">
               <div className="col-md-5 mt-3">
                 <dt className="text-sm font-medium text-gray-500">
                   First Name
@@ -316,20 +319,23 @@ const Profile = () => {
                   Joining Date
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900">
-                  {moment(authState?.date_joined).format('MMMM Do YYYY, h:mm:ss a') || "N/A"}
+                  {moment(authState?.date_joined).format(
+                    "MMMM Do YYYY, h:mm:ss a"
+                  ) || "N/A"}
                 </dd>
               </div>
               <div className="col-md-5 mt-3">
                 <dt className="text-sm font-medium text-gray-500">
                   Areas Under Administration
                 </dt>
-                {
-                  areas.map((elem) => (
-                    <dd key={elem.area_name} className="mt-1 text-sm text-gray-900">
-                      {elem.area_name}
-                    </dd>
-                  ))
-                }
+                {areas.map((elem) => (
+                  <dd
+                    key={elem.area_name}
+                    className="mt-1 text-sm text-gray-900"
+                  >
+                    {elem.area_name}
+                  </dd>
+                ))}
                 {/* <Button
                   type="primary"
                   // size="large"

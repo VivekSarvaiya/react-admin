@@ -27,12 +27,7 @@ function RecentIssues(props) {
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState("");
   const [searchIssueType, setSearchIssueType] = useState("");
-  const [searchDates, setSearchDates] = useState();
-  searchDates &&
-    console.log(
-      moment(searchDates[0].$d).format("DD-MM-YYYY"),
-      moment(searchDates[1].$d).format("DD-MM-YYYY")
-    );
+  const [searchDates, setSearchDates] = useState([]);
   const tableColumns = [
     {
       title: "Posted By",
@@ -126,7 +121,7 @@ function RecentIssues(props) {
 
   const getIssues = (api) => {
     setLoad(true);
-    console.log(api);
+    // console.log(api);
     axios
       .get(api, {
         headers: {
@@ -134,7 +129,6 @@ function RecentIssues(props) {
         },
       })
       .then((res) => {
-        console.log(res);
         setData(res.data?.results);
         setLoad(false);
       })
@@ -215,7 +209,7 @@ function RecentIssues(props) {
     if (selectedArea !== undefined) {
       api = api + `?search=${selectedArea}`;
     }
-    if (searchDates) {
+    if (searchDates.length > 0) {
       api =
         api +
         `?startdate=${moment(searchDates[0].$d).format(
@@ -250,16 +244,17 @@ function RecentIssues(props) {
 
   const contentStyle = {
     margin: 0,
-    height: "80%",
+    // height: "80%",
     color: "#364d79",
     lineHeight: "160px",
     textAlign: "center",
+    aspectRatio: "16/9",
   };
-
   const resetSearch = () => {
     getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
     setSearchIssueType(undefined);
     setSelectedArea(undefined);
+    searchDates([]);
   };
   const fetchAreaDetails = async () => {
     await axios
@@ -340,6 +335,7 @@ function RecentIssues(props) {
                 <label htmlFor="" className="font16">
                   Search issues between two dates
                 </label>
+                <br />
                 <RangePicker
                   className="mar10 selectElement"
                   onChange={(e) => setSearchDates(e)}
@@ -450,9 +446,10 @@ function RecentIssues(props) {
                   <div>
                     <img
                       src={elem.image}
-                      width="100%"
+                      // width="100%"
                       alt=""
                       key={elem.Issue}
+                      className="rounded mx-auto d-block"
                       style={contentStyle}
                     />
                   </div>
@@ -489,7 +486,6 @@ function RecentIssues(props) {
                   ? issueView.latitude + " , " + issueView.logitude
                   : "N/A"}
               </Form.Item>
-
               {/* <Form.Item className="mb-3" label="Site Videos">
                 {issueView?.User_Issue_Videos.length > 0
                   ? issueView?.User_Issue_Videos.map((elem) => (
@@ -517,6 +513,7 @@ function RecentIssues(props) {
                       name="assig_to_staff"
                       onClick={() => getStaffList(issueView?.id)}
                       onChange={(e) => setSelectedStaff(e)}
+                      style={{ width: 300 }}
                     >
                       {staffList?.map((elem, i) => (
                         <Option key={i} value={elem.id}>
