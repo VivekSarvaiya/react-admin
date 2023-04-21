@@ -13,6 +13,7 @@ import axios from "axios";
 import moment from "moment";
 import { Carousel } from "antd";
 import { Excel } from "antd-table-saveas-excel";
+import { Avatar } from "@mui/material";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -28,6 +29,10 @@ function RecentIssues(props) {
   const [selectedArea, setSelectedArea] = useState("");
   const [searchIssueType, setSearchIssueType] = useState("");
   const [searchDates, setSearchDates] = useState([]);
+  const [assign, setAssign] = useState(false);
+  const [openStaffModal, setOpenStaffModal] = useState(false);
+  const [staffView, setStaffView] = useState({});
+
   const tableColumns = [
     {
       title: "Posted By",
@@ -129,6 +134,7 @@ function RecentIssues(props) {
         },
       })
       .then((res) => {
+        console.log(res);
         setData(res.data?.results);
         setLoad(false);
       })
@@ -266,6 +272,19 @@ function RecentIssues(props) {
       .then((res) => {
         console.log(res);
         setAreas(res.data.results);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const getStaffDetails = (id) => {
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/${id}`)
+      .then((res) => {
+        console.log(res);
+        setStaffView(res.data.results[0]);
+        setOpenStaffModal(true);
       })
       .catch((error) => {
         console.log(error);
@@ -436,7 +455,7 @@ function RecentIssues(props) {
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        width={1000}
+        // width={1000}
       >
         {issueView !== "" && (
           <Card>
@@ -501,46 +520,81 @@ function RecentIssues(props) {
               <Form.Item className="mb-3" label="No. of Votes">
                 {issueView?.issue_votes}
               </Form.Item>
-              {issueView?.issue_status === "R" ? (
-                <Form.Item
-                  className="mb-3 "
-                  label="Assign this issue to staff member"
-                >
-                  <div className="d-flex gap-5">
-                    <Select
-                      className="selectElement"
-                      placeholder="Select Staff"
-                      name="assig_to_staff"
-                      onClick={() => getStaffList(issueView?.id)}
-                      onChange={(e) => setSelectedStaff(e)}
-                      style={{ width: 300 }}
-                    >
-                      {staffList?.map((elem, i) => (
-                        <Option key={i} value={elem.id}>
-                          {elem.username}{" "}
-                          {elem.staff_work_status === "F" ? (
-                            <Tag style={{ float: "right" }} color="green">
-                              Available
-                            </Tag>
-                          ) : (
-                            <Tag color="volcano" style={{ float: "right" }}>
-                              Angaged
-                            </Tag>
-                          )}
-                        </Option>
-                      ))}
-                    </Select>
-                    <Button
-                      type="primary"
-                      size="large"
-                      className="d-flex align-items-center"
-                      onClick={() => assignIssue(issueView?.id)}
-                    >
-                      Assign
-                    </Button>
-                  </div>
+              {issueView?.issue_status === "R" && (
+                <div className="d-flex gap-3">
+                  {!assign ? (
+                    <>
+                      <Button type="primary" danger>
+                        Reject This Issue
+                      </Button>
+                      <Button type="primary" onClick={() => setAssign(true)}>
+                        Assign This Issue To Staff
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      {/* <Form.Item
+                        className="mb-3"
+                        label="Assign this issue to staff member"
+                      > */}
+                      <div>
+                        <Form.Item
+                          className="mb-1"
+                          label="Assign this issue to staff member"
+                        ></Form.Item>
+
+                        <Select
+                          className="selectElement mb-2"
+                          placeholder="Select Staff"
+                          name="assig_to_staff"
+                          onClick={() => getStaffList(issueView?.id)}
+                          onChange={(e) => setSelectedStaff(e)}
+                          style={{ width: 300 }}
+                        >
+                          {staffList?.map((elem, i) => (
+                            <Option key={i} value={elem.id}>
+                              {elem.username}{" "}
+                              {elem.staff_work_status === "F" ? (
+                                <Tag style={{ float: "right" }} color="green">
+                                  Available
+                                </Tag>
+                              ) : (
+                                <Tag color="volcano" style={{ float: "right" }}>
+                                  Angaged
+                                </Tag>
+                              )}
+                            </Option>
+                          ))}
+                        </Select>
+                        <br />
+                        <Button
+                          type="primary"
+                          size="large"
+                          className="d-flex align-items-center"
+                          onClick={() => assignIssue(issueView?.id)}
+                        >
+                          Assign
+                        </Button>
+                      </div>
+                      {/* </Form.Item> */}
+                    </>
+                  )}
+                </div>
+              )}
+
+              {issueView?.issue_status === "A" && (
+                <Form.Item label="This issue has been assigned to">
+                  <Button
+                    type="link"
+                    onClick={() => getStaffDetails(issueView?.staff?.id)}
+                  >
+                    {issueView?.staff?.first_name +
+                      " " +
+                      issueView?.staff?.last_name}
+                  </Button>
                 </Form.Item>
-              ) : (
+              )}
+              {issueView?.issue_status === "S" && (
                 <Button
                   type="primary"
                   size="large"
@@ -550,9 +604,68 @@ function RecentIssues(props) {
                   Verify this issue
                 </Button>
               )}
+              {issueView?.issue_status === "VA" && (
+                <Form.Item label="This issue has been solved by">
+                  <Button
+                    type="link"
+                    onClick={() => getStaffDetails(issueView?.staff?.id)}
+                  >
+                    {issueView?.staff?.first_name +
+                      " " +
+                      issueView?.staff?.last_name}
+                  </Button>
+                </Form.Item>
+              )}
             </Form>
           </Card>
         )}
+      </Modal>
+      <Modal
+        title="Staff member Details"
+        open={openStaffModal}
+        onCancel={() => setOpenStaffModal(false)}
+        footer={null}
+      >
+        <Card>
+          <Avatar
+            sx={{
+              m: 1,
+              width: "8rem",
+              height: "8rem",
+              background: "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+            }}
+            src={staffView?.image}
+          />
+          <Form>
+            <Form.Item name="name" label="Username">
+              {staffView?.username}
+            </Form.Item>
+            <Form.Item name="email" label="Email ID ">
+              {staffView?.email}
+            </Form.Item>
+            <Form.Item name="name" label="Firstname">
+              {staffView?.first_name}
+            </Form.Item>
+            <Form.Item name="name" label="Lastname">
+              {staffView?.last_name}
+            </Form.Item>
+            <Form.Item name="address" label="State">
+              {staffView?.state?.state_name}
+            </Form.Item>
+            <Form.Item name="city" label="City">
+              {staffView?.city?.city_name}
+            </Form.Item>
+            <Form.Item name="jdate" label="Date Of Birth">
+              {staffView?.Date_of_birth}
+            </Form.Item>
+            <Form.Item name="jdate" label="Aadhar Card Number">
+              {staffView?.aadhar_no}
+            </Form.Item>
+            <Form.Item name="jdate" label="Phone Number">
+              {staffView?.phone_no}
+            </Form.Item>
+          </Form>
+        </Card>
       </Modal>
     </>
   );
