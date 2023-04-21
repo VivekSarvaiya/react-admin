@@ -1,23 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { DatePicker, Tag } from "antd";
-import { Card, Table, Select, Button, Menu, Form, message, Spin } from "antd";
+import { Card, Table, Select, Button, Form, message, Spin } from "antd";
 import {
-  EyeOutlined,
-  DeleteOutlined,
   SearchOutlined,
   ReloadOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
 import { Modal } from "antd";
-import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
+import { antdTableSorter, Flex } from "../Utils/Index";
 import axios from "axios";
 import moment from "moment";
 import { Carousel } from "antd";
 import { Excel } from "antd-table-saveas-excel";
-const { confirm } = Modal;
 const { Option } = Select;
-const { MonthPicker, RangePicker } = DatePicker;
+const { RangePicker } = DatePicker;
 
 function RecentIssues(props) {
   const [data, setData] = useState([]);
@@ -30,38 +27,12 @@ function RecentIssues(props) {
   const [areas, setAreas] = useState([]);
   const [selectedArea, setSelectedArea] = useState("");
   const [searchIssueType, setSearchIssueType] = useState("");
-
-  // const dropdownMenu = (row) => (
-  //   <Menu className="selectElement">
-  //     <Menu.Item
-  //       onClick={() => {
-  //         setOpen(true);
-  //         setIssueView((prev) => (prev = row));
-  //       }}
-  //     >
-  //       <Flex alignItems="center">
-  //         <EyeOutlined style={{ fontSize: "15px" }} />
-  //         <span className="mx-2">View Details</span>
-  //       </Flex>
-  //     </Menu.Item>
-  //     <Menu.Item
-  //       style={{
-  //         color: "#cf1322",
-  //         background: "#fff1f0",
-  //         borderColor: "#ffa39e",
-  //       }}
-  //       onClick={() => {
-  //         setRow(row);
-  //       }}
-  //     >
-  //       <Flex alignItems="center">
-  //         <DeleteOutlined style={{ fontSize: "15px" }} />
-  //         <span className="mx-2">Reject Issue</span>
-  //       </Flex>
-  //     </Menu.Item>
-  //   </Menu>
-  // );
-
+  const [searchDates, setSearchDates] = useState();
+  searchDates &&
+    console.log(
+      moment(searchDates[0].$d).format("DD-MM-YYYY"),
+      moment(searchDates[1].$d).format("DD-MM-YYYY")
+    );
   const tableColumns = [
     {
       title: "Posted By",
@@ -69,16 +40,13 @@ function RecentIssues(props) {
       key: "user",
       fixed: "center",
       render: (name, elem) => {
-        // console.log(elem);
-        const uname = name?.first_name
         return (
-
-          <Button type="link" className="p-0" >
+          <Button type="link" className="p-0">
             {name?.first_name + " " + name?.last_name}
           </Button>
-        )
+        );
       },
-      sorter: (a, b) => antdTableSorter(a, b, "uname"),
+      // sorter: (a, b) => antdTableSorter(a, b, "uname"),
     },
     {
       title: "Title",
@@ -108,7 +76,7 @@ function RecentIssues(props) {
       dataIndex: "issue_votes",
       key: "issue_votes",
       render: (issue_votes) => {
-        return issue_votes
+        return issue_votes;
       },
       sorter: (a, b) => antdTableSorter(a, b, "issue_votes"),
     },
@@ -142,10 +110,14 @@ function RecentIssues(props) {
       title: "Actions",
       dataIndex: "actions",
       render: (_, elm) => (
-        <Button type="link" className="p-0" onClick={() => {
-          setOpen(true);
-          setIssueView(elm);
-        }}>
+        <Button
+          type="link"
+          className="p-0"
+          onClick={() => {
+            setOpen(true);
+            setIssueView(elm);
+          }}
+        >
           View
         </Button>
       ),
@@ -236,12 +208,19 @@ function RecentIssues(props) {
   };
 
   const search = () => {
-    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?search=`
+    let api = `${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`;
     if (searchIssueType !== undefined) {
-      api = api + searchIssueType
+      api = api + `?search=${searchIssueType}`;
     }
     if (selectedArea !== undefined) {
-      api = api + selectedArea
+      api = api + `?search=${selectedArea}`;
+    }
+    if (searchDates) {
+      api =
+        api +
+        `?startdate=${moment(searchDates[0].$d).format(
+          "DD-MM-YYYY"
+        )}&enddate=${moment(searchDates[1].$d).format("DD-MM-YYYY")}`;
     }
     getIssues(api);
   };
@@ -278,13 +257,15 @@ function RecentIssues(props) {
   };
 
   const resetSearch = () => {
-    setSearchIssueType();
     getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
+    setSearchIssueType(undefined);
+    setSelectedArea(undefined);
   };
   const fetchAreaDetails = async () => {
     await axios
       .get(
-        `${process.env.REACT_APP_BASE_URL
+        `${
+          process.env.REACT_APP_BASE_URL
         }/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`
       )
       .then((res) => {
@@ -300,6 +281,8 @@ function RecentIssues(props) {
     getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
     // fetchIssueTypes();
     fetchAreaDetails();
+    setSearchIssueType(undefined);
+    setSelectedArea(undefined);
   }, []);
 
   return (
@@ -352,6 +335,17 @@ function RecentIssues(props) {
                     </Option>
                   ))}
                 </Select>
+              </div>
+              <div>
+                <label htmlFor="" className="font16">
+                  Search issues between two dates
+                </label>
+                <RangePicker
+                  className="mar10 selectElement"
+                  onChange={(e) => setSearchDates(e)}
+                  format="DD-MM-YYYY"
+                  style={{ height: "39px" }}
+                />
               </div>
             </div>
             <br />
@@ -491,7 +485,9 @@ function RecentIssues(props) {
                 {issueView?.landmark || "N/A"}
               </Form.Item>
               <Form.Item className="mb-3" label="Coordinates">
-                {issueView?.latitude ? issueView.latitude + " , " + issueView.logitude : "N/A"}
+                {issueView?.latitude
+                  ? issueView.latitude + " , " + issueView.logitude
+                  : "N/A"}
               </Form.Item>
 
               {/* <Form.Item className="mb-3" label="Site Videos">
