@@ -32,8 +32,17 @@ function RecentIssues(props) {
   const [assign, setAssign] = useState(false);
   const [openStaffModal, setOpenStaffModal] = useState(false);
   const [staffView, setStaffView] = useState({});
+  const [openUserModal, setOpenUserModal] = useState(false);
+  const [userView, setUserView] = useState({});
 
   const tableColumns = [
+    {
+      title: "Issue Id",
+      dataIndex: "id",
+      key: "id",
+      width: 110,
+      sorter: (a, b) => antdTableSorter(a, b, "id"),
+    },
     {
       title: "Posted By",
       dataIndex: "user",
@@ -41,7 +50,7 @@ function RecentIssues(props) {
       fixed: "center",
       render: (name, elem) => {
         return (
-          <Button type="link" className="p-0">
+          <Button type="link" className="p-0" onClick={() => getUsersDetails(elem?.user?.id)}>
             {name?.first_name + " " + name?.last_name}
           </Button>
         );
@@ -75,6 +84,7 @@ function RecentIssues(props) {
       title: "Votes",
       dataIndex: "issue_votes",
       key: "issue_votes",
+      width: 90,
       render: (issue_votes) => {
         return issue_votes;
       },
@@ -102,6 +112,8 @@ function RecentIssues(props) {
           return <Tag color="volcano">Ready for Review</Tag>;
         } else if (status === "VA") {
           return <Tag color="success">Verified</Tag>;
+        } else if (status === "RJ") {
+          return <Tag color="red">Rejected</Tag>;
         }
       },
       sorter: (a, b) => antdTableSorter(a, b, "issue_status"),
@@ -109,6 +121,7 @@ function RecentIssues(props) {
     {
       title: "Actions",
       dataIndex: "actions",
+      width: 100,
       render: (_, elm) => (
         <Button
           type="link"
@@ -146,6 +159,7 @@ function RecentIssues(props) {
   };
 
   const getStaffList = (id) => {
+    console.log(id);
     axios
       .get(`${process.env.REACT_APP_BASE_URL}/api/StaffList/${id}`, {
         headers: {
@@ -175,6 +189,7 @@ function RecentIssues(props) {
       )
       .then((res) => {
         console.log(res);
+        getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
         message.success("Issue assigned successfully");
         setOpen(false);
       })
@@ -184,12 +199,13 @@ function RecentIssues(props) {
       });
   };
 
-  const changeIssueStatus = (id) => {
+  const changeIssueStatus = (id, status) => {
+    console.log(id, status);
     axios
       .patch(
         `${process.env.REACT_APP_BASE_URL}/api/issue/IssueStatusChange/${id}`,
         {
-          issue_status: "VA",
+          issue_status: status,
         },
         {
           headers: {
@@ -199,7 +215,12 @@ function RecentIssues(props) {
       )
       .then((res) => {
         console.log(res);
-        message.success("Issue verified succesfully !");
+        if (status === "RJ") {
+          message.success("Issue has been rejected")
+        }
+        if (status === "VA") {
+          message.success("Issue verified succesfully !");
+        }
       })
       .catch((err) => {
         console.log(err);
@@ -218,9 +239,9 @@ function RecentIssues(props) {
     if (searchDates.length > 0) {
       api =
         api +
-        `?startdate=${moment(searchDates[0].$d).format(
-          "DD-MM-YYYY"
-        )}&enddate=${moment(searchDates[1].$d).format("DD-MM-YYYY")}`;
+        `?start_date=${moment(searchDates[0].$d).format(
+          "YYYY-MM-DD"
+        )}&end_date=${moment(searchDates[1].$d).format("YYYY-MM-DD")}`;
     }
     getIssues(api);
   };
@@ -265,8 +286,7 @@ function RecentIssues(props) {
   const fetchAreaDetails = async () => {
     await axios
       .get(
-        `${
-          process.env.REACT_APP_BASE_URL
+        `${process.env.REACT_APP_BASE_URL
         }/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`
       )
       .then((res) => {
@@ -280,11 +300,32 @@ function RecentIssues(props) {
 
   const getStaffDetails = (id) => {
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/${id}`)
+      .get(`${process.env.REACT_APP_BASE_URL}/api/StaffDetail/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
       .then((res) => {
         console.log(res);
-        setStaffView(res.data.results[0]);
+        setStaffView(res.data);
         setOpenStaffModal(true);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+  const getUsersDetails = (id) => {
+    console.log(id);
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/UserDetail/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res, "user");
+        setUserView(res.data);
+        setOpenUserModal(true);
       })
       .catch((error) => {
         console.log(error);
@@ -358,7 +399,7 @@ function RecentIssues(props) {
                 <RangePicker
                   className="mar10 selectElement"
                   onChange={(e) => setSearchDates(e)}
-                  format="DD-MM-YYYY"
+                  format="YYYY-MM-DD"
                   style={{ height: "39px" }}
                 />
               </div>
@@ -455,7 +496,7 @@ function RecentIssues(props) {
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        // width={1000}
+      // width={1000}
       >
         {issueView !== "" && (
           <Card>
@@ -505,18 +546,6 @@ function RecentIssues(props) {
                   ? issueView.latitude + " , " + issueView.logitude
                   : "N/A"}
               </Form.Item>
-              {/* <Form.Item className="mb-3" label="Site Videos">
-                {issueView?.User_Issue_Videos.length > 0
-                  ? issueView?.User_Issue_Videos.map((elem) => (
-                      <img
-                        src={elem.video}
-                        width="100%"
-                        alt=""
-                        key={elem.Issue}
-                      />
-                    ))
-                  : "N/A"}
-              </Form.Item> */}
               <Form.Item className="mb-3" label="No. of Votes">
                 {issueView?.issue_votes}
               </Form.Item>
@@ -524,7 +553,7 @@ function RecentIssues(props) {
                 <div className="d-flex gap-3">
                   {!assign ? (
                     <>
-                      <Button type="primary" danger>
+                      <Button type="primary" danger onClick={() => changeIssueStatus(issueView.id, "RJ")}>
                         Reject This Issue
                       </Button>
                       <Button type="primary" onClick={() => setAssign(true)}>
@@ -533,10 +562,6 @@ function RecentIssues(props) {
                     </>
                   ) : (
                     <>
-                      {/* <Form.Item
-                        className="mb-3"
-                        label="Assign this issue to staff member"
-                      > */}
                       <div>
                         <Form.Item
                           className="mb-1"
@@ -576,7 +601,6 @@ function RecentIssues(props) {
                           Assign
                         </Button>
                       </div>
-                      {/* </Form.Item> */}
                     </>
                   )}
                 </div>
@@ -608,7 +632,6 @@ function RecentIssues(props) {
                 <Form.Item label="This issue has been solved by">
                   <Button
                     type="link"
-                    onClick={() => getStaffDetails(issueView?.staff?.id)}
                   >
                     {issueView?.staff?.first_name +
                       " " +
@@ -663,6 +686,54 @@ function RecentIssues(props) {
             </Form.Item>
             <Form.Item name="jdate" label="Phone Number">
               {staffView?.phone_no}
+            </Form.Item>
+          </Form>
+        </Card>
+      </Modal>
+      <Modal
+        title="User Details"
+        open={openUserModal}
+        onCancel={() => setOpenUserModal(false)}
+        footer={null}
+      // width={1000}
+      >
+        <Card>
+          <Avatar
+            sx={{
+              m: 1,
+              width: "8rem",
+              height: "8rem",
+              background: "linear-gradient(90deg,  #3c56bd 0%, #5a78ef 100%)",
+            }}
+            src={userView?.image}
+          />
+          <Form>
+            <Form.Item name="name" label="Username">
+              {userView?.username}
+            </Form.Item>
+            <Form.Item name="email" label="Email ID ">
+              {userView?.email}
+            </Form.Item>
+            <Form.Item name="name" label="Firstname">
+              {userView?.first_name}
+            </Form.Item>
+            <Form.Item name="name" label="Lastname">
+              {userView?.last_name}
+            </Form.Item>
+            <Form.Item name="address" label="State">
+              {userView?.state?.state_name}
+            </Form.Item>
+            <Form.Item name="city" label="City">
+              {userView?.city?.city_name}
+            </Form.Item>
+            <Form.Item name="jdate" label="Date Of Birth">
+              {userView?.Date_of_birth}
+            </Form.Item>
+            <Form.Item name="jdate" label="Aadhar Card Number">
+              {userView?.aadhar_no}
+            </Form.Item>
+            <Form.Item name="jdate" label="Phone Number">
+              {userView?.phone_no}
             </Form.Item>
           </Form>
         </Card>
