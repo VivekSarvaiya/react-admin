@@ -29,18 +29,20 @@ function RecentIssues(props) {
   const [selectedArea, setSelectedArea] = useState("");
   const [searchIssueType, setSearchIssueType] = useState("");
   const [searchDates, setSearchDates] = useState([]);
+  const [searchStatus, setSearchStatus] = useState("");
   const [assign, setAssign] = useState(false);
   const [openStaffModal, setOpenStaffModal] = useState(false);
   const [staffView, setStaffView] = useState({});
   const [openUserModal, setOpenUserModal] = useState(false);
   const [userView, setUserView] = useState({});
+  const [openSolvedIssueView, setOpenSolvedIssue] = useState(false);
 
   const tableColumns = [
     {
       title: "Issue Id",
       dataIndex: "id",
       key: "id",
-      width: 110,
+      // width: 110,
       sorter: (a, b) => antdTableSorter(a, b, "id"),
     },
     {
@@ -50,7 +52,11 @@ function RecentIssues(props) {
       fixed: "center",
       render: (name, elem) => {
         return (
-          <Button type="link" className="p-0" onClick={() => getUsersDetails(elem?.user?.id)}>
+          <Button
+            type="link"
+            className="p-0"
+            onClick={() => getUsersDetails(elem?.user?.id)}
+          >
             {name?.first_name + " " + name?.last_name}
           </Button>
         );
@@ -61,8 +67,8 @@ function RecentIssues(props) {
       title: "Title",
       dataIndex: "issue_title",
       key: "issue_title",
-      ellipsis: true,
-      width: 200,
+      // ellipsis: true,
+      // width: 200,
     },
     {
       title: "Area",
@@ -84,7 +90,7 @@ function RecentIssues(props) {
       title: "Votes",
       dataIndex: "issue_votes",
       key: "issue_votes",
-      width: 90,
+      // width: 90,
       render: (issue_votes) => {
         return issue_votes;
       },
@@ -121,7 +127,7 @@ function RecentIssues(props) {
     {
       title: "Actions",
       dataIndex: "actions",
-      width: 100,
+      // width: 100,
       render: (_, elm) => (
         <Button
           type="link"
@@ -139,7 +145,7 @@ function RecentIssues(props) {
 
   const getIssues = (api) => {
     setLoad(true);
-    // console.log(api);
+    console.log(api);
     axios
       .get(api, {
         headers: {
@@ -215,16 +221,20 @@ function RecentIssues(props) {
       )
       .then((res) => {
         console.log(res);
+        getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
         if (status === "RJ") {
-          message.success("Issue has been rejected")
+          message.success("Issue has been rejected");
         }
         if (status === "VA") {
           message.success("Issue verified succesfully !");
         }
+        setOpen(false);
+        setOpenSolvedIssue(false);
+        setOpenStaffModal(false);
       })
       .catch((err) => {
         console.log(err);
-        message.error("Issue verification failed !");
+        message.error(err.response?.data?.error);
       });
   };
 
@@ -236,12 +246,15 @@ function RecentIssues(props) {
     if (selectedArea !== undefined) {
       api = api + `?search=${selectedArea}`;
     }
-    if (searchDates.length > 0) {
+    if (searchDates?.length > 0) {
       api =
         api +
         `?start_date=${moment(searchDates[0].$d).format(
           "YYYY-MM-DD"
         )}&end_date=${moment(searchDates[1].$d).format("YYYY-MM-DD")}`;
+    }
+    if (searchStatus) {
+      api = api + `?issue_status=${searchStatus}`;
     }
     getIssues(api);
   };
@@ -281,12 +294,14 @@ function RecentIssues(props) {
     getIssues(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/`);
     setSearchIssueType(undefined);
     setSelectedArea(undefined);
+    setSearchStatus(undefined);
     searchDates([]);
   };
   const fetchAreaDetails = async () => {
     await axios
       .get(
-        `${process.env.REACT_APP_BASE_URL
+        `${
+          process.env.REACT_APP_BASE_URL
         }/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`
       )
       .then((res) => {
@@ -338,6 +353,7 @@ function RecentIssues(props) {
     fetchAreaDetails();
     setSearchIssueType(undefined);
     setSelectedArea(undefined);
+    setSearchStatus(undefined);
   }, []);
 
   return (
@@ -402,6 +418,25 @@ function RecentIssues(props) {
                   format="YYYY-MM-DD"
                   style={{ height: "39px" }}
                 />
+              </div>
+              <div>
+                <label htmlFor="" className="font16">
+                  Status
+                </label>
+                <Select
+                  className="w-100 mar10 selectElement"
+                  placeholder="Search issues by status"
+                  onChange={(e) => setSearchStatus(e)}
+                  allowClear
+                  style={{ width: 200 }}
+                  value={searchStatus}
+                >
+                  <Option value="RJ">Rejected</Option>
+                  <Option value="R">Recieved</Option>
+                  <Option value="A">Assigned</Option>
+                  <Option value="S">Solved</Option>
+                  <Option value="VA">Verified</Option>
+                </Select>
               </div>
             </div>
             <br />
@@ -486,7 +521,12 @@ function RecentIssues(props) {
           </Flex>
 
           <div className="table-responsive">
-            <Table columns={tableColumns} dataSource={data} rowKey="id" />
+            <Table
+              columns={tableColumns}
+              dataSource={data}
+              rowKey="id"
+              scroll="x"
+            />
           </div>
         </Card>
       </div>
@@ -496,7 +536,7 @@ function RecentIssues(props) {
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-      // width={1000}
+        // width={1000}
       >
         {issueView !== "" && (
           <Card>
@@ -553,7 +593,11 @@ function RecentIssues(props) {
                 <div className="d-flex gap-3">
                   {!assign ? (
                     <>
-                      <Button type="primary" danger onClick={() => changeIssueStatus(issueView.id, "RJ")}>
+                      <Button
+                        type="primary"
+                        danger
+                        onClick={() => changeIssueStatus(issueView.id, "RJ")}
+                      >
                         Reject This Issue
                       </Button>
                       <Button type="primary" onClick={() => setAssign(true)}>
@@ -616,22 +660,41 @@ function RecentIssues(props) {
                       " " +
                       issueView?.staff?.last_name}
                   </Button>
+                  {issueView?.isssue_assign_date_and_time && (
+                    <>
+                      On
+                      {moment(issueView?.isssue_assign_date_and_time).format(
+                        "MMMM Do YYYY, h:mm:ss a"
+                      )}
+                    </>
+                  )}
                 </Form.Item>
               )}
               {issueView?.issue_status === "S" && (
-                <Button
-                  type="primary"
-                  size="large"
-                  className="d-flex align-items-center"
-                  onClick={() => changeIssueStatus(issueView?.id)}
-                >
-                  Verify this issue
-                </Button>
+                <div className="d-flex gap-3">
+                  <Button
+                    type="primary"
+                    size="large"
+                    // className="d-flex align-items-center"
+                    onClick={() => setOpenSolvedIssue(true)}
+                  >
+                    Check solved issue
+                  </Button>
+                  {/* <Button
+                    type="primary"
+                    size="large"
+                    // className="d-flex align-items-center"
+                    onClick={() => changeIssueStatus(issueView?.id, "VA")}
+                  >
+                    Verify this issue
+                  </Button> */}
+                </div>
               )}
               {issueView?.issue_status === "VA" && (
                 <Form.Item label="This issue has been solved by">
                   <Button
                     type="link"
+                    onClick={() => getStaffDetails(issueView?.staff?.id)}
                   >
                     {issueView?.staff?.first_name +
                       " " +
@@ -639,6 +702,84 @@ function RecentIssues(props) {
                   </Button>
                 </Form.Item>
               )}
+            </Form>
+          </Card>
+        )}
+      </Modal>
+      <Modal
+        title="Solved Issue Details"
+        open={openSolvedIssueView}
+        onCancel={() => setOpenSolvedIssue(false)}
+        footer={null}
+        // width={1000}
+      >
+        {issueView !== "" && (
+          <Card>
+            <Carousel autoplay>
+              {issueView?.Staff_Issue_Images.length > 0 ? (
+                issueView?.Staff_Issue_Images.map((elem) => (
+                  <div>
+                    <img
+                      src={elem.image}
+                      // width="100%"
+                      alt=""
+                      key={elem.Issue}
+                      className="rounded mx-auto d-block"
+                      style={contentStyle}
+                    />
+                  </div>
+                ))
+              ) : (
+                <div>
+                  <h3 style={contentStyle}>No Images Available</h3>
+                </div>
+              )}
+            </Carousel>
+            <Form>
+              <Form.Item className="mb-3" label="Title">
+                {issueView?.issue_title || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Staff's Description">
+                {issueView?.Staff_issue_solved_description || "N/A"}
+              </Form.Item>
+              {/* <Form.Item className="mb-3" label="Type">
+                {issueView?.issue_type?.Issue_Type_Name || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Created On">
+                {moment(issueView?.issue_created_time).format(
+                  "MMMM Do YYYY, h:mm:ss a"
+                ) || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Solved On">
+                {moment(issueView?.issue_solved_date_and_time).format(
+                  "MMMM Do YYYY, h:mm:ss a"
+                ) || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Area">
+                {issueView?.area?.area_name || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Landmark">
+                {issueView?.landmark || "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="Coordinates">
+                {issueView?.latitude
+                  ? issueView.latitude + " , " + issueView.logitude
+                  : "N/A"}
+              </Form.Item>
+              <Form.Item className="mb-3" label="No. of Votes">
+                {issueView?.issue_votes}
+              </Form.Item> */}
+
+              <div className="d-flex gap-3">
+                <Button
+                  type="primary"
+                  size="large"
+                  // className="d-flex align-items-center"
+                  onClick={() => changeIssueStatus(issueView?.id, "VA")}
+                >
+                  Verify this issue
+                </Button>
+              </div>
             </Form>
           </Card>
         )}
@@ -695,7 +836,7 @@ function RecentIssues(props) {
         open={openUserModal}
         onCancel={() => setOpenUserModal(false)}
         footer={null}
-      // width={1000}
+        // width={1000}
       >
         <Card>
           <Avatar
