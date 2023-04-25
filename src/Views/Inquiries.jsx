@@ -12,7 +12,6 @@ import Swal from "sweetalert2";
 import { antdTableSorter, Flex } from "../Utils/Index";
 import axios from "axios";
 import { Avatar } from "@mui/material";
-import { Excel } from "antd-table-saveas-excel";
 
 function Inquiries(props) {
   const [data, setData] = useState([]);
@@ -26,11 +25,24 @@ function Inquiries(props) {
 
   const tableColumns = [
     {
+      title: "User Id",
+      dataIndex: "user",
+      key: "user",
+      // wuserth: 110,
+      sorter: (a, b) => antdTableSorter(a, b, "user"),
+    },
+    {
       title: "Username",
       dataIndex: "username",
       key: "username",
-      onFilter: (value, record) => console.log(value, record),
       sorter: (a, b) => antdTableSorter(a, b, "username"),
+    },
+    {
+      title: "Message",
+      dataIndex: "details",
+      key: "details",
+      ellipsis: true,
+      // sorter: (a, b) => antdTableSorter(a, b, "username"),
     },
     {
       title: "Email",
@@ -53,25 +65,7 @@ function Inquiries(props) {
       },
       // sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
-    {
-      title: "Date of Birth",
-      dataIndex: "Date_of_birth",
-      key: "Date_of_birth",
-      sorter: (a, b) => antdTableSorter(a, b, "Date_of_birth"),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
-        // if (status === "active") {
-        return <Tag color="success">Active</Tag>;
-        // } else {
-        //   return <Tag color="red">Blocked</Tag>;
-        // }
-      },
-      // sorter: (a, b) => antdTableSorter(a, b, "jdate"),
-    },
+
     {
       title: "Actions",
       dataIndex: "actions",
@@ -90,29 +84,10 @@ function Inquiries(props) {
     },
   ];
 
-  const exportTableData = (users) => {
-    let arr = [];
-    // console.log(users);
-    users.map((item) => {
-      arr.push({
-        username: item.username,
-        email: item.email,
-        first_name: item.first_name,
-        last_name: item.last_name,
-        state_name: item.state.state_name,
-        city_name: item.city.city_name,
-        Date_of_birth: item.Date_of_birth,
-        aadhar_no: item.aadhar_no,
-        phone_no: item.phone_no,
-      });
-    });
-    return arr.flatMap((item) => item);
-  };
-
   const fetchData = (api) => {
     setLoad(true);
     axios
-      .get(api, {
+      .get(`${process.env.REACT_APP_BASE_URL}/api/UserContactsGet`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
       })
       .then((res) => {
@@ -127,18 +102,18 @@ function Inquiries(props) {
       });
   };
 
-  const search = () => {
-    let api = `${process.env.REACT_APP_BASE_URL}/api/UserAllDetails?search=${searchusername}${searchEmail}${searchArea}${searchphone_no}`;
-    fetchData(api);
-  };
+  // const search = () => {
+  //   let api = `${process.env.REACT_APP_BASE_URL}/api/UserContactsGet?search=${searchusername}${searchEmail}${searchArea}${searchphone_no}`;
+  //   fetchData(api);
+  // };
 
-  const resetSearch = () => {
-    setSearchusername("");
-    setSearchArea("");
-    setSearchEmail("");
-    setSearchphone_no("");
-    fetchData(`${process.env.REACT_APP_BASE_URL}/api/UserAllDetails`);
-  };
+  // const resetSearch = () => {
+  //   setSearchusername("");
+  //   setSearchArea("");
+  //   setSearchEmail("");
+  //   setSearchphone_no("");
+  //   fetchData(`${process.env.REACT_APP_BASE_URL}/api/UserAllDetails`);
+  // };
 
   useEffect(() => {
     fetchData(`${process.env.REACT_APP_BASE_URL}/api/UserAllDetails`);
