@@ -1,22 +1,20 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Tag, message } from "antd";
-import { Card, Table, Input, Button, Menu, Form, Spin } from "antd";
+import { Card, Table, Input, Button, Form, Spin } from "antd";
 import {
-  EyeOutlined,
   SearchOutlined,
   ReloadOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
 import { Modal } from "antd";
-import { Block } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { antdTableSorter, Flex } from "../Utils/Index";
 import axios from "axios";
 import { Avatar } from "@mui/material";
 import { Excel } from "antd-table-saveas-excel";
 
-function Users(props) {
+function Inquiries(props) {
   const [data, setData] = useState([]);
   const [open1, setOpen1] = useState(false);
   const [row, setRow] = useState(null);
@@ -25,20 +23,6 @@ function Users(props) {
   const [searchEmail, setSearchEmail] = useState("");
   const [searchphone_no, setSearchphone_no] = useState("");
   const [load, setLoad] = useState(false);
-
-  function showConfirm(row) {
-    console.log(row);
-    Swal.fire({
-      title: `Do you want to Block ${row.name}`,
-      icon: "question",
-      showDenyButton: true,
-      confirmButtonText: "Yes",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(`${row.name} has been blocked`, "", "success");
-      }
-    });
-  }
 
   const tableColumns = [
     {
@@ -168,7 +152,7 @@ function Users(props) {
           padding: 24,
         }}
       >
-        <div className="">
+        {/* <div className="" >
           <Card className="selectElement">
             <div className="search-card">
               <div>
@@ -224,6 +208,7 @@ function Users(props) {
                   prefix={<SearchOutlined />}
                 />
               </div>
+
             </div>
             <br />
             <div
@@ -290,7 +275,7 @@ function Users(props) {
               Export
             </Button>
           </div>
-        </div>
+        </div> */}
         {load && (
           <Spin
             tip="Loading..."
@@ -366,4 +351,4 @@ function Users(props) {
   );
 }
 
-export default Users;
+export default Inquiries;

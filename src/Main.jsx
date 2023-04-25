@@ -11,6 +11,7 @@ import Profile from "./Views/Profile";
 import { PrivateRoutes } from "./Components/PrivateRoutes";
 import Sidebar from "./Components/Sidebar";
 import GoogleMapComp from "./Components/GoogleMapComp";
+import Inquiries from "./Views/Inquiries";
 
 function Main(props) {
   return (
@@ -25,7 +26,8 @@ function Main(props) {
             <Route path="/staff" element={<Staff />} />
             <Route path="/map" element={<GoogleMapComp />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/recentissues" element={<RecentIssues />} />
+            <Route path="/issues" element={<RecentIssues />} />
+            <Route path="/inquiries" element={<Inquiries />} />
           </Route>
           <Route path="/changepassword" element={<ChangePassword />} />
         </Route>
