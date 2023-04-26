@@ -80,7 +80,7 @@ export const Login = (props) => {
                   component="div"
                   style={{ margin: "1em auto" }}
                 >
-                  <img src="../assets/images/logo.png" alt="logo" width={100} style={{ filter: "invert(1)" }} />
+                  <img src="../assets/images/logo.png" alt="logo" width={100} />
                 </Typography>
                 <h3 className="my-3 mx-5 text-center">Welcome back, Admin</h3>
                 <div className="card-body px-5 py-4">

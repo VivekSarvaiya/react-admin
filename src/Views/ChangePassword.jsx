@@ -117,6 +117,7 @@ function ChangePassword(props) {
                           prefix={<LockOutlined className="text-primary" />}
                         />
                       </Form.Item>
+                      <br />
                       <Form.Item>
                         <Button
                           loading={loading}

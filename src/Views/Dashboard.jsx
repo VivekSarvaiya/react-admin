@@ -249,17 +249,17 @@ function Dashboard(props) {
           </div>
         </div>
         <div className="p-4 px-2">
-          <ReactApexChart
+          {/* <ReactApexChart
             className="chart-body"
             options={options}
             series={series}
             type="area"
             height={350}
             width="100%"
-          />
+          /> */}
 
-          <div className="d-flex justify-content-around mt-5">
-            {/* <LineChart /> */}
+          <div className="d-flex gap-5 mt-4">
+
             <Donut />
             <Donut2 />
           </div>

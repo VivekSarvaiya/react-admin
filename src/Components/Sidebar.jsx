@@ -14,9 +14,9 @@ import FormatIndentIncreaseRoundedIcon from "@mui/icons-material/FormatIndentInc
 import FormatIndentDecreaseRoundedIcon from "@mui/icons-material/FormatIndentDecreaseRounded";
 import { Badge, Layout, Menu, theme } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
-import { IconButton } from "@mui/material";
+import { Avatar, IconButton } from "@mui/material";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
-import { Dropdown, Avatar } from "antd";
+import { Dropdown } from "antd";
 import Swal from "sweetalert2";
 import axios from "axios";
 
@@ -105,13 +105,17 @@ const Sidebar = () => {
         }}
       >
         <div className="logo">
-          <img
+          {collapsed ? <img
             src="../assets/images/logo.png"
             alt="logo"
             width={50}
             onClick={() => nav("/")}
-          />
-          {!collapsed ? <p>Make My City</p> : ""}
+          /> : <img
+            src="../assets/images/logo_name.png"
+            alt="logo"
+            style={{ width: "100%" }}
+            onClick={() => nav("/")}
+          />}
         </div>
         <Menu
           theme="dark"
@@ -183,11 +187,11 @@ const Sidebar = () => {
               alignItems: "center",
             }}
           >
-            <IconButton>
+            {/* <IconButton>
               <Badge count={5}>
                 <NotificationsNoneOutlinedIcon color="action" />
               </Badge>
-            </IconButton>
+            </IconButton> */}
             <Dropdown
               placement="bottomRight"
               overlay={profileMenu}
