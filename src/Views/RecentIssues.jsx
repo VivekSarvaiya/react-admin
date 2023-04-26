@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { DatePicker, Tag } from "antd";
+import { DatePicker, Pagination, Tag } from "antd";
 import { Card, Table, Select, Button, Form, message, Spin } from "antd";
 import {
   SearchOutlined,
@@ -36,6 +36,8 @@ function RecentIssues(props) {
   const [openUserModal, setOpenUserModal] = useState(false);
   const [userView, setUserView] = useState({});
   const [openSolvedIssueView, setOpenSolvedIssue] = useState(false);
+  const [next, setNext] = useState()
+  const [previous, setPrevious] = useState()
 
   const tableColumns = [
     {
@@ -145,7 +147,7 @@ function RecentIssues(props) {
 
   const getIssues = (api) => {
     setLoad(true);
-    console.log(api);
+    // console.log(api);
     axios
       .get(api, {
         headers: {
@@ -155,6 +157,8 @@ function RecentIssues(props) {
       .then((res) => {
         console.log(res);
         setData(res.data?.results);
+        setNext(res.data?.next)
+        setPrevious(res.data?.previous)
         setLoad(false);
       })
       .catch((err) => {
@@ -300,8 +304,7 @@ function RecentIssues(props) {
   const fetchAreaDetails = async () => {
     await axios
       .get(
-        `${
-          process.env.REACT_APP_BASE_URL
+        `${process.env.REACT_APP_BASE_URL
         }/api/details/areaDetail/${localStorage.getItem("CITY_ID")}`
       )
       .then((res) => {
@@ -525,8 +528,11 @@ function RecentIssues(props) {
               columns={tableColumns}
               dataSource={data}
               rowKey="id"
-              scroll="x"
+              // scroll="x"
+              pagination={false}
+
             />
+            <Pagination className="my-4" defaultCurrent={6} total={500} />
           </div>
         </Card>
       </div>
@@ -536,7 +542,7 @@ function RecentIssues(props) {
         open={open}
         onCancel={() => setOpen(false)}
         footer={null}
-        // width={1000}
+      // width={1000}
       >
         {issueView !== "" && (
           <Card>
@@ -711,7 +717,7 @@ function RecentIssues(props) {
         open={openSolvedIssueView}
         onCancel={() => setOpenSolvedIssue(false)}
         footer={null}
-        // width={1000}
+      // width={1000}
       >
         {issueView !== "" && (
           <Card>
@@ -836,7 +842,7 @@ function RecentIssues(props) {
         open={openUserModal}
         onCancel={() => setOpenUserModal(false)}
         footer={null}
-        // width={1000}
+      // width={1000}
       >
         <Card>
           <Avatar
