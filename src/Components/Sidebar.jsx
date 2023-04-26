@@ -3,6 +3,7 @@ import { AuthContext } from "../Context/userContext";
 import {
   AccountCircle,
   Engineering,
+  Feedback,
   GridView,
   Logout,
   MapOutlined,
@@ -142,11 +143,17 @@ const Sidebar = () => {
             {
               key: "4",
               icon: <Rule />,
-              label: "Recent Issues",
-              onClick: () => nav("/recentissues"),
+              label: "Issues",
+              onClick: () => nav("/issues"),
             },
             {
               key: "5",
+              icon: <Feedback />,
+              label: "Inquiries",
+              onClick: () => nav("/inquiries"),
+            },
+            {
+              key: "6",
               icon: <MapOutlined />,
               label: "City Map",
               onClick: () => nav("/map"),

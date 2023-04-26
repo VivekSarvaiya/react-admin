@@ -1,22 +1,19 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Tag, message } from "antd";
-import { Card, Table, Input, Button, Menu, Form, Spin } from "antd";
+import { Card, Table, Input, Button, Form, Spin } from "antd";
 import {
-  EyeOutlined,
   SearchOutlined,
   ReloadOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
 import { Modal } from "antd";
-import { Block } from "@mui/icons-material";
 import Swal from "sweetalert2";
 import { antdTableSorter, Flex } from "../Utils/Index";
 import axios from "axios";
 import { Avatar } from "@mui/material";
-import { Excel } from "antd-table-saveas-excel";
 
-function Users(props) {
+function Inquiries(props) {
   const [data, setData] = useState([]);
   const [open1, setOpen1] = useState(false);
   const [row, setRow] = useState(null);
@@ -26,27 +23,26 @@ function Users(props) {
   const [searchphone_no, setSearchphone_no] = useState("");
   const [load, setLoad] = useState(false);
 
-  function showConfirm(row) {
-    console.log(row);
-    Swal.fire({
-      title: `Do you want to Block ${row.name}`,
-      icon: "question",
-      showDenyButton: true,
-      confirmButtonText: "Yes",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(`${row.name} has been blocked`, "", "success");
-      }
-    });
-  }
-
   const tableColumns = [
+    {
+      title: "User Id",
+      dataIndex: "user",
+      key: "user",
+      // wuserth: 110,
+      sorter: (a, b) => antdTableSorter(a, b, "user"),
+    },
     {
       title: "Username",
       dataIndex: "username",
       key: "username",
-      onFilter: (value, record) => console.log(value, record),
       sorter: (a, b) => antdTableSorter(a, b, "username"),
+    },
+    {
+      title: "Message",
+      dataIndex: "details",
+      key: "details",
+      ellipsis: true,
+      // sorter: (a, b) => antdTableSorter(a, b, "username"),
     },
     {
       title: "Email",
@@ -69,25 +65,7 @@ function Users(props) {
       },
       // sorter: (a, b) => antdTableSorter(a, b, "area"),
     },
-    {
-      title: "Date of Birth",
-      dataIndex: "Date_of_birth",
-      key: "Date_of_birth",
-      sorter: (a, b) => antdTableSorter(a, b, "Date_of_birth"),
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => {
-        // if (status === "active") {
-        return <Tag color="success">Active</Tag>;
-        // } else {
-        //   return <Tag color="red">Blocked</Tag>;
-        // }
-      },
-      // sorter: (a, b) => antdTableSorter(a, b, "jdate"),
-    },
+
     {
       title: "Actions",
       dataIndex: "actions",
@@ -106,29 +84,10 @@ function Users(props) {
     },
   ];
 
-  const exportTableData = (users) => {
-    let arr = [];
-    // console.log(users);
-    users.map((item) => {
-      arr.push({
-        username: item.username,
-        email: item.email,
-        first_name: item.first_name,
-        last_name: item.last_name,
-        state_name: item.state.state_name,
-        city_name: item.city.city_name,
-        Date_of_birth: item.Date_of_birth,
-        aadhar_no: item.aadhar_no,
-        phone_no: item.phone_no,
-      });
-    });
-    return arr.flatMap((item) => item);
-  };
-
   const fetchData = (api) => {
     setLoad(true);
     axios
-      .get(api, {
+      .get(`${process.env.REACT_APP_BASE_URL}/api/UserContactsGet`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
       })
       .then((res) => {
@@ -143,18 +102,18 @@ function Users(props) {
       });
   };
 
-  const search = () => {
-    let api = `${process.env.REACT_APP_BASE_URL}/api/UserAllDetails?search=${searchusername}${searchEmail}${searchArea}${searchphone_no}`;
-    fetchData(api);
-  };
+  // const search = () => {
+  //   let api = `${process.env.REACT_APP_BASE_URL}/api/UserContactsGet?search=${searchusername}${searchEmail}${searchArea}${searchphone_no}`;
+  //   fetchData(api);
+  // };
 
-  const resetSearch = () => {
-    setSearchusername("");
-    setSearchArea("");
-    setSearchEmail("");
-    setSearchphone_no("");
-    fetchData(`${process.env.REACT_APP_BASE_URL}/api/UserAllDetails`);
-  };
+  // const resetSearch = () => {
+  //   setSearchusername("");
+  //   setSearchArea("");
+  //   setSearchEmail("");
+  //   setSearchphone_no("");
+  //   fetchData(`${process.env.REACT_APP_BASE_URL}/api/UserAllDetails`);
+  // };
 
   useEffect(() => {
     fetchData(`${process.env.REACT_APP_BASE_URL}/api/UserAllDetails`);
@@ -168,7 +127,7 @@ function Users(props) {
           padding: 24,
         }}
       >
-        <div className="">
+        {/* <div className="" >
           <Card className="selectElement">
             <div className="search-card">
               <div>
@@ -224,6 +183,7 @@ function Users(props) {
                   prefix={<SearchOutlined />}
                 />
               </div>
+
             </div>
             <br />
             <div
@@ -290,7 +250,7 @@ function Users(props) {
               Export
             </Button>
           </div>
-        </div>
+        </div> */}
         {load && (
           <Spin
             tip="Loading..."
@@ -366,4 +326,4 @@ function Users(props) {
   );
 }
 
-export default Users;
+export default Inquiries;
