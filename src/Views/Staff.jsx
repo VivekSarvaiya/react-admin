@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Tag, message } from "antd";
+import { Pagination, Tag, message } from "antd";
 import { DatePicker } from "antd";
 import {
   Card,
@@ -24,7 +24,7 @@ import { Modal } from "antd";
 import moment from "moment/moment";
 import { AddCircleOutlineOutlined, Block } from "@mui/icons-material";
 import Swal from "sweetalert2";
-import { antdTableSorter, EllipsisDropdown, Flex } from "../Utils/Index";
+import { antdTableSorter, Flex } from "../Utils/Index";
 import axios from "axios";
 import { Excel } from "antd-table-saveas-excel";
 const { confirm } = Modal;
@@ -59,56 +59,13 @@ function Staff() {
   const [searchphone_no, setSearchphone_no] = useState("");
   const [Date_of_birth, setDate_of_birth] = useState();
   const [searchStatus, setSearchStatus] = useState("");
+  const [count, setCount] = useState(0)
 
   const changehandler = (event) => {
     const { name, value } = event.target;
     setAddData({ ...addData, [name]: value || event });
   };
 
-  function showConfirm(row) {
-    console.log(row);
-    Swal.fire({
-      title: `Do you want to Block ${row.name}`,
-      icon: "question",
-      showDenyButton: true,
-      confirmButtonText: "Yes",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire(`${row.name} has been blocked`, "", "success");
-      }
-    });
-  }
-  const dropdownMenu = (row) => (
-    <Menu className="selectElement">
-      <Menu.Item
-        onClick={() => {
-          setOpen1(true);
-          setRow((prev) => (prev = row));
-        }}
-      >
-        <Flex alignItems="center">
-          <EyeOutlined style={{ fontSize: "15px" }} />
-          <span className="mx-2">View Details</span>
-        </Flex>
-      </Menu.Item>
-      <Menu.Item
-        style={{
-          color: "#cf1322",
-          background: "#fff1f0",
-          borderColor: "#ffa39e",
-        }}
-        onClick={() => {
-          showConfirm(row);
-          setRow(row);
-        }}
-      >
-        <Flex alignItems="center">
-          <Block style={{ fontSize: "15px" }} />
-          <span className="mx-2">Block</span>
-        </Flex>
-      </Menu.Item>
-    </Menu>
-  );
   const tableColumns = [
     {
       title: "Username",
@@ -228,6 +185,7 @@ function Staff() {
       })
       .then((res) => {
         console.log(res);
+        count === 0 && setCount(res.data.count)
         setData(res.data.results);
         setLoad(false);
       })
@@ -237,9 +195,30 @@ function Staff() {
         message.error("Something went wrong while fetching data !");
       });
   };
+  const handlePagination = (page) => {
+    setLoad(true);
+    // console.log(api);
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails/?page=${page}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.data.results)
+        setLoad(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Something went wrong while fetching data !");
+        setLoad(false);
+      });
+  };
 
   const submitStaffDetails = (event) => {
-    // console.log({ ...addData, department, Date_of_birth: moment(Date_of_birth).format('YYYY-MM-DD') })
+    setLoad(true)
+    setOpenAdd(false)
     axios
       .post(
         `${process.env.REACT_APP_BASE_URL}/api/StaffCreate/`,
@@ -260,10 +239,12 @@ function Staff() {
         message.success(res.data.success);
         setOpenAdd(false);
         fetchData(`${process.env.REACT_APP_BASE_URL}/api/StaffAllDetails`);
+        setLoad(false)
       })
       .catch((err) => {
         console.log(err);
         message.error("Something went wrong while creating new staff !");
+        setLoad(false)
       });
   };
 
@@ -445,7 +426,8 @@ function Staff() {
             <Flex className="mb-1" mobileFlex={false}></Flex>
           </Flex>
           <div className="table-responsive">
-            <Table columns={tableColumns} dataSource={data} rowKey="id" />
+            <Table columns={tableColumns} dataSource={data} rowKey="id" pagination={false} />
+            <Pagination className="my-4" defaultCurrent={1} total={count} onChange={handlePagination} style={{ float: "right" }} />
           </div>
         </Card>
       </div>

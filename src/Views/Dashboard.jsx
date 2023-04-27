@@ -208,11 +208,11 @@ function Dashboard(props) {
             width="100%"
           /> */}
 
-          <div className="d-flex gap-5 mt-4">
+          {/* <div className="d-flex gap-5 mt-4">
 
             <Donut />
             <Donut2 />
-          </div>
+          </div> */}
         </div>
       </div>
     </>

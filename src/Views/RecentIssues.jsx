@@ -36,8 +36,7 @@ function RecentIssues(props) {
   const [openUserModal, setOpenUserModal] = useState(false);
   const [userView, setUserView] = useState({});
   const [openSolvedIssueView, setOpenSolvedIssue] = useState(false);
-  const [next, setNext] = useState()
-  const [previous, setPrevious] = useState()
+  const [count, setCount] = useState(0)
 
   const tableColumns = [
     {
@@ -156,9 +155,8 @@ function RecentIssues(props) {
       })
       .then((res) => {
         console.log(res);
-        setData(res.data?.results);
-        setNext(res.data?.next)
-        setPrevious(res.data?.previous)
+        count === 0 && setCount(res.data.count)
+        setData(res.data.results)
         setLoad(false);
       })
       .catch((err) => {
@@ -167,6 +165,29 @@ function RecentIssues(props) {
         setLoad(false);
       });
   };
+
+  const handlePagination = (page) => {
+    setLoad(true);
+    // console.log(api);
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/issue/AllIssuesGet/?page=${page}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.data.results)
+        setLoad(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Something went wrong while fetching data !");
+        setLoad(false);
+      });
+  };
+
+
 
   const getStaffList = (id) => {
     console.log(id);
@@ -532,7 +553,7 @@ function RecentIssues(props) {
               pagination={false}
 
             />
-            <Pagination className="my-4" defaultCurrent={6} total={500} />
+            <Pagination className="my-4" defaultCurrent={1} total={count} onChange={handlePagination} style={{ float: "right" }} />
           </div>
         </Card>
       </div>

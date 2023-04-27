@@ -87,7 +87,7 @@ function Inquiries(props) {
   const fetchData = (api) => {
     setLoad(true);
     axios
-      .get(`${process.env.REACT_APP_BASE_URL}/api/UserContactsGet`, {
+      .get(`${process.env.REACT_APP_BASE_URL}/api/contact/`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("TOKEN")}` },
       })
       .then((res) => {
@@ -277,7 +277,7 @@ function Inquiries(props) {
         open={open1}
         onCancel={() => setOpen1(false)}
         footer={null}
-        // width={1000}
+      // width={1000}
       >
         {row !== "" && (
           <Card>

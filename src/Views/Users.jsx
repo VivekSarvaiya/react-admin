@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Tag, message } from "antd";
+import { Pagination, Tag, message } from "antd";
 import { Card, Table, Input, Button, Menu, Form, Spin } from "antd";
 import {
   EyeOutlined,
@@ -25,6 +25,7 @@ function Users(props) {
   const [searchEmail, setSearchEmail] = useState("");
   const [searchphone_no, setSearchphone_no] = useState("");
   const [load, setLoad] = useState(false);
+  const [count, setCount] = useState(0)
 
   function showConfirm(row) {
     console.log(row);
@@ -133,7 +134,28 @@ function Users(props) {
       })
       .then((res) => {
         console.log(res);
+        count === 0 && setCount(res.data.count)
         setData(res.data?.results);
+        setLoad(false);
+      })
+      .catch((err) => {
+        console.log(err);
+        message.error("Something went wrong while fetching data !");
+        setLoad(false);
+      });
+  };
+  const handlePagination = (page) => {
+    setLoad(true);
+    // console.log(api);
+    axios
+      .get(`${process.env.REACT_APP_BASE_URL}/api/issue/UserAllDetails/?page=${page}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("TOKEN")}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setData(res.data.results)
         setLoad(false);
       })
       .catch((err) => {
@@ -307,7 +329,8 @@ function Users(props) {
           </Flex>
 
           <div className="table-responsive ">
-            <Table columns={tableColumns} dataSource={data} rowKey="id" />
+            <Table columns={tableColumns} dataSource={data} rowKey="id" pagination={false} />
+            <Pagination className="my-4" defaultCurrent={1} total={count} onChange={handlePagination} style={{ float: "right" }} />
           </div>
         </Card>
       </div>
@@ -317,7 +340,7 @@ function Users(props) {
         open={open1}
         onCancel={() => setOpen1(false)}
         footer={null}
-        // width={1000}
+      // width={1000}
       >
         {row !== "" && (
           <Card>
